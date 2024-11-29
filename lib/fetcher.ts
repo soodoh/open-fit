@@ -3,8 +3,10 @@ type FetchArgs = {
   accessToken?: string;
 };
 
+const BASE_URL = "https://wger.pauld.link/api/v2";
+
 export const fetcher = async ({ url, accessToken }: FetchArgs) => {
-  const response = await fetch(url, {
+  const response = await fetch(BASE_URL + url, {
     headers: {
       "Content-Type": "application/json",
       ...(accessToken && { Authorization: `Bearer ${accessToken}` }),

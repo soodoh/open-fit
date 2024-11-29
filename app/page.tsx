@@ -14,7 +14,7 @@ export default function Home() {
   const [refreshToken, setRefreshToken] = useState("");
 
   const { data } = useSWR(
-    accessToken ? { url: `${BASE_URL}/workoutlog`, accessToken } : null,
+    accessToken ? { url: `/workoutlog`, accessToken } : null,
     fetcher,
   );
   console.log(data);
