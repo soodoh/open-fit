@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import { CssBaseline } from "@mui/material";
 import "./globals.css";
+import { AuthWrapper } from "@/lib/Authentication";
 
 export const metadata: Metadata = {
   title: "Create Next App",
