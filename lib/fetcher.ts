@@ -1,3 +1,5 @@
+"use client";
+
 type FetchArgs = {
   url: string | null;
   accessToken?: string;

@@ -1,13 +1,13 @@
 "use client";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
-import { fetcher } from "./fetcher";
+import { fetcher } from "@/lib/fetcher";
 import { useRouter } from "next/navigation";
-import { useRefreshToken } from "./useRefreshToken";
-import { ACCESS_TOKEN_KEY } from "./constants";
+import { useRefreshToken } from "@/lib/useRefreshToken";
+import { ACCESS_TOKEN_KEY } from "@/lib/constants";
 
 function useToken() {
-  const currentToken = localStorage.getItem(ACCESS_TOKEN_KEY);
+  const currentToken = localStorage?.getItem(ACCESS_TOKEN_KEY);
   const [accessToken, setAccessToken] = useState<string | null>(currentToken);
 
   useEffect(() => {

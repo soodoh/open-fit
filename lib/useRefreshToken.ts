@@ -1,12 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
-import { fetcher } from "./fetcher";
+import { fetcher } from "@/lib/fetcher";
 import { useRouter } from "next/navigation";
-import { REFRESH_TOKEN_KEY } from "./constants";
+import { REFRESH_TOKEN_KEY } from "@/lib/constants";
 
 function useToken() {
-  const currentToken = localStorage.getItem(REFRESH_TOKEN_KEY);
+  const currentToken = localStorage?.getItem(REFRESH_TOKEN_KEY);
   const [refreshToken, setRefreshToken] = useState<string | null>(currentToken);
 
   useEffect(() => {
