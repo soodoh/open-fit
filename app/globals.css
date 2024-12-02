@@ -1,20 +1,30 @@
 :root {
-  /* --background: #ffffff; */
-  /* --foreground: #171717; */
+  /* Colors */
+  --space-cadet: #22223b;
+  --ultra-violet: #4a4e69;
+  --rose-quartz: #9a8c98;
+  --pale-dogwood: #c9ada7;
+  --isabelline: #f2e9e4;
+  /* Defaults */
+  --background: var(--isabelline);
+  --foreground: var(--space-cadet);
+  --max-width: 1320px;
 }
 
-/* @media (prefers-color-scheme: dark) { */
-/*   :root { */
-/*     --background: #0a0a0a; */
-/*     --foreground: #ededed; */
-/*   } */
-/* } */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* --background: var(--rose-quartz); */
+    /* --foreground: var(--isabelline); */
+  }
+}
 
 html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
   min-height: 100vh;
+  background-color: var(--background);
+  color: var(--foreground);
 }
 
 body {

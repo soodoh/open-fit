@@ -1,0 +1,22 @@
+.header {
+  background-color: var(--space-cadet);
+  color: var(--isabelline);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.5rem 1rem;
+}
+
+.content {
+  max-width: var(--max-width);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}

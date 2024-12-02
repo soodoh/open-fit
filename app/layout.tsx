@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import { CssBaseline } from "@mui/material";
 import "./globals.css";
+import styles from "./layout.module.css";
+import { Header } from "@/components/Header";
+import { ThemeClient } from "@/components/ThemeClient";
 
 export const metadata: Metadata = {
   title: "Wger",
@@ -23,7 +26,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <CssBaseline />
-      <body className={roboto.className}>{children}</body>
+      <body className={(roboto.className, styles.body)}>
+        <ThemeClient>
+          <Header />
+          <main className={styles.main}>{children}</main>
+        </ThemeClient>
+      </body>
     </html>
   );
 }
