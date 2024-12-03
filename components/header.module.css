@@ -4,10 +4,10 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 0.5rem 1rem;
 }
 
 .content {
+  margin: 1rem 2rem;
   max-width: var(--max-width);
   width: 100%;
   display: flex;

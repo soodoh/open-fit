@@ -9,6 +9,11 @@
   --background: var(--isabelline);
   --foreground: var(--space-cadet);
   --max-width: 1320px;
+  /* Mui Theme */
+  --mui-palette-primary-main: var(--space-cadet);
+  --mui-palette-primary-light: var(--ultra-violet);
+  --mui-palette-primary-dark: var(--space-cadet);
+  --mui-palette-primary-contrast-text: var(--isabelline);
 }
 
 @media (prefers-color-scheme: dark) {

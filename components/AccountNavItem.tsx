@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { useState, type MouseEvent } from "react";
 import { Logout, Settings, AccountCircle } from "@mui/icons-material";
-import styles from "./AccountNavItem.module.css";
+import styles from "./accountNavItem.module.css";
 
 export const AccountNavItem = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -26,13 +26,14 @@ export const AccountNavItem = () => {
   };
 
   return (
-    <>
+    <div className={styles.container}>
       <Button
         id="account-button"
         aria-controls={open ? "profile-menu" : undefined}
         aria-haspopup="true"
         aria-expanded={open ? "true" : undefined}
         onClick={handleClick}
+        sx={{ color: "inherit" }}
       >
         Account &nbsp;
         <AccountCircle />
@@ -45,6 +46,9 @@ export const AccountNavItem = () => {
         MenuListProps={{
           "aria-labelledby": "account-button",
         }}
+        transformOrigin={{ horizontal: "right", vertical: "top" }}
+        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+        disableScrollLock
       >
         <MenuItem onClick={handleClose}>
           <ListItemIcon>
@@ -59,6 +63,6 @@ export const AccountNavItem = () => {
           <ListItemText>Logout</ListItemText>
         </MenuItem>
       </Menu>
-    </>
+    </div>
   );
 };

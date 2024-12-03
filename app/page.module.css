@@ -1,6 +1,7 @@
 .page {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  max-width: var(--max-width);
+  width: 100%;
+  margin: 1rem 2rem;
 }

@@ -4,11 +4,11 @@ import { type ReactNode } from "react";
 
 export const ThemeClient = ({ children }: { children: ReactNode }) => {
   const theme = createTheme({
+    cssVariables: true,
     components: {
       MuiButton: {
         styleOverrides: {
           root: {
-            color: "inherit",
             textTransform: "none",
           },
         },

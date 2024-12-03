@@ -1,11 +1,12 @@
 "use client";
-import styles from "./page.module.css";
+import styles from "./login.module.css";
 import { Button, TextField } from "@mui/material";
 import { type FormEvent, useState } from "react";
 import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from "@/lib/constants";
 
 import { z } from "zod";
 import { fetcher } from "@/lib/fetcher";
+import { useRouter } from "next/navigation";
 
 const LoginFormSchema = z.object({
   username: z
@@ -28,6 +29,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [pending, setPending] = useState(false);
   const [showErrors, setShowErrors] = useState(false);
+  const router = useRouter();
   // Form validation
   const validatedFields = LoginFormSchema.safeParse({
     username,
@@ -52,10 +54,10 @@ export default function LoginPage() {
         }),
       },
     });
-    console.log(data);
     setPending(false);
     localStorage.setItem(ACCESS_TOKEN_KEY, data.access);
     localStorage.setItem(REFRESH_TOKEN_KEY, data.refresh);
+    router.push("/");
   };
 
   return (
