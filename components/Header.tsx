@@ -10,7 +10,13 @@ export const Header = () => {
       <div className={styles.content}>
         <nav className={styles.nav}>
           <Link href="/">
-            <Image src="/logo-bg-white.png" alt="logo" width={40} height={40} />
+            <Image
+              src="/logo-bg-white.png"
+              alt="logo"
+              priority
+              width={40}
+              height={40}
+            />
           </Link>
           <Link href="/routines">Routines</Link>
           <Link href="/exercises">Exercises</Link>

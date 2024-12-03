@@ -13,6 +13,23 @@ type ExtendedExercise = Exercise & {
   notes: string[];
 };
 
+type Image = {
+  id: number;
+  uuid: string;
+  style: string;
+  exercise_base: number;
+  exercise_base_uuid: string;
+  image: string;
+  is_main: boolean;
+  author_history: string[];
+  license: number;
+  license_author: string;
+  license_author_url: string;
+  license_derivative_source_url: string;
+  license_object_url: string;
+  license_title: string;
+};
+
 export type ExerciseBaseInfo = {
   author_history: string[];
   category: ExerciseCategory;
@@ -20,7 +37,7 @@ export type ExerciseBaseInfo = {
   equipment: Equipment[];
   exercises: ExtendedExercise[];
   id: number;
-  images: string[];
+  images: Image[];
   last_update: string;
   last_update_global: string;
   license: License;

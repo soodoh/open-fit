@@ -44,7 +44,6 @@ export function useAccessToken() {
         body: JSON.stringify({ refresh: refreshToken }),
       },
     }).then((data) => {
-      console.log("received refresh data", data);
       localStorage.setItem(ACCESS_TOKEN_KEY, data.access);
     });
   }, [accessToken, error, isLoading, refreshToken]);

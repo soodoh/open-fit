@@ -1,4 +1,4 @@
-export type WorkoutSet = {
+export type WorkoutSetType = {
   id: number;
   exerciseday: number;
   sets: number;

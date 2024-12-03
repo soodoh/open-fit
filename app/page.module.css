@@ -3,5 +3,6 @@
   flex-direction: column;
   max-width: var(--max-width);
   width: 100%;
-  margin: 1rem 2rem;
+  margin: 2rem;
+  gap: 2rem;
 }
