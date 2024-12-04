@@ -1,14 +1,9 @@
 "use client";
 import { useAccessToken } from "@/lib/useAccessToken";
 
-type FetchArgs = {
-  url: string | null;
-  opts?: RequestInit;
-};
-
 const BASE_URL = "https://wger.pauld.link/api/v2";
 
-export const fetcher = async ({ url, opts }: FetchArgs) => {
+export const fetcher = async (url: string | null, opts?: RequestInit) => {
   if (!url) {
     return null;
   }
@@ -28,13 +23,10 @@ export const fetcher = async ({ url, opts }: FetchArgs) => {
 
 export const useAuthFetcher = () => {
   const accessToken = useAccessToken();
-  return (url: string) =>
-    fetcher({
-      url,
-      opts: {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
+  return (url: string | null) =>
+    fetcher(url, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
       },
     });
 };

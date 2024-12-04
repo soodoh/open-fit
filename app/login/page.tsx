@@ -44,15 +44,12 @@ export default function LoginPage() {
       return;
     }
     setPending(true);
-    const data = await fetcher({
-      url: "/token",
-      opts: {
-        method: "POST",
-        body: JSON.stringify({
-          username,
-          password,
-        }),
-      },
+    const data = await fetcher("/token", {
+      method: "POST",
+      body: JSON.stringify({
+        username,
+        password,
+      }),
     });
     setPending(false);
     localStorage.setItem(ACCESS_TOKEN_KEY, data.access);

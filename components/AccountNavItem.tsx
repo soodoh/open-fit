@@ -13,12 +13,15 @@ import styles from "./accountNavItem.module.css";
 export const AccountNavItem = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
+
   const logout = () => {
     localStorage.removeItem(ACCESS_TOKEN_KEY);
     localStorage.removeItem(REFRESH_TOKEN_KEY);
@@ -35,7 +38,6 @@ export const AccountNavItem = () => {
         onClick={handleClick}
         sx={{ color: "inherit" }}
       >
-        Account &nbsp;
         <AccountCircle />
       </Button>
       <Menu

@@ -5,22 +5,15 @@ import type { PaginatedResponse } from "@/types/response";
 import type { WorkoutSetType } from "@/types/privateApi/set";
 import {
   Avatar,
-  Collapse,
-  List,
   ListItem,
   ListItemAvatar,
   ListItemButton,
   ListItemText,
 } from "@mui/material";
-import {
-  Error,
-  ExpandLess,
-  ExpandMore,
-  Image as ImageIcon,
-} from "@mui/icons-material";
+import { Error, Image as ImageIcon } from "@mui/icons-material";
 import { ExerciseBaseInfo } from "@/types/publicApi/exerciseBaseInfo";
-import { useState } from "react";
 import { WorkoutSetting } from "./WorkoutSetting";
+import styles from "./workoutSet.module.css";
 
 export const WorkoutSet = ({ set }: { set: WorkoutSetType }) => {
   const { data: setting, isLoading: settingLoading } = useSWR<
@@ -39,8 +32,6 @@ export const WorkoutSet = ({ set }: { set: WorkoutSetType }) => {
   const exercise = exerciseBaseInfo?.exercises.find(
     (exercise) => exercise.language === 2,
   );
-
-  const [open, setOpen] = useState(false);
 
   if (isLoading) {
     return null;
@@ -61,7 +52,7 @@ export const WorkoutSet = ({ set }: { set: WorkoutSetType }) => {
 
   return (
     <>
-      <ListItemButton onClick={() => setOpen(!open)}>
+      <ListItemButton>
         <ListItemAvatar>
           {imageUrl ? (
             <Avatar alt={`${exercise.name} set item`} src={imageUrl} />
@@ -73,20 +64,30 @@ export const WorkoutSet = ({ set }: { set: WorkoutSetType }) => {
         </ListItemAvatar>
         <ListItemText
           primary={exercise.name}
-          secondary={`${set.sets} total sets`}
+          secondary={
+            <span className={styles.setInfo}>
+              <span>{setting.count} sets</span>
+              {setting.results.map((currentSet) => (
+                <WorkoutSetting
+                  key={`set-${set.id}-day-${set.exerciseday}-exercise-${exercise.uuid}-${currentSet.id}`}
+                  setting={currentSet}
+                />
+              ))}
+            </span>
+          }
         />
-        {open ? <ExpandLess /> : <ExpandMore />}
       </ListItemButton>
-      <Collapse in={open} timeout="auto">
-        <List component="div" disablePadding>
-          {setting.results.map((currentSet) => (
-            <WorkoutSetting
-              key={`set-${set.id}-day-${set.exerciseday}-exercise-${exercise.uuid}-${currentSet.id}`}
-              setting={currentSet}
-            />
-          ))}
-        </List>
-      </Collapse>
     </>
   );
 };
+// {open ? <ExpandLess /> : <ExpandMore />}
+// <Collapse in={open} timeout="auto">
+//   <List component="div" disablePadding>
+//     {setting.results.map((currentSet) => (
+//       <WorkoutSetting
+//         key={`set-${set.id}-day-${set.exerciseday}-exercise-${exercise.uuid}-${currentSet.id}`}
+//         setting={currentSet}
+//       />
+//     ))}
+//   </List>
+// </Collapse>

@@ -7,6 +7,7 @@ import { Accordion, AccordionSummary, List } from "@mui/material";
 import moment from "moment";
 import styles from "./workoutDay.module.css";
 import { WorkoutSet as WorkoutSet } from "./WorkoutSet";
+import { ExpandMore } from "@mui/icons-material";
 
 export const WorkoutDay = ({ day }: { day: Day }) => {
   const { data: workoutSet } = useSWR<PaginatedResponse<WorkoutSetType>>(
@@ -16,7 +17,11 @@ export const WorkoutDay = ({ day }: { day: Day }) => {
 
   return (
     <Accordion>
-      <AccordionSummary>
+      <AccordionSummary
+        expandIcon={<ExpandMore />}
+        aria-controls={`workout-day-${day.id}-content`}
+        id={`workout-day-${day.id}-header`}
+      >
         <div>
           <h4>{day.description}</h4>
           <span className={styles.weekdays}>

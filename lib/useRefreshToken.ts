@@ -19,15 +19,11 @@ function useToken() {
 export function useRefreshToken() {
   const refreshToken = useToken();
   const router = useRouter();
-  const { error, isLoading } = useSWR(
-    {
-      url: refreshToken && "/token/verify",
-      opts: {
-        method: "POST",
-        body: JSON.stringify({ token: refreshToken }),
-      },
-    },
-    fetcher,
+  const { error, isLoading } = useSWR(refreshToken, (token) =>
+    fetcher("/token/verify", {
+      method: "POST",
+      body: JSON.stringify({ token }),
+    }),
   );
 
   useEffect(() => {

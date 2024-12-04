@@ -1,13 +1,31 @@
 import useSWR from "swr";
-import { useAuthFetcher } from "@/lib/fetcher";
 import type { Setting } from "@/types/privateApi/setting";
-import { ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
+import { Chip } from "@mui/material";
+import { fetcher } from "@/lib/fetcher";
+import { WeightUnit } from "@/types/publicApi/weightUnit";
 
-export const WorkoutSetting = ({ setting }: { setting: Setting }) => {
+export const WorkoutSetting = ({
+  setting: { repetition_unit, weight_unit, reps, weight },
+}: {
+  setting: Setting;
+}) => {
+  // const { data: repetitionUnit } = useSWR<RepetitionUnit>(
+  //   repetition_unit ? `/setting-repetitionunit/${repetition_unit}` : null,
+  //   fetcher,
+  // );
+  const { data: weightUnit } = useSWR<WeightUnit>(
+    weight_unit ? `/setting-weightunit/${weight_unit}` : null,
+    fetcher,
+  );
+
+  const weightLabel =
+    (weight ? parseFloat(weight) + " " : "") + (weightUnit?.name ?? "");
   return (
-    <ListItemButton sx={{ pl: 4 }}>
-      <ListItemIcon>test</ListItemIcon>
-      <ListItemText primary={setting.reps} />
-    </ListItemButton>
+    <Chip
+      component="span"
+      label={`${reps} x ${weightLabel}`}
+      size="small"
+      variant="filled"
+    />
   );
 };

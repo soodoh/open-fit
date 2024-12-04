@@ -11,6 +11,7 @@ export const WorkoutRoutine = ({ workout }: { workout: Workout }) => {
     `/day?training=${workout.id}`,
     useAuthFetcher(),
   );
+
   return (
     <Card>
       <CardHeader title={workout.name} subheader={workout.description} />
