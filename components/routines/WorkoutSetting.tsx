@@ -1,25 +1,27 @@
 import useSWR from "swr";
 import type { Setting } from "@/types/privateApi/setting";
 import { Chip } from "@mui/material";
-import { fetcher } from "@/lib/fetcher";
+import { fetcher, useAuthFetcher } from "@/lib/fetcher";
 import { WeightUnit } from "@/types/publicApi/weightUnit";
 
-export const WorkoutSetting = ({
-  setting: { weight_unit, reps, weight },
-}: {
-  setting: Setting;
-}) => {
+export const WorkoutSetting = ({ settingId }: { settingId: number }) => {
+  const authFetcher = useAuthFetcher();
+  const { data: setting } = useSWR<Setting>(
+    `/setting/${settingId}`,
+    authFetcher,
+  );
   const { data: weightUnit } = useSWR<WeightUnit>(
-    weight_unit ? `/setting-weightunit/${weight_unit}` : null,
+    setting?.weight_unit ? `/setting-weightunit/${setting.weight_unit}` : null,
     fetcher,
   );
 
   const weightLabel =
-    (weight ? parseFloat(weight) + " " : "") + (weightUnit?.name ?? "");
+    (setting?.weight ? parseFloat(setting?.weight) + " " : "") +
+    (weightUnit?.name ?? "");
   return (
     <Chip
       component="span"
-      label={`${reps} x ${weightLabel}`}
+      label={`${setting?.reps} x ${weightLabel}`}
       size="small"
       variant="filled"
     />

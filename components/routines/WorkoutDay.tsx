@@ -15,17 +15,24 @@ import styles from "@/styles/workoutDay.module.css";
 import { Weekday } from "./Weekday";
 
 export const WorkoutDay = ({
-  day,
+  dayId,
+  // workoutId,
   namespace,
 }: {
-  day: Day;
+  dayId: number;
+  workoutId: number;
   namespace: string;
 }) => {
+  const authFetcher = useAuthFetcher();
+  const { data: day } = useSWR<Day>(`/day/${dayId}`, authFetcher);
   const { data: workoutSet } = useSWR<PaginatedResponse<WorkoutSetType>>(
-    `/set?exerciseday=${day.id}`,
-    useAuthFetcher(),
+    `/set?exerciseday=${dayId}`,
+    authFetcher,
   );
 
+  if (!day) {
+    return null;
+  }
   return (
     <Accordion>
       <AccordionSummary
@@ -51,7 +58,12 @@ export const WorkoutDay = ({
         {workoutSet?.results.map((set) => {
           const setNamespace = `${namespace}-set-${set.id}`;
           return (
-            <WorkoutSet key={setNamespace} namespace={setNamespace} set={set} />
+            <WorkoutSet
+              key={setNamespace}
+              namespace={setNamespace}
+              dayId={dayId}
+              setId={set.id}
+            />
           );
         })}
       </List>

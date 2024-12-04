@@ -18,25 +18,33 @@ import { DeleteRoutineModal } from "./DeleteRoutineModal";
 import { useState } from "react";
 
 export const WorkoutRoutine = ({
-  workout,
+  workoutId,
   onEdit,
 }: {
-  workout: Workout;
+  workoutId: number;
   onEdit: () => void;
 }) => {
+  const authFetcher = useAuthFetcher();
+  const { data: workout } = useSWR<Workout>(
+    `/workout/${workoutId}`,
+    authFetcher,
+  );
   const { data: workoutDay } = useSWR<PaginatedResponse<Day>>(
-    `/day?training=${workout.id}`,
-    useAuthFetcher(),
+    `/day?training=${workoutId}`,
+    authFetcher,
   );
   const [showDeleteModal, setDeleteModal] = useState(false);
-  const namespace = `workout-${workout.id}`;
+  const namespace = `workout-${workoutId}`;
 
+  if (!workout) {
+    return null;
+  }
   return (
     <>
       <DeleteRoutineModal
         open={showDeleteModal}
         onClose={() => setDeleteModal(false)}
-        workoutId={workout.id}
+        workoutId={workoutId}
       />
       <Card>
         <CardHeader
@@ -78,7 +86,8 @@ export const WorkoutRoutine = ({
                 <WorkoutDay
                   key={dayNamespace}
                   namespace={dayNamespace}
-                  day={workoutDay}
+                  workoutId={workoutId}
+                  dayId={workoutDay.id}
                 />
               );
             })}

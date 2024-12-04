@@ -15,25 +15,28 @@ import styles from "@/styles/routinePage.module.css";
 
 export const EditRoutineModal = ({
   open,
-  routine,
+  workoutId,
   onClose,
 }: {
   open: boolean;
-  routine: Workout | null;
+  workoutId: number | null;
   onClose: () => void;
 }) => {
   const authFetcher = useAuthFetcher();
-  const { data: workouts, mutate } = useSWR<PaginatedResponse<Workout>>(
-    "/workout",
+  const { data: workouts, mutate: mutateResults } = useSWR<
+    PaginatedResponse<Workout>
+  >("/workout", authFetcher);
+  const { data: workout, mutate } = useSWR<Workout>(
+    Number.isInteger(workoutId) ? `/workout/${workoutId}` : null,
     authFetcher,
   );
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
 
   useEffect(() => {
-    setName(routine?.name ?? "");
-    setDescription(routine?.description ?? "");
-  }, [routine]);
+    setName(workout?.name ?? "");
+    setDescription(workout?.description ?? "");
+  }, [workout]);
 
   return (
     <Dialog
@@ -44,9 +47,9 @@ export const EditRoutineModal = ({
         onSubmit: async (event: React.FormEvent<HTMLFormElement>) => {
           event.preventDefault();
           const data = await authFetcher(
-            routine?.id ? `/workout/${routine.id}` : "/workout/",
+            workoutId ? `/workout/${workoutId}` : "/workout/",
             {
-              method: routine?.id ? "PUT" : "POST",
+              method: workoutId ? "PUT" : "POST",
               body: JSON.stringify({
                 name,
                 description,
@@ -58,26 +61,19 @@ export const EditRoutineModal = ({
             return;
           }
 
-          const optimisticUpdate = {
-            ...workouts,
-            results: [...workouts.results],
-          };
-          if (!routine?.id) {
-            optimisticUpdate.count += 1;
-            optimisticUpdate.results.unshift(data);
+          if (!workoutId) {
+            mutateResults({
+              ...workouts,
+              count: workouts.count + 1,
+              results: [data, ...workouts.results],
+            });
           } else {
-            const index = optimisticUpdate.results.findIndex(
-              (workout) => workout.id === routine?.id,
-            );
-            if (index > -1) {
-              optimisticUpdate.results[index] = data;
-            }
+            mutate(data);
           }
-          mutate(optimisticUpdate);
         },
       }}
     >
-      <DialogTitle>{routine ? "Edit Routine" : "New Routine"}</DialogTitle>
+      <DialogTitle>{workoutId ? "Edit Routine" : "New Routine"}</DialogTitle>
       <DialogContent className={styles.editRoutine}>
         <TextField
           autoFocus

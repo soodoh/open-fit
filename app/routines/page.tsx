@@ -17,7 +17,7 @@ export default function Routines() {
     useAuthFetcher(),
   );
   const [showEditModal, setEditModal] = useState(false);
-  const [routine, setRoutine] = useState<Workout | null>(null);
+  const [workoutId, setWorkoutId] = useState<number | null>(null);
 
   return (
     <div className={sharedStyles.page}>
@@ -27,7 +27,7 @@ export default function Routines() {
           color="primary"
           variant="extended"
           onClick={() => {
-            setRoutine(null);
+            setWorkoutId(null);
             setEditModal(true);
           }}
         >
@@ -39,15 +39,15 @@ export default function Routines() {
       <EditRoutineModal
         open={showEditModal}
         onClose={() => setEditModal(false)}
-        routine={routine}
+        workoutId={workoutId}
       />
 
       {workouts?.results.map((workout) => (
         <WorkoutRoutine
           key={`routine-${workout.id}`}
-          workout={workout}
+          workoutId={workout.id}
           onEdit={() => {
-            setRoutine(workout);
+            setWorkoutId(workout.id);
             setEditModal(true);
           }}
         />

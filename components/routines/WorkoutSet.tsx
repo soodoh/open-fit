@@ -17,15 +17,17 @@ import { WorkoutSetting } from "./WorkoutSetting";
 import styles from "@/styles/workoutSet.module.css";
 
 export const WorkoutSet = ({
-  set,
+  setId,
   namespace,
 }: {
-  set: WorkoutSetType;
+  dayId: number;
+  setId: number;
   namespace: string;
 }) => {
+  const authFetcher = useAuthFetcher();
   const { data: setting, isLoading: settingLoading } = useSWR<
     PaginatedResponse<Setting>
-  >(`/setting?set=${set.id}`, useAuthFetcher());
+  >(`/setting?set=${setId}`, authFetcher);
 
   const exerciseBaseId = setting?.results[0]?.exercise_base;
   const { data: exerciseBaseInfo, isLoading: exerciseLoading } =
@@ -89,7 +91,7 @@ export const WorkoutSet = ({
               {setting.results.map((currentSet) => (
                 <WorkoutSetting
                   key={`${namespace}-setting-${currentSet.id}`}
-                  setting={currentSet}
+                  settingId={currentSet.id}
                 />
               ))}
             </span>
