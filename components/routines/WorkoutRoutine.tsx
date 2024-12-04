@@ -11,17 +11,22 @@ export const WorkoutRoutine = ({ workout }: { workout: Workout }) => {
     `/day?training=${workout.id}`,
     useAuthFetcher(),
   );
+  const namespace = `workout-${workout.id}`;
 
   return (
     <Card>
       <CardHeader title={workout.name} subheader={workout.description} />
       <CardContent>
-        {workoutDay?.results.map((workoutDay) => (
-          <WorkoutDay
-            key={`routine-${workout.id}-day-${workoutDay.id}`}
-            day={workoutDay}
-          />
-        ))}
+        {workoutDay?.results.map((workoutDay) => {
+          const dayNamespace = `${namespace}-day-${workoutDay.id}`;
+          return (
+            <WorkoutDay
+              key={dayNamespace}
+              namespace={dayNamespace}
+              day={workoutDay}
+            />
+          );
+        })}
       </CardContent>
     </Card>
   );

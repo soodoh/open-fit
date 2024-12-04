@@ -5,14 +5,10 @@ import { fetcher } from "@/lib/fetcher";
 import { WeightUnit } from "@/types/publicApi/weightUnit";
 
 export const WorkoutSetting = ({
-  setting: { repetition_unit, weight_unit, reps, weight },
+  setting: { weight_unit, reps, weight },
 }: {
   setting: Setting;
 }) => {
-  // const { data: repetitionUnit } = useSWR<RepetitionUnit>(
-  //   repetition_unit ? `/setting-repetitionunit/${repetition_unit}` : null,
-  //   fetcher,
-  // );
   const { data: weightUnit } = useSWR<WeightUnit>(
     weight_unit ? `/setting-weightunit/${weight_unit}` : null,
     fetcher,

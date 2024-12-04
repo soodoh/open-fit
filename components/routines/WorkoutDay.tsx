@@ -9,26 +9,31 @@ import { ExpandMore } from "@mui/icons-material";
 import styles from "@/styles/workoutDay.module.css";
 import { Weekday } from "./Weekday";
 
-export const WorkoutDay = ({ day }: { day: Day }) => {
+export const WorkoutDay = ({
+  day,
+  namespace,
+}: {
+  day: Day;
+  namespace: string;
+}) => {
   const { data: workoutSet } = useSWR<PaginatedResponse<WorkoutSetType>>(
     `/set?exerciseday=${day.id}`,
     useAuthFetcher(),
   );
-  console.log(day);
 
   return (
     <Accordion>
       <AccordionSummary
         expandIcon={<ExpandMore />}
-        aria-controls={`workout-day-${day.id}-content`}
-        id={`workout-day-${day.id}-header`}
+        aria-controls={`${namespace}-content`}
+        id={`${namespace}-header`}
       >
         <div>
           <h4>{day.description}</h4>
           <span className={styles.weekdays}>
             {day.day.map((weekday, index) => (
               <Weekday
-                key={`workoutDay-${day.id}-weekday-${weekday}`}
+                key={`${namespace}-weekday-${weekday}`}
                 weekday={weekday}
                 isLast={index + 1 >= day.day.length}
               />
@@ -37,9 +42,12 @@ export const WorkoutDay = ({ day }: { day: Day }) => {
         </div>
       </AccordionSummary>
       <List>
-        {workoutSet?.results.map((set) => (
-          <WorkoutSet key={`day-${day.id}-set-${set.id}`} set={set} />
-        ))}
+        {workoutSet?.results.map((set) => {
+          const setNamespace = `${namespace}-set-${set.id}`;
+          return (
+            <WorkoutSet key={setNamespace} namespace={setNamespace} set={set} />
+          );
+        })}
       </List>
     </Accordion>
   );
