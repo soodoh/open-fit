@@ -1,3 +1,4 @@
+import useSWR from "swr";
 import { Workout } from "@/types/privateApi/workout";
 import {
   Button,
@@ -8,19 +9,24 @@ import {
   TextField,
 } from "@mui/material";
 import { useEffect, useState } from "react";
+import { PaginatedResponse } from "@/types/response";
+import { useAuthFetcher } from "@/lib/fetcher";
 import styles from "@/styles/routinePage.module.css";
 
 export const EditRoutineModal = ({
   open,
   routine,
-  saveRoutine,
   onClose,
 }: {
   open: boolean;
   routine: Workout | null;
-  saveRoutine: (input: Pick<Workout, "name" | "description">) => Promise<void>;
   onClose: () => void;
 }) => {
+  const authFetcher = useAuthFetcher();
+  const { data: workouts, mutate } = useSWR<PaginatedResponse<Workout>>(
+    "/workout",
+    authFetcher,
+  );
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
 
@@ -35,9 +41,39 @@ export const EditRoutineModal = ({
       onClose={onClose}
       PaperProps={{
         component: "form",
-        onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
+        onSubmit: async (event: React.FormEvent<HTMLFormElement>) => {
           event.preventDefault();
-          saveRoutine({ name, description });
+          const data = await authFetcher(
+            routine?.id ? `/workout/${routine.id}` : "/workout/",
+            {
+              method: routine?.id ? "PUT" : "POST",
+              body: JSON.stringify({
+                name,
+                description,
+              }),
+            },
+          );
+          onClose();
+          if (!workouts) {
+            return;
+          }
+
+          const optimisticUpdate = {
+            ...workouts,
+            results: [...workouts.results],
+          };
+          if (!routine?.id) {
+            optimisticUpdate.count += 1;
+            optimisticUpdate.results.unshift(data);
+          } else {
+            const index = optimisticUpdate.results.findIndex(
+              (workout) => workout.id === routine?.id,
+            );
+            if (index > -1) {
+              optimisticUpdate.results[index] = data;
+            }
+          }
+          mutate(optimisticUpdate);
         },
       }}
     >

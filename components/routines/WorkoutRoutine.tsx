@@ -20,11 +20,9 @@ import { useState } from "react";
 export const WorkoutRoutine = ({
   workout,
   onEdit,
-  deleteRoutine,
 }: {
   workout: Workout;
   onEdit: () => void;
-  deleteRoutine: (id: number) => Promise<void>;
 }) => {
   const { data: workoutDay } = useSWR<PaginatedResponse<Day>>(
     `/day?training=${workout.id}`,
@@ -38,7 +36,7 @@ export const WorkoutRoutine = ({
       <DeleteRoutineModal
         open={showDeleteModal}
         onClose={() => setDeleteModal(false)}
-        deleteRoutine={() => deleteRoutine(workout.id)}
+        workoutId={workout.id}
       />
       <Card>
         <CardHeader

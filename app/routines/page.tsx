@@ -12,65 +12,12 @@ import { useState } from "react";
 import { EditRoutineModal } from "@/components/routines/EditRoutineModal";
 
 export default function Routines() {
-  const { data: workouts, mutate } = useSWR<PaginatedResponse<Workout>>(
+  const { data: workouts } = useSWR<PaginatedResponse<Workout>>(
     "/workout",
     useAuthFetcher(),
   );
   const [showEditModal, setEditModal] = useState(false);
   const [routine, setRoutine] = useState<Workout | null>(null);
-  const authFetcher = useAuthFetcher();
-
-  const saveRoutine = async ({
-    name,
-    description,
-  }: Pick<Workout, "name" | "description">) => {
-    const data = await authFetcher(
-      routine?.id ? `/workout/${routine.id}` : "/workout/",
-      {
-        method: routine?.id ? "PUT" : "POST",
-        body: JSON.stringify({
-          name,
-          description,
-        }),
-      },
-    );
-    setEditModal(false);
-    if (!workouts) {
-      return;
-    }
-
-    const optimisticUpdate = {
-      ...workouts,
-      results: [...workouts.results],
-    };
-    if (!routine?.id) {
-      optimisticUpdate.count += 1;
-      optimisticUpdate.results.unshift(data);
-    } else {
-      const index = optimisticUpdate.results.findIndex(
-        (workout) => workout.id === routine?.id,
-      );
-      if (index > -1) {
-        optimisticUpdate.results[index] = data;
-      }
-    }
-    mutate(optimisticUpdate);
-  };
-
-  const deleteRoutine = async (id: number) => {
-    authFetcher(`/workout/${id}/`, {
-      method: "DELETE",
-    });
-    if (!workouts) {
-      return;
-    }
-    const optimisticUpdate = {
-      ...workouts,
-      count: workouts.count - 1,
-      results: workouts.results.filter((workout) => workout.id === id),
-    };
-    mutate(optimisticUpdate);
-  };
 
   return (
     <div className={sharedStyles.page}>
@@ -92,7 +39,6 @@ export default function Routines() {
       <EditRoutineModal
         open={showEditModal}
         onClose={() => setEditModal(false)}
-        saveRoutine={saveRoutine}
         routine={routine}
       />
 
@@ -104,7 +50,6 @@ export default function Routines() {
             setRoutine(workout);
             setEditModal(true);
           }}
-          deleteRoutine={deleteRoutine}
         />
       ))}
     </div>

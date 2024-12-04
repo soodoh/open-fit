@@ -1,3 +1,6 @@
+import useSWR from "swr";
+import { Workout } from "@/types/privateApi/workout";
+import { PaginatedResponse } from "@/types/response";
 import {
   Button,
   Dialog,
@@ -6,16 +9,37 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
+import { useAuthFetcher } from "@/lib/fetcher";
 
 export const DeleteRoutineModal = ({
   open,
   onClose,
-  deleteRoutine,
+  workoutId,
 }: {
   open: boolean;
   onClose: () => void;
-  deleteRoutine: () => Promise<void>;
+  workoutId: number;
 }) => {
+  const authFetcher = useAuthFetcher();
+  const { data: workouts, mutate } = useSWR<PaginatedResponse<Workout>>(
+    "/workout",
+    authFetcher,
+  );
+  const deleteRoutine = async () => {
+    authFetcher(`/workout/${workoutId}/`, {
+      method: "DELETE",
+    });
+    if (!workouts) {
+      return;
+    }
+    const optimisticUpdate = {
+      ...workouts,
+      count: workouts.count - 1,
+      results: workouts.results.filter((workout) => workout.id === workoutId),
+    };
+    mutate(optimisticUpdate);
+  };
+
   return (
     <Dialog
       open={open}
