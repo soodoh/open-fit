@@ -30,9 +30,6 @@ export function useRefreshToken() {
     if (isLoading) {
       return;
     }
-    if (isTokenInvalid) {
-      localStorage.removeItem(REFRESH_TOKEN_KEY);
-    }
     if (!refreshToken || isTokenInvalid) {
       router.push("/login");
     }

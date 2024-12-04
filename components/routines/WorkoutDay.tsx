@@ -3,7 +3,12 @@ import { Day } from "@/types/privateApi/day";
 import useSWR from "swr";
 import type { PaginatedResponse } from "@/types/response";
 import type { WorkoutSetType } from "@/types/privateApi/set";
-import { Accordion, AccordionSummary, List } from "@mui/material";
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  List,
+} from "@mui/material";
 import { WorkoutSet as WorkoutSet } from "./WorkoutSet";
 import { ExpandMore } from "@mui/icons-material";
 import styles from "@/styles/workoutDay.module.css";
@@ -41,6 +46,7 @@ export const WorkoutDay = ({
           </span>
         </div>
       </AccordionSummary>
+      <AccordionDetails>details</AccordionDetails>
       <List>
         {workoutSet?.results.map((set) => {
           const setNamespace = `${namespace}-set-${set.id}`;

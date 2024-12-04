@@ -39,11 +39,5 @@ export function useAccessToken() {
     });
   }, [accessToken, isTokenInvalid, isLoading, refreshToken]);
 
-  useEffect(() => {
-    if (isTokenInvalid) {
-      localStorage.removeItem(ACCESS_TOKEN_KEY);
-    }
-  }, [isTokenInvalid]);
-
   return accessToken;
 }

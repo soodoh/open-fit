@@ -18,15 +18,20 @@ export const fetcher = async (url: string | null, opts?: RequestInit) => {
   if (!response.ok) {
     throw new Error("Failed to fetch");
   }
+  if (response.status === 204) {
+    return response;
+  }
   return response.json();
 };
 
 export const useAuthFetcher = () => {
   const accessToken = useAccessToken();
-  return (url: string | null) =>
+  return (url: string | null, opts?: RequestInit) =>
     fetcher(url, {
+      ...opts,
       headers: {
         Authorization: `Bearer ${accessToken}`,
+        ...opts?.headers,
       },
     });
 };
