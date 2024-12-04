@@ -4,17 +4,17 @@ import useSWR from "swr";
 import type { PaginatedResponse } from "@/types/response";
 import type { WorkoutSetType } from "@/types/privateApi/set";
 import { Accordion, AccordionSummary, List } from "@mui/material";
-import moment from "moment";
 import { WorkoutSet as WorkoutSet } from "./WorkoutSet";
 import { ExpandMore } from "@mui/icons-material";
 import styles from "@/styles/workoutDay.module.css";
+import { Weekday } from "./Weekday";
 
 export const WorkoutDay = ({ day }: { day: Day }) => {
   const { data: workoutSet } = useSWR<PaginatedResponse<WorkoutSetType>>(
     `/set?exerciseday=${day.id}`,
     useAuthFetcher(),
   );
-  console.log(day)
+  console.log(day);
 
   return (
     <Accordion>
@@ -26,9 +26,13 @@ export const WorkoutDay = ({ day }: { day: Day }) => {
         <div>
           <h4>{day.description}</h4>
           <span className={styles.weekdays}>
-            {day.day
-              .map((weekday) => moment().day(weekday).format("dddd"))
-              .join(", ")}
+            {day.day.map((weekday, index) => (
+              <Weekday
+                key={`workoutDay-${day.id}-weekday-${weekday}`}
+                weekday={weekday}
+                isLast={index + 1 >= day.day.length}
+              />
+            ))}
           </span>
         </div>
       </AccordionSummary>
