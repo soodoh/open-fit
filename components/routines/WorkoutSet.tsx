@@ -5,15 +5,16 @@ import type { PaginatedResponse } from "@/types/response";
 import type { WorkoutSetType } from "@/types/privateApi/set";
 import {
   Avatar,
+  IconButton,
   ListItem,
   ListItemAvatar,
   ListItemButton,
   ListItemText,
 } from "@mui/material";
-import { Error, Image as ImageIcon } from "@mui/icons-material";
+import { Delete, Edit, Error, Image as ImageIcon } from "@mui/icons-material";
 import { ExerciseBaseInfo } from "@/types/publicApi/exerciseBaseInfo";
 import { WorkoutSetting } from "./WorkoutSetting";
-import styles from "./workoutSet.module.css";
+import styles from "@/styles/workoutSet.module.css";
 
 export const WorkoutSet = ({ set }: { set: WorkoutSetType }) => {
   const { data: setting, isLoading: settingLoading } = useSWR<
@@ -51,7 +52,19 @@ export const WorkoutSet = ({ set }: { set: WorkoutSetType }) => {
   }
 
   return (
-    <>
+    <ListItem
+      disablePadding
+      secondaryAction={
+        <>
+          <IconButton>
+            <Edit />
+          </IconButton>
+          <IconButton>
+            <Delete />
+          </IconButton>
+        </>
+      }
+    >
       <ListItemButton>
         <ListItemAvatar>
           {imageUrl ? (
@@ -77,17 +90,6 @@ export const WorkoutSet = ({ set }: { set: WorkoutSetType }) => {
           }
         />
       </ListItemButton>
-    </>
+    </ListItem>
   );
 };
-// {open ? <ExpandLess /> : <ExpandMore />}
-// <Collapse in={open} timeout="auto">
-//   <List component="div" disablePadding>
-//     {setting.results.map((currentSet) => (
-//       <WorkoutSetting
-//         key={`set-${set.id}-day-${set.exerciseday}-exercise-${exercise.uuid}-${currentSet.id}`}
-//         setting={currentSet}
-//       />
-//     ))}
-//   </List>
-// </Collapse>

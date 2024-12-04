@@ -1,8 +1,8 @@
 "use client";
-import styles from "./header.module.css";
 import Image from "next/image";
 import Link from "next/link";
 import { AccountNavItem } from "./AccountNavItem";
+import styles from "@/styles/header.module.css";
 
 export const Header = () => {
   return (

@@ -19,7 +19,7 @@ function useToken() {
 export function useRefreshToken() {
   const refreshToken = useToken();
   const router = useRouter();
-  const { error, isLoading } = useSWR(refreshToken, (token) =>
+  const { error: isTokenInvalid, isLoading } = useSWR(refreshToken, (token) =>
     fetcher("/token/verify", {
       method: "POST",
       body: JSON.stringify({ token }),
@@ -30,10 +30,13 @@ export function useRefreshToken() {
     if (isLoading) {
       return;
     }
-    if (!refreshToken || error) {
+    if (isTokenInvalid) {
+      localStorage.removeItem(REFRESH_TOKEN_KEY);
+    }
+    if (!refreshToken || isTokenInvalid) {
       router.push("/login");
     }
-  }, [error, isLoading, refreshToken, router]);
+  }, [isTokenInvalid, isLoading, refreshToken, router]);
 
   return refreshToken;
 }

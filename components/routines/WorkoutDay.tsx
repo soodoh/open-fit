@@ -5,15 +5,16 @@ import type { PaginatedResponse } from "@/types/response";
 import type { WorkoutSetType } from "@/types/privateApi/set";
 import { Accordion, AccordionSummary, List } from "@mui/material";
 import moment from "moment";
-import styles from "./workoutDay.module.css";
 import { WorkoutSet as WorkoutSet } from "./WorkoutSet";
 import { ExpandMore } from "@mui/icons-material";
+import styles from "@/styles/workoutDay.module.css";
 
 export const WorkoutDay = ({ day }: { day: Day }) => {
   const { data: workoutSet } = useSWR<PaginatedResponse<WorkoutSetType>>(
     `/set?exerciseday=${day.id}`,
     useAuthFetcher(),
   );
+  console.log(day)
 
   return (
     <Accordion>

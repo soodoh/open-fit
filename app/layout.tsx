@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import { CssBaseline } from "@mui/material";
-import "./globals.css";
-import styles from "./layout.module.css";
-import { Header } from "@/components/Header";
-import { ThemeClient } from "@/components/ThemeClient";
+import { Header } from "@/components/layout/Header";
+import { ThemeClient } from "@/components/layout/ThemeClient";
+import styles from "@/styles/layout.module.css";
+import "@/styles/globals.css";
 
 export const metadata: Metadata = {
   title: "Wger",

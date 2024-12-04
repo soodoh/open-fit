@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { useState, type MouseEvent } from "react";
 import { Logout, Settings, AccountCircle } from "@mui/icons-material";
-import styles from "./accountNavItem.module.css";
+import styles from "@/styles/accountNavItem.module.css";
 
 export const AccountNavItem = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);

@@ -2,7 +2,6 @@
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { fetcher } from "@/lib/fetcher";
-import { useRouter } from "next/navigation";
 import { useRefreshToken } from "@/lib/useRefreshToken";
 import { ACCESS_TOKEN_KEY } from "@/lib/constants";
 
@@ -20,8 +19,7 @@ function useToken() {
 export function useAccessToken() {
   const accessToken = useToken();
   const refreshToken = useRefreshToken();
-  const router = useRouter();
-  const { error, isLoading } = useSWR(accessToken, (token) =>
+  const { error: isTokenInvalid, isLoading } = useSWR(accessToken, (token) =>
     fetcher("/token/verify", {
       method: "POST",
       body: JSON.stringify({ token }),
@@ -30,7 +28,7 @@ export function useAccessToken() {
 
   // Refresh accessToken if invalid && refreshToken is still valid
   useEffect(() => {
-    if (!refreshToken || isLoading || !error) {
+    if (!refreshToken || isLoading || !isTokenInvalid) {
       return;
     }
     fetcher("/token/refresh", {
@@ -39,17 +37,13 @@ export function useAccessToken() {
     }).then((data) => {
       localStorage.setItem(ACCESS_TOKEN_KEY, data.access);
     });
-  }, [accessToken, error, isLoading, refreshToken]);
+  }, [accessToken, isTokenInvalid, isLoading, refreshToken]);
 
   useEffect(() => {
-    // Skip redirect if refreshToken is still valid
-    if (refreshToken || isLoading) {
-      return;
+    if (isTokenInvalid) {
+      localStorage.removeItem(ACCESS_TOKEN_KEY);
     }
-    if (!accessToken || error) {
-      router.push("/login");
-    }
-  }, [error, isLoading, accessToken, router, refreshToken]);
+  }, [isTokenInvalid]);
 
   return accessToken;
 }

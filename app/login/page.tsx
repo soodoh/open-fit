@@ -1,12 +1,11 @@
 "use client";
-import styles from "./login.module.css";
 import { Button, TextField } from "@mui/material";
 import { type FormEvent, useState } from "react";
 import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from "@/lib/constants";
-
 import { z } from "zod";
 import { fetcher } from "@/lib/fetcher";
 import { useRouter } from "next/navigation";
+import styles from "@/styles/loginPage.module.css";
 
 const LoginFormSchema = z.object({
   username: z
