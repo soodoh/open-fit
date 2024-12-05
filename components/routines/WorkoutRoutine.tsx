@@ -9,11 +9,16 @@ import {
   CardContent,
   CardHeader,
   IconButton,
+  MenuList,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
+  Menu,
 } from "@mui/material";
 import useSWR from "swr";
 import { WorkoutDay } from "./WorkoutDay";
 import styles from "@/styles/workoutRoutine.module.css";
-import { Delete, Edit } from "@mui/icons-material";
+import { Delete, Edit, MoreVert } from "@mui/icons-material";
 import { DeleteRoutineModal } from "./DeleteRoutineModal";
 import { useState } from "react";
 
@@ -35,12 +40,14 @@ export const WorkoutRoutine = ({
   );
   const [showDeleteModal, setDeleteModal] = useState(false);
   const namespace = `workout-${workoutId}`;
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const menuOpen = Boolean(anchorEl);
 
   if (!workout) {
     return null;
   }
   return (
-    <>
+    <div>
       <DeleteRoutineModal
         open={showDeleteModal}
         onClose={() => setDeleteModal(false)}
@@ -49,20 +56,56 @@ export const WorkoutRoutine = ({
       <Card>
         <CardHeader
           action={
-            <>
+            <div>
               <IconButton
-                aria-label={`Edit routine: ${workout.name}`}
-                onClick={onEdit}
+                aria-label={`Edit actions for ${workout.name}`}
+                id={`edit-actions-${workout.id}`}
+                aria-controls={
+                  menuOpen ? `edit-actions-${workout.id}-menu` : undefined
+                }
+                aria-haspopup="true"
+                aria-expanded={menuOpen ? "true" : undefined}
+                onClick={(event: React.MouseEvent<HTMLElement>) => {
+                  setAnchorEl(event.currentTarget);
+                }}
               >
-                <Edit />
+                <MoreVert />
               </IconButton>
-              <IconButton
-                aria-label={`Delete routine: ${workout.name}`}
-                onClick={() => setDeleteModal(true)}
+              <Menu
+                id={`edit-actions-${workout.id}-menu`}
+                aria-labelledby="edit-actions"
+                open={menuOpen}
+                onClose={() => setAnchorEl(null)}
+                anchorEl={anchorEl}
+                transformOrigin={{ horizontal: "right", vertical: "top" }}
+                anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
               >
-                <Delete />
-              </IconButton>
-            </>
+                <MenuList>
+                  <MenuItem
+                    onClick={() => {
+                      setAnchorEl(null);
+                      onEdit();
+                    }}
+                  >
+                    <ListItemIcon>
+                      <Edit fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>Edit</ListItemText>
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => {
+                      setAnchorEl(null);
+                      setDeleteModal(true);
+                    }}
+                  >
+                    <ListItemIcon>
+                      <Delete fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>Delete</ListItemText>
+                  </MenuItem>
+                </MenuList>
+              </Menu>
+            </div>
           }
           title={workout.name}
           subheader={
@@ -94,6 +137,6 @@ export const WorkoutRoutine = ({
           </div>
         </CardContent>
       </Card>
-    </>
+    </div>
   );
 };
