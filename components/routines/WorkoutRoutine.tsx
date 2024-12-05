@@ -39,7 +39,6 @@ export const WorkoutRoutine = ({
     authFetcher,
   );
   const [showDeleteModal, setDeleteModal] = useState(false);
-  const namespace = `workout-${workoutId}`;
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const menuOpen = Boolean(anchorEl);
 
@@ -124,11 +123,9 @@ export const WorkoutRoutine = ({
         <CardContent>
           <div className={styles.workoutDayContainer}>
             {workoutDay?.results.map((workoutDay) => {
-              const dayNamespace = `${namespace}-day-${workoutDay.id}`;
               return (
                 <WorkoutDay
-                  key={dayNamespace}
-                  namespace={dayNamespace}
+                  key={`day-${workoutDay.id}`}
                   workoutId={workoutId}
                   dayId={workoutDay.id}
                 />

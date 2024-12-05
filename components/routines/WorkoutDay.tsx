@@ -17,11 +17,9 @@ import { Weekday } from "./Weekday";
 export const WorkoutDay = ({
   dayId,
   // workoutId,
-  namespace,
 }: {
   dayId: number;
   workoutId: number;
-  namespace: string;
 }) => {
   const authFetcher = useAuthFetcher();
   const { data: day } = useSWR<Day>(`/day/${dayId}`, authFetcher);
@@ -29,6 +27,7 @@ export const WorkoutDay = ({
     `/set?exerciseday=${dayId}`,
     authFetcher,
   );
+  const namespace = `day-${dayId}`;
 
   if (!day) {
     return null;
@@ -56,14 +55,8 @@ export const WorkoutDay = ({
       <AccordionDetails>details</AccordionDetails>
       <List>
         {workoutSet?.results.map((set) => {
-          const setNamespace = `${namespace}-set-${set.id}`;
           return (
-            <WorkoutSet
-              key={setNamespace}
-              namespace={setNamespace}
-              dayId={dayId}
-              setId={set.id}
-            />
+            <WorkoutSet key={`set-${set.id}`} dayId={dayId} setId={set.id} />
           );
         })}
       </List>

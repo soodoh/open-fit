@@ -2,7 +2,6 @@ import { useAuthFetcher } from "@/lib/fetcher";
 import { Setting } from "@/types/privateApi/setting";
 import useSWR from "swr";
 import type { PaginatedResponse } from "@/types/response";
-import type { WorkoutSetType } from "@/types/privateApi/set";
 import {
   Avatar,
   IconButton,
@@ -16,14 +15,7 @@ import { ExerciseBaseInfo } from "@/types/publicApi/exerciseBaseInfo";
 import { WorkoutSetting } from "./WorkoutSetting";
 import styles from "@/styles/workoutSet.module.css";
 
-export const WorkoutSet = ({
-  setId,
-  namespace,
-}: {
-  dayId: number;
-  setId: number;
-  namespace: string;
-}) => {
+export const WorkoutSet = ({ setId }: { dayId: number; setId: number }) => {
   const authFetcher = useAuthFetcher();
   const { data: setting, isLoading: settingLoading } = useSWR<
     PaginatedResponse<Setting>
@@ -90,7 +82,7 @@ export const WorkoutSet = ({
               <span>{setting.count} sets</span>
               {setting.results.map((currentSet) => (
                 <WorkoutSetting
-                  key={`${namespace}-setting-${currentSet.id}`}
+                  key={`setting-${currentSet.id}`}
                   settingId={currentSet.id}
                 />
               ))}
