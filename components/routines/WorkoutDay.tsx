@@ -8,17 +8,17 @@ import {
   AccordionDetails,
   AccordionSummary,
   Divider,
-  Fab,
   List,
   Typography,
 } from "@mui/material";
 import { WorkoutSet as WorkoutSet } from "./WorkoutSet";
-import { Edit, ExpandMore, MoreVert } from "@mui/icons-material";
+import { ExpandMore } from "@mui/icons-material";
 import { Weekday } from "./Weekday";
+import { EditDayActions } from "./EditDayActions";
 
 export const WorkoutDay = ({
   dayId,
-  // workoutId,
+  workoutId,
 }: {
   dayId: number;
   workoutId: number;
@@ -55,9 +55,7 @@ export const WorkoutDay = ({
       </AccordionSummary>
 
       <AccordionDetails>
-        <Fab size="small">
-          <MoreVert />
-        </Fab>
+        <EditDayActions workoutId={workoutId} dayId={dayId} />
       </AccordionDetails>
       <Divider />
 
