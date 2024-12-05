@@ -7,11 +7,13 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Divider,
+  Fab,
   List,
+  Typography,
 } from "@mui/material";
 import { WorkoutSet as WorkoutSet } from "./WorkoutSet";
-import { ExpandMore } from "@mui/icons-material";
-import styles from "@/styles/workoutDay.module.css";
+import { Edit, ExpandMore, MoreVert } from "@mui/icons-material";
 import { Weekday } from "./Weekday";
 
 export const WorkoutDay = ({
@@ -27,7 +29,6 @@ export const WorkoutDay = ({
     `/set?exerciseday=${dayId}`,
     authFetcher,
   );
-  const namespace = `day-${dayId}`;
 
   if (!day) {
     return null;
@@ -36,23 +37,30 @@ export const WorkoutDay = ({
     <Accordion>
       <AccordionSummary
         expandIcon={<ExpandMore />}
-        aria-controls={`${namespace}-content`}
-        id={`${namespace}-header`}
+        aria-controls={`day-${dayId}-content`}
+        id={`day-${dayId}-header`}
       >
         <div>
-          <h4>{day.description}</h4>
-          <span className={styles.weekdays}>
+          <Typography variant="subtitle1">{day.description}</Typography>
+          <Typography variant="caption">
             {day.day.map((weekday, index) => (
               <Weekday
-                key={`${namespace}-weekday-${weekday}`}
+                key={`day-${dayId}-weekday-${weekday}`}
                 weekday={weekday}
                 isLast={index + 1 >= day.day.length}
               />
             ))}
-          </span>
+          </Typography>
         </div>
       </AccordionSummary>
-      <AccordionDetails>details</AccordionDetails>
+
+      <AccordionDetails>
+        <Fab size="small">
+          <MoreVert />
+        </Fab>
+      </AccordionDetails>
+      <Divider />
+
       <List>
         {workoutSet?.results.map((set) => {
           return (

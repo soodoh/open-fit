@@ -9,7 +9,7 @@ import { Add } from "@mui/icons-material";
 import sharedStyles from "@/styles/sharedPage.module.css";
 import styles from "@/styles/routinePage.module.css";
 import { useState } from "react";
-import { EditRoutineModal } from "@/components/routines/EditRoutineModal";
+import { EditRoutineModal as CreateRoutineModal } from "@/components/routines/EditRoutineModal";
 
 export default function Routines() {
   const { data: workouts } = useSWR<PaginatedResponse<Workout>>(
@@ -17,7 +17,6 @@ export default function Routines() {
     useAuthFetcher(),
   );
   const [showEditModal, setEditModal] = useState(false);
-  const [workoutId, setWorkoutId] = useState<number | null>(null);
 
   return (
     <div className={sharedStyles.page}>
@@ -26,31 +25,21 @@ export default function Routines() {
         <Fab
           color="primary"
           variant="extended"
-          onClick={() => {
-            setWorkoutId(null);
-            setEditModal(true);
-          }}
+          onClick={() => setEditModal(true)}
         >
           <Add sx={{ mr: 1 }} />
           Create Routine
         </Fab>
       </div>
 
-      <EditRoutineModal
+      <CreateRoutineModal
         open={showEditModal}
         onClose={() => setEditModal(false)}
-        workoutId={workoutId}
+        workoutId={null}
       />
 
       {workouts?.results.map((workout) => (
-        <WorkoutRoutine
-          key={`routine-${workout.id}`}
-          workoutId={workout.id}
-          onEdit={() => {
-            setWorkoutId(workout.id);
-            setEditModal(true);
-          }}
-        />
+        <WorkoutRoutine key={`routine-${workout.id}`} workoutId={workout.id} />
       ))}
     </div>
   );

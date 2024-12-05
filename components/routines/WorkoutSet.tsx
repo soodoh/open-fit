@@ -4,13 +4,12 @@ import useSWR from "swr";
 import type { PaginatedResponse } from "@/types/response";
 import {
   Avatar,
-  IconButton,
   ListItem,
   ListItemAvatar,
   ListItemButton,
   ListItemText,
 } from "@mui/material";
-import { Delete, Edit, Error, Image as ImageIcon } from "@mui/icons-material";
+import { Error, Image as ImageIcon } from "@mui/icons-material";
 import { ExerciseBaseInfo } from "@/types/publicApi/exerciseBaseInfo";
 import { WorkoutSetting } from "./WorkoutSetting";
 import styles from "@/styles/workoutSet.module.css";
@@ -52,19 +51,7 @@ export const WorkoutSet = ({ setId }: { dayId: number; setId: number }) => {
   }
 
   return (
-    <ListItem
-      disablePadding
-      secondaryAction={
-        <>
-          <IconButton>
-            <Edit />
-          </IconButton>
-          <IconButton>
-            <Delete />
-          </IconButton>
-        </>
-      }
-    >
+    <ListItem>
       <ListItemButton>
         <ListItemAvatar>
           {imageUrl ? (
