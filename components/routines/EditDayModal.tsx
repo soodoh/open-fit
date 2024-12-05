@@ -1,16 +1,24 @@
 import useSWR from "swr";
 import {
   Button,
+  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
   TextField,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { PaginatedResponse } from "@/types/response";
-import { useAuthFetcher } from "@/lib/fetcher";
+import { fetcher, useAuthFetcher } from "@/lib/fetcher";
 import { Day } from "@/types/privateApi/day";
+import { DaysOfWeek } from "@/types/publicApi/daysOfWeek";
+import styles from "@/styles/editDay.module.css";
 
 export const EditDayModal = ({
   open,
@@ -27,6 +35,11 @@ export const EditDayModal = ({
   const { data: workoutDays, mutate: mutateResults } = useSWR<
     PaginatedResponse<Day>
   >(`/day?training=${workoutId}`, authFetcher);
+  const { data: daysOfWeek } = useSWR<PaginatedResponse<DaysOfWeek>>(
+    `/daysofweek/`,
+    fetcher,
+  );
+
   const { data: workoutDay, mutate } = useSWR<Day>(
     Number.isInteger(dayId) ? `/day/${dayId}` : null,
     authFetcher,
@@ -43,6 +56,8 @@ export const EditDayModal = ({
     <Dialog
       open={open}
       onClose={onClose}
+      maxWidth="sm"
+      fullWidth
       PaperProps={{
         component: "form",
         onSubmit: async (event: React.FormEvent<HTMLFormElement>) => {
@@ -75,16 +90,52 @@ export const EditDayModal = ({
       <DialogTitle>
         {workoutId ? "Edit Workout Day" : "New Workout Day"}
       </DialogTitle>
-      <DialogContent>
+      <DialogContent className={styles.editDay}>
         <TextField
           autoFocus
+          fullWidth
+          margin="normal"
           id="workoutDay-description"
           variant="filled"
           label="Description"
           value={description}
           onChange={(event) => setDescription(event.target.value)}
         />
+        <List disablePadding dense>
+          {daysOfWeek?.results.map(({ day_of_week: dayOfWeek }, index) => {
+            const dayNum = index + 1;
+            const checked = weekdays.includes(dayNum);
+            const labelId = `weekday-check-${dayOfWeek}`;
+            const handleChange = () => {
+              if (weekdays.includes(dayNum)) {
+                setWeekdays(weekdays.filter((day) => day !== dayNum));
+              } else {
+                setWeekdays([...weekdays, dayNum]);
+              }
+            };
+
+            return (
+              <ListItem key={`edit-day-week-${dayOfWeek}`} disablePadding>
+                <ListItemButton role={undefined} onClick={handleChange} dense>
+                  <ListItemIcon>
+                    <Checkbox
+                      edge="start"
+                      checked={checked}
+                      onChange={handleChange}
+                      size="small"
+                      disableRipple
+                      tabIndex={-1}
+                      inputProps={{ "aria-labelledby": labelId }}
+                    />
+                  </ListItemIcon>
+                  <ListItemText id={labelId} primary={dayOfWeek} />
+                </ListItemButton>
+              </ListItem>
+            );
+          })}
+        </List>
       </DialogContent>
+
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
         <Button type="submit">Save</Button>
