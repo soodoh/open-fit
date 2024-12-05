@@ -64,7 +64,7 @@ export const EditDayModal = ({
             mutateResults({
               ...workoutDays,
               count: workoutDays.count + 1,
-              results: [data, ...workoutDays.results],
+              results: [...workoutDays.results, data],
             });
           } else {
             mutate(data);

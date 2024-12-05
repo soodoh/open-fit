@@ -10,6 +10,7 @@ import {
   MenuList,
 } from "@mui/material";
 import { DeleteDayModal } from "./DeleteDayModal";
+import { AutocompleteExercise } from "../exercises/AutocompleteExercise";
 
 enum Modal {
   EDIT = "edit",
@@ -48,6 +49,9 @@ export const EditDayActions = ({
         workoutId={workoutId}
         dayId={dayId}
       />
+
+      <AutocompleteExercise />
+
       <IconButton
         aria-label={`Edit actions for workout day ${dayId}`}
         id={`edit-day-actions-${dayId}`}
