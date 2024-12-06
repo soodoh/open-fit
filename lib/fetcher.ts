@@ -1,4 +1,3 @@
-"use client";
 import { useAccessToken } from "@/lib/useAccessToken";
 
 const BASE_URL = "https://wger.pauld.link/api/v2";

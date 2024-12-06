@@ -50,20 +50,6 @@ export const EditDayActions = ({
         dayId={dayId}
       />
 
-      <AutocompleteExercise />
-
-      <IconButton
-        aria-label={`Edit actions for workout day ${dayId}`}
-        id={`edit-day-actions-${dayId}`}
-        aria-controls={menuOpen ? `edit-day-actions-${dayId}-menu` : undefined}
-        aria-haspopup="true"
-        aria-expanded={menuOpen ? "true" : undefined}
-        onClick={(event: React.MouseEvent<HTMLElement>) => {
-          setAnchorEl(event.currentTarget);
-        }}
-      >
-        <MoreVert />
-      </IconButton>
       <Menu
         id={`edit-day-actions-${dayId}-menu`}
         aria-labelledby={`edit-day-actions-${dayId}`}
@@ -89,6 +75,24 @@ export const EditDayActions = ({
           </MenuItem>
         </MenuList>
       </Menu>
+
+      <div>
+        <AutocompleteExercise />
+        <IconButton
+          aria-label={`Edit actions for workout day ${dayId}`}
+          id={`edit-day-actions-${dayId}`}
+          aria-controls={
+            menuOpen ? `edit-day-actions-${dayId}-menu` : undefined
+          }
+          aria-haspopup="true"
+          aria-expanded={menuOpen ? "true" : undefined}
+          onClick={(event: React.MouseEvent<HTMLElement>) => {
+            setAnchorEl(event.currentTarget);
+          }}
+        >
+          <MoreVert />
+        </IconButton>
+      </div>
     </>
   );
 };

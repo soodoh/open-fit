@@ -1,6 +1,6 @@
 import { useAuthFetcher } from "@/lib/fetcher";
-import {
-  ExerciseResult,
+import type {
+  ExerciseSearchData,
   ExerciseSearchResults,
 } from "@/types/privateApi/exerciseSearch";
 import { Image as ImageIcon } from "@mui/icons-material";
@@ -25,17 +25,14 @@ export const AutocompleteExercise = () => {
   const options = useMemo(() => {
     const duplicates = new Set();
     return (
-      searchResults?.suggestions?.reduce(
-        (newResults, result) => {
-          if (!result || duplicates.has(result.data.id)) {
-            return newResults;
-          }
-          duplicates.add(result.data.id);
-          newResults.push(result.data);
+      searchResults?.suggestions?.reduce((newResults, result) => {
+        if (!result || duplicates.has(result.data.id)) {
           return newResults;
-        },
-        [] as ExerciseResult["data"][],
-      ) ?? []
+        }
+        duplicates.add(result.data.id);
+        newResults.push(result.data);
+        return newResults;
+      }, [] as ExerciseSearchData[]) ?? []
     );
   }, [searchResults?.suggestions]);
 
@@ -56,7 +53,11 @@ export const AutocompleteExercise = () => {
         setSearchTerm(newInputValue);
       }}
       renderInput={(params) => (
-        <TextField {...params} label="Add an exercise" fullWidth />
+        <TextField
+          {...params}
+          label="Add an exercise"
+          placeholder="Start typing to search for exercises"
+        />
       )}
       renderOption={({ key, ...optionProps }, option) => {
         return (
