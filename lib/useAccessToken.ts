@@ -6,7 +6,10 @@ import { useRefreshToken } from "@/lib/useRefreshToken";
 import { ACCESS_TOKEN_KEY } from "@/lib/constants";
 
 function useToken() {
-  const currentToken = localStorage?.getItem(ACCESS_TOKEN_KEY);
+  const currentToken =
+    typeof window !== "undefined"
+      ? localStorage.getItem(ACCESS_TOKEN_KEY)
+      : null;
   const [accessToken, setAccessToken] = useState<string | null>(currentToken);
 
   useEffect(() => {

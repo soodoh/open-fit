@@ -6,7 +6,10 @@ import { useRouter } from "next/navigation";
 import { REFRESH_TOKEN_KEY } from "@/lib/constants";
 
 function useToken() {
-  const currentToken = localStorage?.getItem(REFRESH_TOKEN_KEY);
+  const currentToken =
+    typeof window !== "undefined"
+      ? localStorage.getItem(REFRESH_TOKEN_KEY)
+      : null;
   const [refreshToken, setRefreshToken] = useState<string | null>(currentToken);
 
   useEffect(() => {
