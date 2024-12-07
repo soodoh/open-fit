@@ -18,7 +18,6 @@ import { PaginatedResponse } from "@/types/response";
 import { fetcher, useAuthFetcher } from "@/lib/fetcher";
 import { Day } from "@/types/privateApi/day";
 import { DaysOfWeek } from "@/types/publicApi/daysOfWeek";
-import styles from "@/styles/editDay.module.css";
 
 export const EditDayModal = ({
   open,
@@ -90,7 +89,7 @@ export const EditDayModal = ({
       <DialogTitle>
         {workoutId ? "Edit Workout Day" : "New Workout Day"}
       </DialogTitle>
-      <DialogContent className={styles.editDay}>
+      <DialogContent>
         <TextField
           autoFocus
           fullWidth

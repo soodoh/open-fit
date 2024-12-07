@@ -6,7 +6,6 @@ import { PaginatedResponse } from "@/types/response";
 import { Typography, Card, CardContent, CardHeader } from "@mui/material";
 import useSWR from "swr";
 import { WorkoutDay } from "./WorkoutDay";
-import styles from "@/styles/workoutRoutine.module.css";
 import { EditRoutineActions } from "./EditRoutineActions";
 
 export const WorkoutRoutine = ({ workoutId }: { workoutId: number }) => {
@@ -40,17 +39,15 @@ export const WorkoutRoutine = ({ workoutId }: { workoutId: number }) => {
         }
       />
       <CardContent>
-        <div className={styles.workoutDayContainer}>
-          {workoutDays?.results.map((workoutDay) => {
-            return (
-              <WorkoutDay
-                key={`day-${workoutDay.id}`}
-                workoutId={workoutId}
-                dayId={workoutDay.id}
-              />
-            );
-          })}
-        </div>
+        {workoutDays?.results.map((workoutDay) => {
+          return (
+            <WorkoutDay
+              key={`day-${workoutDay.id}`}
+              workoutId={workoutId}
+              dayId={workoutDay.id}
+            />
+          );
+        })}
       </CardContent>
     </Card>
   );

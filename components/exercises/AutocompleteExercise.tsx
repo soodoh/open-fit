@@ -39,6 +39,7 @@ export const AutocompleteExercise = () => {
   return (
     <Autocomplete
       autoComplete
+      fullWidth
       options={options}
       isOptionEqualToValue={(option, value) => option?.id === value?.id}
       getOptionLabel={(option) => option?.name ?? "Unknown"}

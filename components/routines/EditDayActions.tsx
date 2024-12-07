@@ -1,3 +1,4 @@
+/** @jsxImportSource @emotion/react */
 import { useEffect, useState } from "react";
 import { EditDayModal } from "./EditDayModal";
 import { Delete, Edit, MoreVert } from "@mui/icons-material";
@@ -11,6 +12,7 @@ import {
 } from "@mui/material";
 import { DeleteDayModal } from "./DeleteDayModal";
 import { AutocompleteExercise } from "../exercises/AutocompleteExercise";
+import { css } from "@emotion/react";
 
 enum Modal {
   EDIT = "edit",
@@ -76,8 +78,21 @@ export const EditDayActions = ({
         </MenuList>
       </Menu>
 
-      <div>
-        <AutocompleteExercise />
+      <div
+        css={css`
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        `}
+      >
+        <div
+          css={css`
+            width: 100%;
+            max-width: 500px;
+          `}
+        >
+          <AutocompleteExercise />
+        </div>
         <IconButton
           aria-label={`Edit actions for workout day ${dayId}`}
           id={`edit-day-actions-${dayId}`}

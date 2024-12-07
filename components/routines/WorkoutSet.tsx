@@ -1,3 +1,4 @@
+/** @jsxImportSource @emotion/react */
 import { useAuthFetcher } from "@/lib/fetcher";
 import { Setting } from "@/types/privateApi/setting";
 import useSWR from "swr";
@@ -12,7 +13,7 @@ import {
 import { Error, Image as ImageIcon } from "@mui/icons-material";
 import { ExerciseBaseInfo } from "@/types/publicApi/exerciseBaseInfo";
 import { WorkoutSetting } from "./WorkoutSetting";
-import styles from "@/styles/workoutSet.module.css";
+import { css } from "@emotion/react";
 
 export const WorkoutSet = ({ setId }: { dayId: number; setId: number }) => {
   const authFetcher = useAuthFetcher();
@@ -65,7 +66,14 @@ export const WorkoutSet = ({ setId }: { dayId: number; setId: number }) => {
         <ListItemText
           primary={exercise.name}
           secondary={
-            <span className={styles.setInfo}>
+            <span
+              css={css`
+                display: flex;
+                gap: 0.5rem;
+                margin-top: 5px;
+                flex-wrap: wrap;
+              `}
+            >
               <span>{setting.count} sets</span>
               {setting.results.map((currentSet) => (
                 <WorkoutSetting

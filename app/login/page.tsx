@@ -1,3 +1,4 @@
+/** @jsxImportSource @emotion/react */
 "use client";
 import { Button, TextField } from "@mui/material";
 import { type FormEvent, useState } from "react";
@@ -5,7 +6,7 @@ import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from "@/lib/constants";
 import { z } from "zod";
 import { fetcher } from "@/lib/fetcher";
 import { useRouter } from "next/navigation";
-import styles from "@/styles/loginPage.module.css";
+import { css } from "@emotion/react";
 
 const LoginFormSchema = z.object({
   username: z
@@ -57,10 +58,24 @@ export default function LoginPage() {
   };
 
   return (
-    <div className={styles.page}>
-      <form onSubmit={login}>
+    <div
+      css={css`
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      `}
+    >
+      <form
+        onSubmit={login}
+        css={css`
+          display: flex;
+          flex-direction: column;
+        `}
+      >
         <TextField
-          className={styles.textField}
+          css={css`
+            margin-bottom: 1rem;
+          `}
           label="Username"
           variant="outlined"
           error={showErrors && !!errors?.username}
@@ -69,7 +84,9 @@ export default function LoginPage() {
           value={username}
         />
         <TextField
-          className={styles.textField}
+          css={css`
+            margin-bottom: 1rem;
+          `}
           label="Password"
           variant="outlined"
           type="password"

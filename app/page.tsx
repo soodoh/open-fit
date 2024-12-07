@@ -1,6 +1,19 @@
-import styles from "@/styles/sharedPage.module.css";
+/** @jsxImportSource @emotion/react */
+import { css } from "@emotion/react";
 
 export default function Home() {
-  // TODOL
-  return <div className={styles.page}>Home page!</div>;
+  return (
+    <div
+      css={css`
+        display: flex;
+        flex-direction: column;
+        max-width: var(--max-width);
+        width: 100%;
+        margin: 2rem;
+        gap: 2rem;
+      `}
+    >
+      Home page!
+    </div>
+  );
 }
