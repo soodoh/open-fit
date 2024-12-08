@@ -1,37 +1,14 @@
 /** @jsxImportSource @emotion/react */
+import { AppBar, Box, Container, Toolbar, Link } from "@mui/material";
 import Image from "next/image";
-import Link from "next/link";
+import NextLink from "next/link";
 import { AccountNavItem } from "./AccountNavItem";
-import { css } from "@emotion/react";
 
 export const Header = () => {
   return (
-    <header
-      css={css`
-        background-color: var(--space-cadet);
-        color: var(--isabelline);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      `}
-    >
-      <div
-        css={css`
-          margin: 1rem 2rem;
-          max-width: var(--max-width);
-          width: 100%;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-        `}
-      >
-        <nav
-          css={css`
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-          `}
-        >
+    <AppBar position="static">
+      <Container maxWidth="xl">
+        <Toolbar disableGutters>
           <Link href="/">
             <Image
               src="/logo-bg-white.png"
@@ -41,12 +18,45 @@ export const Header = () => {
               height={40}
             />
           </Link>
-          <Link href="/routines">Routines</Link>
-          <Link href="/exercises">Exercises</Link>
-          <Link href="/nutrition">Nutrition</Link>
-        </nav>
-        <AccountNavItem />
-      </div>
-    </header>
+          <Box
+            sx={{
+              flexGrow: 1,
+              ml: 3,
+              gap: 4,
+              display: { xs: "none", md: "flex" },
+            }}
+          >
+            <Link
+              component={NextLink}
+              href="/routines"
+              sx={{
+                color: "primary.contrastText",
+              }}
+            >
+              Routines
+            </Link>
+            <Link
+              component={NextLink}
+              href="/exercises"
+              sx={{
+                color: "primary.contrastText",
+              }}
+            >
+              Exercises
+            </Link>
+            <Link
+              component={NextLink}
+              href="/nutrition"
+              sx={{
+                color: "primary.contrastText",
+              }}
+            >
+              Nutrition
+            </Link>
+          </Box>
+          <AccountNavItem />
+        </Toolbar>
+      </Container>
+    </AppBar>
   );
 };
