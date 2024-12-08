@@ -1,4 +1,3 @@
-/** @jsxImportSource @emotion/react */
 import { AppBar, Box, Container, Toolbar, Link } from "@mui/material";
 import Image from "next/image";
 import NextLink from "next/link";

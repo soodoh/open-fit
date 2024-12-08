@@ -1,15 +1,13 @@
-/** @jsxImportSource @emotion/react */
 "use client";
 import { useAuthFetcher } from "@/lib/fetcher";
 import useSWR from "swr";
 import { PaginatedResponse } from "@/types/response";
 import { Workout } from "@/types/privateApi/workout";
 import { WorkoutRoutine } from "@/components/routines/WorkoutRoutine";
-import { Fab, Typography } from "@mui/material";
+import { Box, Container, Fab, Typography } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import { useState } from "react";
 import { EditRoutineModal as CreateRoutineModal } from "@/components/routines/EditRoutineModal";
-import { css } from "@emotion/react";
 
 export default function Routines() {
   const { data: workouts } = useSWR<PaginatedResponse<Workout>>(
@@ -19,21 +17,9 @@ export default function Routines() {
   const [showEditModal, setEditModal] = useState(false);
 
   return (
-    <div
-      css={css`
-        display: flex;
-        flex-direction: column;
-        max-width: var(--max-width);
-        width: 100%;
-        margin: 2rem;
-        gap: 2rem;
-      `}
-    >
-      <div
-        css={css`
-          display: flex;
-          justify-content: space-between;
-        `}
+    <Container maxWidth="xl">
+      <Box
+        sx={{ display: "flex", justifyContent: "space-between", mt: 3, mb: 3 }}
       >
         <Typography variant="h4">Workout Routines</Typography>
         <Fab
@@ -44,7 +30,7 @@ export default function Routines() {
           <Add sx={{ mr: 1 }} />
           Create Routine
         </Fab>
-      </div>
+      </Box>
 
       <CreateRoutineModal
         open={showEditModal}
@@ -55,6 +41,6 @@ export default function Routines() {
       {workouts?.results.map((workout) => (
         <WorkoutRoutine key={`routine-${workout.id}`} workoutId={workout.id} />
       ))}
-    </div>
+    </Container>
   );
 }

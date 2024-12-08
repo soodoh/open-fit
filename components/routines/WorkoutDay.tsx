@@ -59,7 +59,7 @@ export const WorkoutDay = ({
       </AccordionDetails>
       <Divider />
 
-      <List>
+      <List dense disablePadding>
         {workoutSet?.results.map((set) => {
           return (
             <WorkoutSet key={`set-${set.id}`} dayId={dayId} setId={set.id} />

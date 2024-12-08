@@ -1,4 +1,3 @@
-/** @jsxImportSource @emotion/react */
 import useSWR from "swr";
 import { Workout } from "@/types/privateApi/workout";
 import {
@@ -12,7 +11,6 @@ import {
 import { useEffect, useState } from "react";
 import { PaginatedResponse } from "@/types/response";
 import { useAuthFetcher } from "@/lib/fetcher";
-import { css } from "@emotion/react";
 
 export const EditRoutineModal = ({
   open,
@@ -75,13 +73,7 @@ export const EditRoutineModal = ({
       }}
     >
       <DialogTitle>{workoutId ? "Edit Routine" : "New Routine"}</DialogTitle>
-      <DialogContent
-        css={css`
-          display: flex;
-          flex-direction: column;
-          gap: 1rem;
-        `}
-      >
+      <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
         <TextField
           autoFocus
           id="routine-name"

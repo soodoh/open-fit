@@ -1,20 +1,9 @@
-/** @jsxImportSource @emotion/react */
-"use client";
-import { css } from "@emotion/react";
+import { Container } from "@mui/material";
 
 export default function Home() {
   return (
-    <div
-      css={css`
-        display: flex;
-        flex-direction: column;
-        max-width: var(--max-width);
-        width: 100%;
-        margin: 2rem;
-        gap: 2rem;
-      `}
-    >
+    <Container maxWidth="xl" sx={{ mt: 3 }}>
       Home page!
-    </div>
+    </Container>
   );
 }

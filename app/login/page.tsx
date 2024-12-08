@@ -1,12 +1,10 @@
-/** @jsxImportSource @emotion/react */
 "use client";
-import { Button, TextField } from "@mui/material";
+import { Button, Container, TextField } from "@mui/material";
 import { type FormEvent, useState } from "react";
 import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from "@/lib/constants";
 import { z } from "zod";
 import { fetcher } from "@/lib/fetcher";
 import { useRouter } from "next/navigation";
-import { css } from "@emotion/react";
 
 const LoginFormSchema = z.object({
   username: z
@@ -58,47 +56,41 @@ export default function LoginPage() {
   };
 
   return (
-    <div
-      css={css`
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      `}
+    <Container
+      maxWidth="xs"
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        flexDirection: "column",
+      }}
+      component="form"
+      onSubmit={login}
     >
-      <form
-        onSubmit={login}
-        css={css`
-          display: flex;
-          flex-direction: column;
-        `}
-      >
-        <TextField
-          css={css`
-            margin-bottom: 1rem;
-          `}
-          label="Username"
-          variant="outlined"
-          error={showErrors && !!errors?.username}
-          helperText={showErrors && errors?.username?.[0]}
-          onChange={(event) => setUsername(event.target.value)}
-          value={username}
-        />
-        <TextField
-          css={css`
-            margin-bottom: 1rem;
-          `}
-          label="Password"
-          variant="outlined"
-          type="password"
-          error={showErrors && !!errors?.password}
-          helperText={showErrors && errors?.password?.[0]}
-          onChange={(event) => setPassword(event.target.value)}
-          value={password}
-        />
-        <Button variant="contained" disabled={pending} type="submit">
-          Log In
-        </Button>
-      </form>
-    </div>
+      <TextField
+        sx={{ mb: 2 }}
+        fullWidth
+        label="Username"
+        variant="outlined"
+        error={showErrors && !!errors?.username}
+        helperText={showErrors && errors?.username?.[0]}
+        onChange={(event) => setUsername(event.target.value)}
+        value={username}
+      />
+      <TextField
+        sx={{ mb: 3 }}
+        fullWidth
+        label="Password"
+        variant="outlined"
+        type="password"
+        error={showErrors && !!errors?.password}
+        helperText={showErrors && errors?.password?.[0]}
+        onChange={(event) => setPassword(event.target.value)}
+        value={password}
+      />
+      <Button variant="contained" disabled={pending} type="submit" fullWidth>
+        Log In
+      </Button>
+    </Container>
   );
 }
