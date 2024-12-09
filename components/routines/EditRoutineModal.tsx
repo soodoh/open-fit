@@ -32,6 +32,34 @@ export const EditRoutineModal = ({
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
 
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const data = await authFetcher(
+      workoutId ? `/workout/${workoutId}` : "/workout/",
+      {
+        method: workoutId ? "PUT" : "POST",
+        body: JSON.stringify({
+          name,
+          description,
+        }),
+      },
+    );
+    onClose();
+    // Handle optimistic updates
+    if (!workouts) {
+      return;
+    }
+    if (!workoutId) {
+      mutateResults({
+        ...workouts,
+        count: workouts.count + 1,
+        results: [data, ...workouts.results],
+      });
+    } else {
+      mutate(data);
+    }
+  };
+
   useEffect(() => {
     setName(workout?.name ?? "");
     setDescription(workout?.description ?? "");
@@ -43,39 +71,13 @@ export const EditRoutineModal = ({
       onClose={onClose}
       PaperProps={{
         component: "form",
-        onSubmit: async (event: React.FormEvent<HTMLFormElement>) => {
-          event.preventDefault();
-          const data = await authFetcher(
-            workoutId ? `/workout/${workoutId}` : "/workout/",
-            {
-              method: workoutId ? "PUT" : "POST",
-              body: JSON.stringify({
-                name,
-                description,
-              }),
-            },
-          );
-          onClose();
-          if (!workouts) {
-            return;
-          }
-
-          if (!workoutId) {
-            mutateResults({
-              ...workouts,
-              count: workouts.count + 1,
-              results: [data, ...workouts.results],
-            });
-          } else {
-            mutate(data);
-          }
-        },
+        onSubmit: handleSubmit,
       }}
     >
       <DialogTitle>{workoutId ? "Edit Routine" : "New Routine"}</DialogTitle>
+
       <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
         <TextField
-          autoFocus
           id="routine-name"
           variant="filled"
           label="Name"
@@ -92,6 +94,7 @@ export const EditRoutineModal = ({
           onChange={(event) => setDescription(event.target.value)}
         />
       </DialogContent>
+
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
         <Button type="submit">Save</Button>
