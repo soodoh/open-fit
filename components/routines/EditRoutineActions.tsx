@@ -1,3 +1,4 @@
+"use client";
 import { useEffect, useState } from "react";
 import { DeleteRoutineModal } from "./DeleteRoutineModal";
 import { EditRoutineModal } from "@/components/routines/EditRoutineModal";
@@ -66,13 +67,13 @@ export const EditRoutineActions = ({ workoutId }: { workoutId: number }) => {
         id={`edit-workout-actions-${workoutId}-menu`}
         aria-labelledby={`edit-workout-actions-${workoutId}`}
         open={!!anchorEl}
-        onClose={handleClose}
+        onClose={() => setAnchorEl(null)}
         anchorEl={anchorEl}
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
         disableScrollLock
       >
-        <MenuList>
+        <MenuList disablePadding>
           <MenuItem onClick={() => setModal(Modal.ADD)}>
             <ListItemIcon>
               <Add fontSize="small" />

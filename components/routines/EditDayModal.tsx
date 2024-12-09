@@ -1,16 +1,17 @@
 import useSWR from "swr";
 import {
+  Box,
   Button,
-  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  OutlinedInput,
+  Select,
+  type SelectChangeEvent,
   TextField,
 } from "@mui/material";
 import { useEffect, useState } from "react";
@@ -18,6 +19,7 @@ import { PaginatedResponse } from "@/types/response";
 import { fetcher, useAuthFetcher } from "@/lib/fetcher";
 import { Day } from "@/types/privateApi/day";
 import { DaysOfWeek } from "@/types/publicApi/daysOfWeek";
+import { Weekday } from "./Weekday";
 
 export const EditDayModal = ({
   open,
@@ -50,6 +52,11 @@ export const EditDayModal = ({
     setDescription(workoutDay?.description ?? "");
     setWeekdays(workoutDay?.day ?? []);
   }, [workoutDay]);
+
+  const handleWeekdayChange = (event: SelectChangeEvent<number[]>) => {
+    const set = new Set(event.target.value as number[]);
+    setWeekdays(Array.from(set).sort((a, b) => a - b));
+  };
 
   return (
     <Dialog
@@ -89,10 +96,10 @@ export const EditDayModal = ({
       <DialogTitle>
         {workoutId ? "Edit Workout Day" : "New Workout Day"}
       </DialogTitle>
-      <DialogContent>
+      <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
         <TextField
-          autoFocus
           fullWidth
+          sx={{ mb: 1 }}
           margin="normal"
           id="workoutDay-description"
           variant="filled"
@@ -100,39 +107,35 @@ export const EditDayModal = ({
           value={description}
           onChange={(event) => setDescription(event.target.value)}
         />
-        <List disablePadding dense>
-          {daysOfWeek?.results.map(({ day_of_week: dayOfWeek }, index) => {
-            const dayNum = index + 1;
-            const checked = weekdays.includes(dayNum);
-            const labelId = `weekday-check-${dayOfWeek}`;
-            const handleChange = () => {
-              if (weekdays.includes(dayNum)) {
-                setWeekdays(weekdays.filter((day) => day !== dayNum));
-              } else {
-                setWeekdays([...weekdays, dayNum]);
-              }
-            };
-
-            return (
-              <ListItem key={`edit-day-week-${dayOfWeek}`} disablePadding>
-                <ListItemButton role={undefined} onClick={handleChange} dense>
-                  <ListItemIcon>
-                    <Checkbox
-                      edge="start"
-                      checked={checked}
-                      onChange={handleChange}
-                      size="small"
-                      disableRipple
-                      tabIndex={-1}
-                      inputProps={{ "aria-labelledby": labelId }}
-                    />
-                  </ListItemIcon>
-                  <ListItemText id={labelId} primary={dayOfWeek} />
-                </ListItemButton>
-              </ListItem>
-            );
-          })}
-        </List>
+        <FormControl fullWidth>
+          <InputLabel id={`${workoutId}-${dayId}-weekday-label`}>
+            Weekdays
+          </InputLabel>
+          <Select
+            labelId={`${workoutId}-${dayId}-weekday-label`}
+            id={`${workoutId}-${dayId}-weekday`}
+            multiple
+            value={weekdays}
+            onChange={handleWeekdayChange}
+            input={<OutlinedInput label="Weekdays" />}
+            renderValue={(selected) => (
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                {selected.map((value) => (
+                  <Weekday key={`weekday-${value}`} weekday={value} />
+                ))}
+              </Box>
+            )}
+          >
+            {daysOfWeek?.results.map((dayOfWeek, index) => (
+              <MenuItem
+                key={`${workoutId}-${dayId}-${dayOfWeek.day_of_week}`}
+                value={index + 1}
+              >
+                {dayOfWeek.day_of_week}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </DialogContent>
 
       <DialogActions>

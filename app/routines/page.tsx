@@ -3,11 +3,12 @@ import { useAuthFetcher } from "@/lib/fetcher";
 import useSWR from "swr";
 import { PaginatedResponse } from "@/types/response";
 import { Workout } from "@/types/privateApi/workout";
-import { WorkoutRoutine } from "@/components/routines/WorkoutRoutine";
 import { Box, Container, Fab, Typography } from "@mui/material";
 import { Add } from "@mui/icons-material";
+import { Grid2 as Grid } from "@mui/material";
 import { useState } from "react";
 import { EditRoutineModal as CreateRoutineModal } from "@/components/routines/EditRoutineModal";
+import { RoutineCard } from "@/components/routines/RoutineCard";
 
 export default function Routines() {
   const { data: workouts } = useSWR<PaginatedResponse<Workout>>(
@@ -17,10 +18,8 @@ export default function Routines() {
   const [showEditModal, setEditModal] = useState(false);
 
   return (
-    <Container maxWidth="xl">
-      <Box
-        sx={{ display: "flex", justifyContent: "space-between", mt: 3, mb: 3 }}
-      >
+    <Container maxWidth="xl" sx={{ my: 3 }}>
+      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 3 }}>
         <Typography variant="h4">Workout Routines</Typography>
         <Fab
           color="primary"
@@ -38,9 +37,13 @@ export default function Routines() {
         workoutId={null}
       />
 
-      {workouts?.results.map((workout) => (
-        <WorkoutRoutine key={`routine-${workout.id}`} workoutId={workout.id} />
-      ))}
+      <Grid container spacing={2}>
+        {workouts?.results.map((workout) => (
+          <Grid key={`routine-${workout.id}`} size={{ xs: 12, md: 6 }}>
+            <RoutineCard workoutId={workout.id} />
+          </Grid>
+        ))}
+      </Grid>
     </Container>
   );
 }

@@ -1,3 +1,4 @@
+"use client";
 import { useEffect, useState } from "react";
 import { EditDayModal } from "./EditDayModal";
 import { Delete, Edit, MoreVert } from "@mui/icons-material";
@@ -61,7 +62,7 @@ export const EditDayActions = ({
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
         disableScrollLock
       >
-        <MenuList>
+        <MenuList dense disablePadding>
           <MenuItem onClick={() => setModal(Modal.EDIT)}>
             <ListItemIcon>
               <Edit fontSize="small" />
@@ -77,31 +78,18 @@ export const EditDayActions = ({
         </MenuList>
       </Menu>
 
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
+      <IconButton
+        aria-label={`Edit actions for workout day ${dayId}`}
+        id={`edit-day-actions-${dayId}`}
+        aria-controls={menuOpen ? `edit-day-actions-${dayId}-menu` : undefined}
+        aria-haspopup="true"
+        aria-expanded={menuOpen ? "true" : undefined}
+        onClick={(event: React.MouseEvent<HTMLElement>) => {
+          setAnchorEl(event.currentTarget);
         }}
       >
-        <Box sx={{ width: "100%", maxWidth: 500 }}>
-          <AutocompleteExercise />
-        </Box>
-        <IconButton
-          aria-label={`Edit actions for workout day ${dayId}`}
-          id={`edit-day-actions-${dayId}`}
-          aria-controls={
-            menuOpen ? `edit-day-actions-${dayId}-menu` : undefined
-          }
-          aria-haspopup="true"
-          aria-expanded={menuOpen ? "true" : undefined}
-          onClick={(event: React.MouseEvent<HTMLElement>) => {
-            setAnchorEl(event.currentTarget);
-          }}
-        >
-          <MoreVert />
-        </IconButton>
-      </Box>
+        <MoreVert />
+      </IconButton>
     </>
   );
 };

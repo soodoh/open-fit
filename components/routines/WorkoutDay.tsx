@@ -7,14 +7,16 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Box,
+  Chip,
   Divider,
   List,
   Typography,
 } from "@mui/material";
 import { WorkoutSet as WorkoutSet } from "./WorkoutSet";
 import { ExpandMore } from "@mui/icons-material";
-import { Weekday } from "./Weekday";
 import { EditDayActions } from "./EditDayActions";
+import moment from "moment";
 
 export const WorkoutDay = ({
   dayId,
@@ -42,15 +44,14 @@ export const WorkoutDay = ({
       >
         <div>
           <Typography variant="subtitle1">{day.description}</Typography>
-          <Typography variant="caption">
-            {day.day.map((weekday, index) => (
-              <Weekday
+          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+            {day.day.map((weekday) => (
+              <Chip
                 key={`day-${dayId}-weekday-${weekday}`}
-                weekday={weekday}
-                isLast={index + 1 >= day.day.length}
+                label={moment().set("weekday", weekday).format("dddd")}
               />
             ))}
-          </Typography>
+          </Box>
         </div>
       </AccordionSummary>
 

@@ -1,3 +1,4 @@
+"use client";
 import moment from "moment";
 import { useAuthFetcher } from "@/lib/fetcher";
 import { Day } from "@/types/privateApi/day";

@@ -59,6 +59,7 @@ export default function LoginPage() {
     <Container
       maxWidth="xs"
       sx={{
+        flexGrow: 1,
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
