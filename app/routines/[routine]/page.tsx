@@ -5,10 +5,10 @@ import { redirect } from "next/navigation";
 export default async function Page({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ routine: string }>;
 }) {
-  const { id } = await params;
-  const workoutId = parseInt(id, 10);
+  const { routine } = await params;
+  const workoutId = parseInt(routine, 10);
 
   if (Number.isNaN(workoutId)) {
     redirect("/routines");

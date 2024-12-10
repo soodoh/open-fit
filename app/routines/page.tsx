@@ -39,7 +39,7 @@ export default function Routines() {
 
       <Grid container spacing={2}>
         {workouts?.results.map((workout) => (
-          <Grid key={`routine-${workout.id}`} size={{ xs: 12, md: 6 }}>
+          <Grid key={`routine-${workout.id}`} size={{ xs: 12, sm: 6, md: 4 }}>
             <RoutineCard workoutId={workout.id} />
           </Grid>
         ))}

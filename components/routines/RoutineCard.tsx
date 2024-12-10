@@ -9,66 +9,14 @@ import {
   Card,
   CardHeader,
   List,
-  ListItem,
-  ListItemText,
   CardActions,
   Button,
-  Box,
-  Chip,
   Divider,
 } from "@mui/material";
 import useSWR from "swr";
 import { EditRoutineActions } from "./EditRoutineActions";
-import { EditDayActions } from "./EditDayActions";
 import Link from "next/link";
-
-const RoutineDay = ({
-  workoutId,
-  dayId,
-}: {
-  workoutId: number;
-  dayId: number;
-}) => {
-  const authFetcher = useAuthFetcher();
-  const { data: workoutDay } = useSWR<Day>(`/day/${dayId}`, authFetcher);
-
-  if (!workoutDay) {
-    return null;
-  }
-  return (
-    <>
-      <ListItem
-        secondaryAction={
-          <EditDayActions dayId={workoutDay.id} workoutId={workoutId} />
-        }
-      >
-        <ListItemText
-          primary={workoutDay.description}
-          secondary={
-            <Box
-              component="span"
-              sx={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: 0.5,
-                mt: 0.5,
-              }}
-            >
-              {workoutDay.day.map((weekday) => (
-                <Chip
-                  key={`workout-${workoutId}-weekday-${weekday}`}
-                  component="span"
-                  label={moment().set("weekday", weekday).format("ddd")}
-                />
-              ))}
-            </Box>
-          }
-        />
-      </ListItem>
-      <Divider />
-    </>
-  );
-};
+import { RoutineDayItem } from "./RoutineDayItem";
 
 export const RoutineCard = ({ workoutId }: { workoutId: number }) => {
   const authFetcher = useAuthFetcher();
@@ -105,7 +53,7 @@ export const RoutineCard = ({ workoutId }: { workoutId: number }) => {
         <Divider />
         {workoutDays?.results.map((workoutDay) => {
           return (
-            <RoutineDay
+            <RoutineDayItem
               key={`workout-${workoutId}-day-${workoutDay.id}`}
               workoutId={workoutId}
               dayId={workoutDay.id}
