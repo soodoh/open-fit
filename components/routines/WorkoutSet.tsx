@@ -9,8 +9,10 @@ import {
   ListItemButton,
   ListItemText,
 } from "@mui/material";
-import { Error, Image as ImageIcon } from "@mui/icons-material";
+import { DragHandle, Error, Image as ImageIcon } from "@mui/icons-material";
 import { ExerciseBaseInfo } from "@/types/publicApi/exerciseBaseInfo";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 export const WorkoutSet = ({ setId }: { dayId: number; setId: number }) => {
   const authFetcher = useAuthFetcher();
@@ -18,12 +20,15 @@ export const WorkoutSet = ({ setId }: { dayId: number; setId: number }) => {
     PaginatedResponse<Setting>
   >(`/setting?set=${setId}`, authFetcher);
 
-  const exerciseBaseId = setting?.results[0]?.exercise_base;
+  const exerciseBaseId = setting?.results?.[0]?.exercise_base;
   const { data: exerciseBaseInfo, isLoading: exerciseLoading } =
     useSWR<ExerciseBaseInfo>(
       Number.isInteger(exerciseBaseId) && `/exercisebaseinfo/${exerciseBaseId}`,
       useAuthFetcher(),
     );
+
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: setId });
 
   const isLoading = settingLoading || exerciseLoading;
   const imageUrl = exerciseBaseInfo?.images?.[0]?.image;
@@ -49,7 +54,13 @@ export const WorkoutSet = ({ setId }: { dayId: number; setId: number }) => {
   }
 
   return (
-    <ListItem dense disablePadding>
+    <ListItem
+      dense
+      disablePadding
+      ref={setNodeRef}
+      sx={{ transform: CSS.Transform.toString(transform), transition }}
+      secondaryAction={<DragHandle {...attributes} {...listeners} />}
+    >
       <ListItemButton>
         <ListItemAvatar>
           {imageUrl ? (
