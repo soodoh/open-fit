@@ -15,7 +15,11 @@ import {
 import { useMemo, useState } from "react";
 import useSWR from "swr";
 
-export const AutocompleteExercise = () => {
+export const AutocompleteExercise = ({
+  addExercise,
+}: {
+  addExercise: (exercise: ExerciseSearchData) => void;
+}) => {
   const authFetcher = useAuthFetcher();
   const [searchTerm, setSearchTerm] = useState("");
   const { data: searchResults, isLoading } = useSWR<ExerciseSearchResults>(
@@ -47,8 +51,10 @@ export const AutocompleteExercise = () => {
       filterOptions={(option) => option}
       loading={isLoading}
       noOptionsText="No exercises found"
-      onChange={(_, value) => {
-        console.log("change", value);
+      onChange={(_, selectedExercise) => {
+        if (selectedExercise) {
+          addExercise(selectedExercise);
+        }
       }}
       onInputChange={(_, newInputValue: string) => {
         setSearchTerm(newInputValue);

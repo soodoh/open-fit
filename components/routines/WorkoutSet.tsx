@@ -4,6 +4,7 @@ import useSWR from "swr";
 import type { PaginatedResponse } from "@/types/response";
 import {
   Avatar,
+  IconButton,
   ListItem,
   ListItemAvatar,
   ListItemButton,
@@ -59,7 +60,11 @@ export const WorkoutSet = ({ setId }: { dayId: number; setId: number }) => {
       disablePadding
       ref={setNodeRef}
       sx={{ transform: CSS.Transform.toString(transform), transition }}
-      secondaryAction={<DragHandle {...attributes} {...listeners} />}
+      secondaryAction={
+        <IconButton>
+          <DragHandle {...attributes} {...listeners} />
+        </IconButton>
+      }
     >
       <ListItemButton>
         <ListItemAvatar>

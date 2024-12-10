@@ -9,7 +9,6 @@ import {
   Card,
   CardHeader,
   Chip,
-  Divider,
   List,
   ListItem,
   Typography,
@@ -24,6 +23,7 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import { ExerciseSearchData } from "@/types/privateApi/exerciseSearch";
 
 export const DayCard = ({
   dayId,
@@ -64,6 +64,28 @@ export const DayCard = ({
     mutateSets({ ...workoutSets, results: newSets });
   };
 
+  const handleAdd = async (exercise: ExerciseSearchData) => {
+    const data = await authFetcher("/set/", {
+      method: "POST",
+      body: JSON.stringify({
+        exerciseday: dayId,
+        order: sets.length,
+        sets: 1,
+      }),
+    });
+    const newSets = [...sets, data];
+    mutateSets({ ...workoutSets, results: newSets });
+    // Add 1 setting to the set
+    await authFetcher("/setting/", {
+      method: "POST",
+      body: JSON.stringify({
+        set: data.id,
+        exercise_base: exercise.base_id,
+        reps: 0,
+      }),
+    });
+  };
+
   if (!day) {
     return null;
   }
@@ -88,11 +110,9 @@ export const DayCard = ({
         action={<EditDayActions workoutId={workoutId} dayId={dayId} />}
       />
 
-      <Divider />
-
       <List dense disablePadding>
         <ListItem>
-          <AutocompleteExercise />
+          <AutocompleteExercise addExercise={handleAdd} />
         </ListItem>
         <DndContext onDragEnd={handleSort}>
           <SortableContext items={sets} strategy={verticalListSortingStrategy}>
