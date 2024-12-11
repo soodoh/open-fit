@@ -5,6 +5,7 @@ import type { PaginatedResponse } from "@/types/response";
 import {
   Avatar,
   Collapse,
+  Fab,
   IconButton,
   List,
   ListItem,
@@ -13,9 +14,11 @@ import {
   ListItemText,
 } from "@mui/material";
 import {
+  Add,
+  Check,
+  Delete,
   DragHandle,
   Error,
-  ExpandLess,
   Image as ImageIcon,
 } from "@mui/icons-material";
 import { ExerciseBaseInfo } from "@/types/publicApi/exerciseBaseInfo";
@@ -66,13 +69,14 @@ export const WorkoutSet = ({ setId }: { dayId: number; setId: number }) => {
   return (
     <>
       <ListItem
-        dense
         disablePadding
         ref={setNodeRef}
         sx={{ transform: CSS.Transform.toString(transform), transition }}
         secondaryAction={
           edit ? (
-            <ExpandLess />
+            <IconButton>
+              <Delete />
+            </IconButton>
           ) : (
             <IconButton>
               <DragHandle {...attributes} {...listeners} />
@@ -99,11 +103,25 @@ export const WorkoutSet = ({ setId }: { dayId: number; setId: number }) => {
       <Collapse in={edit} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
           {settings.results?.map((setting) => (
-            <ListItem key={`setting-${setting.id}`} sx={{ pl: 4 }}>
+            <ListItem
+              key={`setting-${setting.id}`}
+              sx={{ pl: 4 }}
+              secondaryAction={
+                <IconButton>
+                  <Delete />
+                </IconButton>
+              }
+            >
               {setting.reps} {setting.repetition_unit} x {setting.weight}{" "}
               {setting.weight_unit}
             </ListItem>
           ))}
+          <ListItem sx={{ mb: 1 }}>
+            <Fab size="medium" variant="extended">
+              <Add />
+              Add new set
+            </Fab>
+          </ListItem>
         </List>
       </Collapse>
     </>
