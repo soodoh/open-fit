@@ -4,8 +4,15 @@ import { Setting } from "@/types/privateApi/setting";
 import { RepetitionUnit } from "@/types/publicApi/repetitionUnit";
 import { WeightUnit } from "@/types/publicApi/weightUnit";
 import { PaginatedResponse } from "@/types/response";
-import { Check, CheckCircle, Delete } from "@mui/icons-material";
-import { Box, IconButton, ListItem, MenuItem, TextField } from "@mui/material";
+import { Check, Delete } from "@mui/icons-material";
+import {
+  Box,
+  IconButton,
+  ListItem,
+  ListItemText,
+  MenuItem,
+  TextField,
+} from "@mui/material";
 import { useState } from "react";
 import useSWR from "swr";
 
@@ -20,16 +27,41 @@ export const EditSettingRow = ({ settingId }: { settingId: number }) => {
     "/setting-repetitionunit?ordering=id",
     fetcher,
   );
+  const repUnitLabel = repUnits?.results?.find(
+    (unit) => unit.id === setting?.repetition_unit,
+  )?.name;
   const { data: weightUnits } = useSWR<PaginatedResponse<WeightUnit>>(
     "/setting-weightunit?ordering=id",
     fetcher,
   );
+  const weightUnitLabel = weightUnits?.results?.find(
+    (unit) => unit.id === setting?.weight_unit,
+  )?.name;
 
   const defaultWeightUnit = useDefaultWeightUnit().toString();
   const [reps, setReps] = useState<string>("0");
   const [repUnit, setRepUnit] = useState<string>("1");
   const [weight, setWeight] = useState<string>("0");
   const [weightUnit, setWeightUnit] = useState<string>(defaultWeightUnit);
+  const [edit, setEdit] = useState(true);
+
+  if (edit) {
+    return (
+      <ListItem
+        sx={{ pl: 4 }}
+        secondaryAction={
+          <IconButton>
+            <Delete />
+          </IconButton>
+        }
+      >
+        <ListItemText
+          primary={`${setting?.reps ?? 0} ${repUnitLabel}`}
+          secondary={`${parseFloat(setting?.weight ?? "0")} ${weightUnitLabel}`}
+        />
+      </ListItem>
+    );
+  }
 
   return (
     <ListItem

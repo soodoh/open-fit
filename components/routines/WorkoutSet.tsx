@@ -1,6 +1,6 @@
 import { useAuthFetcher } from "@/lib/fetcher";
 import { Setting } from "@/types/privateApi/setting";
-import useSWR, { useSWRConfig } from "swr";
+import useSWR from "swr";
 import type { PaginatedResponse } from "@/types/response";
 import {
   Avatar,
@@ -27,6 +27,9 @@ import { CSS } from "@dnd-kit/utilities";
 import { useState } from "react";
 import { EditSettingRow } from "./EditSettingRow";
 import { DeleteSetModal } from "./DeleteSetModal";
+import { useDefaultWeightUnit } from "@/lib/useDefaultWeightUnit";
+import { WorkoutSetType } from "@/types/privateApi/set";
+import { EditSetCommentModal } from "./EditSetCommentModal";
 
 export const WorkoutSet = ({
   dayId,
@@ -39,9 +42,11 @@ export const WorkoutSet = ({
 }) => {
   const authFetcher = useAuthFetcher();
 
-  const { data: settings, isLoading: settingLoading } = useSWR<
-    PaginatedResponse<Setting>
-  >(`/setting?set=${setId}`, authFetcher);
+  const {
+    data: settings,
+    isLoading: settingLoading,
+    mutate: mutateSettings,
+  } = useSWR<PaginatedResponse<Setting>>(`/setting?set=${setId}`, authFetcher);
 
   const exerciseBaseId = settings?.results?.[0]?.exercise_base;
   const { data: exerciseBaseInfo, isLoading: exerciseLoading } =
@@ -50,10 +55,14 @@ export const WorkoutSet = ({
       useAuthFetcher(),
     );
 
+  const { data: set } = useSWR<WorkoutSetType>(`/set/${setId}`, authFetcher);
+
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: setId });
   const [edit, setEdit] = useState(false);
+  const [editComment, setEditComment] = useState(false);
   const [deleteOpen, setDelete] = useState(false);
+  const defaultWeightUnit = useDefaultWeightUnit();
 
   const isLoading = settingLoading || exerciseLoading;
   const imageUrl = exerciseBaseInfo?.images?.[0]?.image;
@@ -61,22 +70,47 @@ export const WorkoutSet = ({
     (exercise) => exercise.language === 2,
   );
 
+  const handleAdd = async () => {
+    const newSet = await authFetcher("/setting/", {
+      method: "POST",
+      body: JSON.stringify({
+        set: setId,
+        exercise_base: exerciseBaseId,
+        weight: 0,
+        weight_unit: defaultWeightUnit,
+        reps: 0,
+      }),
+    });
+    mutateSettings({
+      ...settings,
+      count: settings?.count ? settings.count + 1 : 1,
+      results: settings?.results ? [...settings.results, newSet] : [newSet],
+    });
+  };
+
   if (isLoading) {
     return null;
   }
 
-  if (!settings || !exercise) {
-    return (
-      <ListItem>
-        <ListItemAvatar>
-          <Avatar>
-            <Error />
-          </Avatar>
-        </ListItemAvatar>
-        <ListItemText primary="Unknown Exercise" />
-      </ListItem>
+  const EditActions =
+    edit && isSortingActive ? (
+      <IconButton
+        onClick={() => {
+          setDelete(true);
+          setEdit(false);
+        }}
+      >
+        <Delete />
+      </IconButton>
+    ) : (
+      <IconButton
+        sx={{ touchAction: "manipulation" }}
+        {...attributes}
+        {...listeners}
+      >
+        <DragHandle />
+      </IconButton>
     );
-  }
 
   return (
     <>
@@ -86,63 +120,58 @@ export const WorkoutSet = ({
         dayId={dayId}
         setId={setId}
       />
+      <EditSetCommentModal
+        open={editComment}
+        onClose={() => setEditComment(false)}
+        setId={setId}
+      />
 
       <ListItem
         disablePadding
         ref={setNodeRef}
         sx={{ transform: CSS.Transform.toString(transform), transition }}
-        secondaryAction={
-          edit && isSortingActive ? (
-            <IconButton
-              onClick={() => {
-                setDelete(true);
-                setEdit(false);
-              }}
-            >
-              <Delete />
-            </IconButton>
-          ) : (
-            <IconButton
-              sx={{ touchAction: "manipulation" }}
-              {...attributes}
-              {...listeners}
-            >
-              <DragHandle />
-            </IconButton>
-          )
-        }
+        secondaryAction={EditActions}
       >
         <ListItemButton onClick={() => setEdit(!edit)}>
           <ListItemAvatar>
-            {imageUrl ? (
+            {exercise && imageUrl ? (
               <Avatar alt={`${exercise.name} set item`} src={imageUrl} />
             ) : (
-              <Avatar>
-                <ImageIcon />
-              </Avatar>
+              <Avatar>{exercise ? <ImageIcon /> : <Error />}</Avatar>
             )}
           </ListItemAvatar>
           <ListItemText
-            primary={exercise.name}
-            secondary={`${settings.count} sets`}
+            primary={exercise?.name ?? "Unknown exercise"}
+            secondary={`${settings?.count ?? 0} sets`}
           />
         </ListItemButton>
       </ListItem>
 
       <Collapse in={edit && isSortingActive} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
-          {settings.results?.map((setting) => (
+          {set?.comment && (
+            <ListItem dense sx={{ pl: 4 }}>
+              <ListItemText secondary={set.comment} />
+            </ListItem>
+          )}
+
+          {settings?.results?.map((setting) => (
             <EditSettingRow
               key={`setting-${setting.id}`}
               settingId={setting.id}
             />
           ))}
+
           <ListItem sx={{ display: "flex", gap: 2 }}>
-            <Fab size="medium" variant="extended">
+            <Fab size="medium" variant="extended" onClick={handleAdd}>
               <Add />
               New set
             </Fab>
-            <Fab size="medium" variant="extended">
+            <Fab
+              size="medium"
+              variant="extended"
+              onClick={() => setEditComment(true)}
+            >
               <Comment />
             </Fab>
           </ListItem>

@@ -70,7 +70,7 @@ export const AddExerciseRow = ({ dayId }: { dayId: number }) => {
       component="form"
       onSubmit={handleSubmit}
     >
-      <Box sx={{ minWidth: 150, flexGrow: 1 }}>
+      <Box sx={{ minWidth: 150, maxWidth: 400, flexGrow: 1 }}>
         <AutocompleteExercise
           value={exercise}
           onChange={(newExercise) => setExercise(newExercise)}
