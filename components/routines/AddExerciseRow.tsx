@@ -66,11 +66,11 @@ export const AddExerciseRow = ({ dayId }: { dayId: number }) => {
 
   return (
     <Box
-      sx={{ display: "flex", gap: 2, alignItems: "center" }}
+      sx={{ display: "flex", gap: 2, alignItems: "center", flexWrap: "wrap" }}
       component="form"
       onSubmit={handleSubmit}
     >
-      <Box sx={{ minWidth: 200, flexGrow: 1 }}>
+      <Box sx={{ minWidth: 150, flexGrow: 1 }}>
         <AutocompleteExercise
           value={exercise}
           onChange={(newExercise) => setExercise(newExercise)}
@@ -85,7 +85,7 @@ export const AddExerciseRow = ({ dayId }: { dayId: number }) => {
         }}
         value={numSets}
         onChange={(event) => setNumSets(event.target.value)}
-        sx={{ width: 75 }}
+        sx={{ minWidth: 50, maxWidth: 75 }}
       />
       <IconButton type="submit">
         <Add />

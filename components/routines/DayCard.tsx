@@ -16,7 +16,15 @@ import {
 import { WorkoutSet as WorkoutSet } from "./WorkoutSet";
 import { EditDayMenu } from "./EditDayMenu";
 import moment from "moment";
-import { DndContext, DragEndEvent } from "@dnd-kit/core";
+import {
+  DndContext,
+  DragEndEvent,
+  KeyboardSensor,
+  MouseSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
 import {
   arrayMove,
   SortableContext,
@@ -32,13 +40,17 @@ export const DayCard = ({
   workoutId: number;
 }) => {
   const authFetcher = useAuthFetcher();
-
   const { data: day } = useSWR<Day>(`/day/${dayId}`, authFetcher);
-
   const { data: workoutSets, mutate: mutateSets } = useSWR<
     PaginatedResponse<WorkoutSetType>
   >(`/set?exerciseday=${dayId}`, authFetcher);
   const sets = workoutSets?.results ?? [];
+
+  const mouseSensor = useSensor(MouseSensor);
+  const touchSensor = useSensor(TouchSensor);
+  const keyboardSensor = useSensor(KeyboardSensor);
+
+  const sensors = useSensors(mouseSensor, touchSensor, keyboardSensor);
 
   const handleSort = async (event: DragEndEvent) => {
     const dragId = event.active.id;
@@ -94,7 +106,7 @@ export const DayCard = ({
       </CardContent>
 
       <List dense disablePadding>
-        <DndContext onDragEnd={handleSort}>
+        <DndContext onDragEnd={handleSort} sensors={sensors}>
           <SortableContext items={sets} strategy={verticalListSortingStrategy}>
             {sets.map((set) => {
               return (

@@ -25,6 +25,13 @@ export const AppWrapper = ({ children }: Readonly<{ children: ReactNode }>) => {
           },
         },
       },
+      MuiFab: {
+        styleOverrides: {
+          root: {
+            textTransform: "none",
+          },
+        },
+      },
     },
   });
 

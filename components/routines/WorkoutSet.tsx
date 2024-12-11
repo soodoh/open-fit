@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import {
   Add,
+  Comment,
   Delete,
   DragHandle,
   Error,
@@ -99,8 +100,12 @@ export const WorkoutSet = ({
               <Delete />
             </IconButton>
           ) : (
-            <IconButton>
-              <DragHandle {...attributes} {...listeners} />
+            <IconButton
+              sx={{ touchAction: "manipulation" }}
+              {...attributes}
+              {...listeners}
+            >
+              <DragHandle />
             </IconButton>
           )
         }
@@ -130,10 +135,13 @@ export const WorkoutSet = ({
               settingId={setting.id}
             />
           ))}
-          <ListItem sx={{ mb: 1 }}>
+          <ListItem sx={{ display: "flex", gap: 2 }}>
             <Fab size="medium" variant="extended">
               <Add />
-              Add new set
+              New set
+            </Fab>
+            <Fab size="medium" variant="extended">
+              <Comment />
             </Fab>
           </ListItem>
         </List>
