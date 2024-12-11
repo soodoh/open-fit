@@ -66,7 +66,7 @@ export const WorkoutSet = ({
 
   const isLoading = settingLoading || exerciseLoading;
   const imageUrl = exerciseBaseInfo?.images?.[0]?.image;
-  const exercise = exerciseBaseInfo?.exercises.find(
+  const exercise = exerciseBaseInfo?.exercises?.find(
     (exercise) => exercise.language === 2,
   );
 

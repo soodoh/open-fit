@@ -92,7 +92,7 @@ export const DayCard = ({
               {day.description}
             </Typography>
             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-              {day.day.map((weekday) => (
+              {day.day?.map((weekday) => (
                 <Chip
                   key={`day-${dayId}-weekday-${weekday}`}
                   label={moment().set("weekday", weekday).format("dddd")}
