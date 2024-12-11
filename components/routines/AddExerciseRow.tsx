@@ -66,7 +66,7 @@ export const AddExerciseRow = ({ dayId }: { dayId: number }) => {
 
   return (
     <Box
-      sx={{ display: "flex", gap: 2 }}
+      sx={{ display: "flex", gap: 2, alignItems: "center" }}
       component="form"
       onSubmit={handleSubmit}
     >

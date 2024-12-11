@@ -2,6 +2,7 @@ import useSWR from "swr";
 import {
   Box,
   Button,
+  Chip,
   Dialog,
   DialogActions,
   DialogContent,
@@ -19,7 +20,7 @@ import { PaginatedResponse } from "@/types/response";
 import { fetcher, useAuthFetcher } from "@/lib/fetcher";
 import { Day } from "@/types/privateApi/day";
 import { DaysOfWeek } from "@/types/publicApi/daysOfWeek";
-import { Weekday } from "./Weekday";
+import moment from "moment";
 
 export const EditDayModal = ({
   open,
@@ -84,8 +85,8 @@ export const EditDayModal = ({
           if (!dayId) {
             mutateResults({
               ...workoutDays,
-              count: workoutDays.count + 1,
-              results: [...workoutDays.results, data],
+              count: (workoutDays?.count ?? 0) + 1,
+              results: [...(workoutDays?.results ?? []), data],
             });
           } else {
             mutate(data);
@@ -121,12 +122,15 @@ export const EditDayModal = ({
             renderValue={(selected) => (
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                 {selected.map((value) => (
-                  <Weekday key={`weekday-${value}`} weekday={value} />
+                  <Chip
+                    key={`weekday-${value}`}
+                    label={moment().set("weekday", value).format("dddd")}
+                  />
                 ))}
               </Box>
             )}
           >
-            {daysOfWeek?.results.map((dayOfWeek, index) => (
+            {daysOfWeek?.results?.map((dayOfWeek, index) => (
               <MenuItem
                 key={`${workoutId}-${dayId}-${dayOfWeek.day_of_week}`}
                 value={index + 1}
