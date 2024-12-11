@@ -16,9 +16,11 @@ import { useMemo, useState } from "react";
 import useSWR from "swr";
 
 export const AutocompleteExercise = ({
-  addExercise,
+  value,
+  onChange,
 }: {
-  addExercise: (exercise: ExerciseSearchData) => void;
+  value: ExerciseSearchData | null;
+  onChange: (exercise: ExerciseSearchData | null) => void;
 }) => {
   const authFetcher = useAuthFetcher();
   const [searchTerm, setSearchTerm] = useState("");
@@ -44,6 +46,8 @@ export const AutocompleteExercise = ({
     <Autocomplete
       autoComplete
       fullWidth
+      value={value}
+      inputValue={searchTerm}
       options={options}
       isOptionEqualToValue={(option, value) => option?.id === value?.id}
       getOptionLabel={(option) => option?.name ?? "Unknown"}
@@ -52,9 +56,7 @@ export const AutocompleteExercise = ({
       loading={isLoading}
       noOptionsText="No exercises found"
       onChange={(_, selectedExercise) => {
-        if (selectedExercise) {
-          addExercise(selectedExercise);
-        }
+        onChange(selectedExercise);
       }}
       onInputChange={(_, newInputValue: string) => {
         setSearchTerm(newInputValue);

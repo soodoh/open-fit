@@ -9,7 +9,7 @@ import {
   ListItemText,
 } from "@mui/material";
 import useSWR from "swr";
-import { EditDayActions } from "./EditDayActions";
+import { EditDayMenu } from "./EditDayMenu";
 import moment from "moment";
 import Link from "next/link";
 
@@ -32,7 +32,7 @@ export const RoutineDayItem = ({
         dense
         disablePadding
         secondaryAction={
-          <EditDayActions dayId={workoutDay.id} workoutId={workoutId} />
+          <EditDayMenu dayId={workoutDay.id} workoutId={workoutId} />
         }
       >
         <ListItemButton

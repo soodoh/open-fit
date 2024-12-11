@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import { WorkoutSet as WorkoutSet } from "./WorkoutSet";
 import { ExpandMore } from "@mui/icons-material";
-import { EditDayActions } from "./EditDayActions";
+import { EditDayMenu } from "./EditDayMenu";
 import moment from "moment";
 
 export const WorkoutDay = ({
@@ -65,9 +65,8 @@ export const WorkoutDay = ({
       </List>
 
       <AccordionActions>
-        <EditDayActions workoutId={workoutId} dayId={dayId} />
+        <EditDayMenu workoutId={workoutId} dayId={dayId} />
       </AccordionActions>
     </Accordion>
   );
 };
-

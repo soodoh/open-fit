@@ -7,23 +7,22 @@ import type { WorkoutSetType } from "@/types/privateApi/set";
 import {
   Box,
   Card,
+  CardContent,
   CardHeader,
   Chip,
   List,
-  ListItem,
   Typography,
 } from "@mui/material";
 import { WorkoutSet as WorkoutSet } from "./WorkoutSet";
-import { EditDayActions } from "./EditDayActions";
+import { EditDayMenu } from "./EditDayMenu";
 import moment from "moment";
-import { AutocompleteExercise } from "../exercises/AutocompleteExercise";
 import { DndContext, DragEndEvent } from "@dnd-kit/core";
 import {
   arrayMove,
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { ExerciseSearchData } from "@/types/privateApi/exerciseSearch";
+import { AddExerciseRow } from "./AddExerciseRow";
 
 export const DayCard = ({
   dayId,
@@ -33,7 +32,9 @@ export const DayCard = ({
   workoutId: number;
 }) => {
   const authFetcher = useAuthFetcher();
+
   const { data: day } = useSWR<Day>(`/day/${dayId}`, authFetcher);
+
   const { data: workoutSets, mutate: mutateSets } = useSWR<
     PaginatedResponse<WorkoutSetType>
   >(`/set?exerciseday=${dayId}`, authFetcher);
@@ -64,28 +65,6 @@ export const DayCard = ({
     mutateSets({ ...workoutSets, results: newSets });
   };
 
-  const handleAdd = async (exercise: ExerciseSearchData) => {
-    const data = await authFetcher("/set/", {
-      method: "POST",
-      body: JSON.stringify({
-        exerciseday: dayId,
-        order: sets.length,
-        sets: 1,
-      }),
-    });
-    const newSets = [...sets, data];
-    mutateSets({ ...workoutSets, results: newSets });
-    // Add 1 setting to the set
-    await authFetcher("/setting/", {
-      method: "POST",
-      body: JSON.stringify({
-        set: data.id,
-        exercise_base: exercise.base_id,
-        reps: 0,
-      }),
-    });
-  };
-
   if (!day) {
     return null;
   }
@@ -107,13 +86,14 @@ export const DayCard = ({
             </Box>
           </>
         }
-        action={<EditDayActions workoutId={workoutId} dayId={dayId} />}
+        action={<EditDayMenu workoutId={workoutId} dayId={dayId} />}
       />
 
+      <CardContent>
+        <AddExerciseRow dayId={dayId} />
+      </CardContent>
+
       <List dense disablePadding>
-        <ListItem>
-          <AutocompleteExercise addExercise={handleAdd} />
-        </ListItem>
         <DndContext onDragEnd={handleSort}>
           <SortableContext items={sets} strategy={verticalListSortingStrategy}>
             {sets.map((set) => {

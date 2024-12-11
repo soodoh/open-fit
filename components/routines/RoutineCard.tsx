@@ -4,18 +4,9 @@ import { useAuthFetcher } from "@/lib/fetcher";
 import { Day } from "@/types/privateApi/day";
 import { Workout } from "@/types/privateApi/workout";
 import { PaginatedResponse } from "@/types/response";
-import {
-  Typography,
-  Card,
-  CardHeader,
-  List,
-  CardActions,
-  Button,
-  Divider,
-} from "@mui/material";
+import { Typography, Card, CardHeader, List, Divider } from "@mui/material";
 import useSWR from "swr";
-import { EditRoutineActions } from "./EditRoutineActions";
-import Link from "next/link";
+import { EditRoutineMenu } from "./EditRoutineMenu";
 import { RoutineDayItem } from "./RoutineDayItem";
 
 export const RoutineCard = ({ workoutId }: { workoutId: number }) => {
@@ -35,7 +26,7 @@ export const RoutineCard = ({ workoutId }: { workoutId: number }) => {
   return (
     <Card sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
       <CardHeader
-        action={<EditRoutineActions workoutId={workoutId} />}
+        action={<EditRoutineMenu workoutId={workoutId} />}
         title={workout.name}
         subheader={
           <>
@@ -61,12 +52,6 @@ export const RoutineCard = ({ workoutId }: { workoutId: number }) => {
           );
         })}
       </List>
-
-      <CardActions>
-        <Button component={Link} href={`/routines/${workoutId}`}>
-          View Routine
-        </Button>
-      </CardActions>
     </Card>
   );
 };

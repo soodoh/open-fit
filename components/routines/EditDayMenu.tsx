@@ -1,8 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import { DeleteRoutineModal } from "./DeleteRoutineModal";
-import { EditRoutineModal } from "@/components/routines/EditRoutineModal";
-import { Add, Delete, Edit, MoreVert } from "@mui/icons-material";
+import { EditDayModal } from "./EditDayModal";
+import { Delete, Edit, MoreVert } from "@mui/icons-material";
 import {
   IconButton,
   ListItemIcon,
@@ -11,15 +10,20 @@ import {
   MenuItem,
   MenuList,
 } from "@mui/material";
-import { EditDayModal as AddDayModal } from "./EditDayModal";
+import { DeleteDayModal } from "./DeleteDayModal";
 
 enum Modal {
   EDIT = "edit",
-  ADD = "add",
   DELETE = "delete",
 }
 
-export const EditRoutineActions = ({ workoutId }: { workoutId: number }) => {
+export const EditDayMenu = ({
+  workoutId,
+  dayId,
+}: {
+  workoutId: number;
+  dayId: number;
+}) => {
   const [modal, setModal] = useState<Modal | null>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const menuOpen = Boolean(anchorEl);
@@ -33,53 +37,30 @@ export const EditRoutineActions = ({ workoutId }: { workoutId: number }) => {
 
   return (
     <>
-      <AddDayModal
-        open={modal === Modal.ADD}
-        onClose={handleClose}
-        workoutId={workoutId}
-        dayId={null}
-      />
-      <EditRoutineModal
+      <EditDayModal
         open={modal === Modal.EDIT}
         onClose={handleClose}
         workoutId={workoutId}
+        dayId={dayId}
       />
-      <DeleteRoutineModal
+      <DeleteDayModal
         open={modal === Modal.DELETE}
         onClose={handleClose}
         workoutId={workoutId}
+        dayId={dayId}
       />
-      <IconButton
-        aria-label={`Edit actions for workout ${workoutId}`}
-        id={`edit-workout-actions-${workoutId}`}
-        aria-controls={
-          menuOpen ? `edit-workout-actions-${workoutId}-menu` : undefined
-        }
-        aria-haspopup="true"
-        aria-expanded={menuOpen ? "true" : undefined}
-        onClick={(event: React.MouseEvent<HTMLElement>) => {
-          setAnchorEl(event.currentTarget);
-        }}
-      >
-        <MoreVert />
-      </IconButton>
+
       <Menu
-        id={`edit-workout-actions-${workoutId}-menu`}
-        aria-labelledby={`edit-workout-actions-${workoutId}`}
-        open={!!anchorEl}
+        id={`edit-day-actions-${dayId}-menu`}
+        aria-labelledby={`edit-day-actions-${dayId}`}
+        open={menuOpen}
         onClose={() => setAnchorEl(null)}
         anchorEl={anchorEl}
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
         disableScrollLock
       >
-        <MenuList disablePadding>
-          <MenuItem onClick={() => setModal(Modal.ADD)}>
-            <ListItemIcon>
-              <Add fontSize="small" />
-            </ListItemIcon>
-            <ListItemText>Add Day</ListItemText>
-          </MenuItem>
+        <MenuList dense disablePadding>
           <MenuItem onClick={() => setModal(Modal.EDIT)}>
             <ListItemIcon>
               <Edit fontSize="small" />
@@ -94,6 +75,19 @@ export const EditRoutineActions = ({ workoutId }: { workoutId: number }) => {
           </MenuItem>
         </MenuList>
       </Menu>
+
+      <IconButton
+        aria-label={`Edit actions for workout day ${dayId}`}
+        id={`edit-day-actions-${dayId}`}
+        aria-controls={menuOpen ? `edit-day-actions-${dayId}-menu` : undefined}
+        aria-haspopup="true"
+        aria-expanded={menuOpen ? "true" : undefined}
+        onClick={(event: React.MouseEvent<HTMLElement>) => {
+          setAnchorEl(event.currentTarget);
+        }}
+      >
+        <MoreVert />
+      </IconButton>
     </>
   );
 };

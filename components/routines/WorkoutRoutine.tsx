@@ -7,7 +7,7 @@ import { PaginatedResponse } from "@/types/response";
 import { Typography, Card, CardContent, CardHeader } from "@mui/material";
 import useSWR from "swr";
 import { WorkoutDay } from "./WorkoutDay";
-import { EditRoutineActions } from "./EditRoutineActions";
+import { EditRoutineMenu } from "./EditRoutineMenu";
 
 export const WorkoutRoutine = ({ workoutId }: { workoutId: number }) => {
   const authFetcher = useAuthFetcher();
@@ -26,7 +26,7 @@ export const WorkoutRoutine = ({ workoutId }: { workoutId: number }) => {
   return (
     <Card>
       <CardHeader
-        action={<EditRoutineActions workoutId={workoutId} />}
+        action={<EditRoutineMenu workoutId={workoutId} />}
         title={workout.name}
         subheader={
           <>
