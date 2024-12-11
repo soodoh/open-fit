@@ -31,6 +31,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { AddExerciseRow } from "./AddExerciseRow";
+import { useState } from "react";
 
 export const DayCard = ({
   dayId,
@@ -49,8 +50,9 @@ export const DayCard = ({
   const mouseSensor = useSensor(MouseSensor);
   const touchSensor = useSensor(TouchSensor);
   const keyboardSensor = useSensor(KeyboardSensor);
-
   const sensors = useSensors(mouseSensor, touchSensor, keyboardSensor);
+
+  const [isSortingActive, setSortingState] = useState(true);
 
   const handleSort = async (event: DragEndEvent) => {
     const dragId = event.active.id;
@@ -75,6 +77,7 @@ export const DayCard = ({
     }, [] as Promise<unknown>[]);
     await Promise.all(patchUpdates);
     mutateSets({ ...workoutSets, results: newSets });
+    setSortingState(true);
   };
 
   if (!day) {
@@ -106,7 +109,13 @@ export const DayCard = ({
       </CardContent>
 
       <List dense disablePadding>
-        <DndContext onDragEnd={handleSort} sensors={sensors}>
+        <DndContext
+          onDragEnd={handleSort}
+          onDragStart={() => setSortingState(false)}
+          onDragCancel={() => setSortingState(true)}
+          onDragAbort={() => setSortingState(true)}
+          sensors={sensors}
+        >
           <SortableContext items={sets} strategy={verticalListSortingStrategy}>
             {sets.map((set) => {
               return (
@@ -114,6 +123,7 @@ export const DayCard = ({
                   key={`set-${set.id}`}
                   dayId={dayId}
                   setId={set.id}
+                  isSortingActive={isSortingActive}
                 />
               );
             })}

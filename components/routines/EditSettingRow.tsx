@@ -4,7 +4,7 @@ import { Setting } from "@/types/privateApi/setting";
 import { RepetitionUnit } from "@/types/publicApi/repetitionUnit";
 import { WeightUnit } from "@/types/publicApi/weightUnit";
 import { PaginatedResponse } from "@/types/response";
-import { Delete } from "@mui/icons-material";
+import { Check, CheckCircle, Delete } from "@mui/icons-material";
 import { Box, IconButton, ListItem, MenuItem, TextField } from "@mui/material";
 import { useState } from "react";
 import useSWR from "swr";
@@ -36,7 +36,7 @@ export const EditSettingRow = ({ settingId }: { settingId: number }) => {
       sx={{ pl: 4 }}
       secondaryAction={
         <IconButton>
-          <Delete />
+          <Check />
         </IconButton>
       }
     >

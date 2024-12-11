@@ -31,9 +31,11 @@ import { DeleteSetModal } from "./DeleteSetModal";
 export const WorkoutSet = ({
   dayId,
   setId,
+  isSortingActive,
 }: {
   dayId: number;
   setId: number;
+  isSortingActive: boolean;
 }) => {
   const authFetcher = useAuthFetcher();
 
@@ -90,7 +92,7 @@ export const WorkoutSet = ({
         ref={setNodeRef}
         sx={{ transform: CSS.Transform.toString(transform), transition }}
         secondaryAction={
-          edit ? (
+          edit && isSortingActive ? (
             <IconButton
               onClick={() => {
                 setDelete(true);
@@ -127,7 +129,7 @@ export const WorkoutSet = ({
         </ListItemButton>
       </ListItem>
 
-      <Collapse in={edit} timeout="auto" unmountOnExit>
+      <Collapse in={edit && isSortingActive} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
           {settings.results?.map((setting) => (
             <EditSettingRow
