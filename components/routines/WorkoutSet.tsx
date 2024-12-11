@@ -1,6 +1,6 @@
 import { useAuthFetcher } from "@/lib/fetcher";
 import { Setting } from "@/types/privateApi/setting";
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 import type { PaginatedResponse } from "@/types/response";
 import {
   Avatar,
@@ -15,7 +15,6 @@ import {
 } from "@mui/material";
 import {
   Add,
-  Check,
   Delete,
   DragHandle,
   Error,
@@ -25,9 +24,18 @@ import { ExerciseBaseInfo } from "@/types/publicApi/exerciseBaseInfo";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useState } from "react";
+import { EditSettingRow } from "./EditSettingRow";
+import { DeleteSetModal } from "./DeleteSetModal";
 
-export const WorkoutSet = ({ setId }: { dayId: number; setId: number }) => {
+export const WorkoutSet = ({
+  dayId,
+  setId,
+}: {
+  dayId: number;
+  setId: number;
+}) => {
   const authFetcher = useAuthFetcher();
+
   const { data: settings, isLoading: settingLoading } = useSWR<
     PaginatedResponse<Setting>
   >(`/setting?set=${setId}`, authFetcher);
@@ -42,6 +50,7 @@ export const WorkoutSet = ({ setId }: { dayId: number; setId: number }) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: setId });
   const [edit, setEdit] = useState(false);
+  const [deleteOpen, setDelete] = useState(false);
 
   const isLoading = settingLoading || exerciseLoading;
   const imageUrl = exerciseBaseInfo?.images?.[0]?.image;
@@ -68,13 +77,25 @@ export const WorkoutSet = ({ setId }: { dayId: number; setId: number }) => {
 
   return (
     <>
+      <DeleteSetModal
+        open={deleteOpen}
+        onClose={() => setDelete(false)}
+        dayId={dayId}
+        setId={setId}
+      />
+
       <ListItem
         disablePadding
         ref={setNodeRef}
         sx={{ transform: CSS.Transform.toString(transform), transition }}
         secondaryAction={
           edit ? (
-            <IconButton>
+            <IconButton
+              onClick={() => {
+                setDelete(true);
+                setEdit(false);
+              }}
+            >
               <Delete />
             </IconButton>
           ) : (
@@ -100,21 +121,14 @@ export const WorkoutSet = ({ setId }: { dayId: number; setId: number }) => {
           />
         </ListItemButton>
       </ListItem>
+
       <Collapse in={edit} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
           {settings.results?.map((setting) => (
-            <ListItem
+            <EditSettingRow
               key={`setting-${setting.id}`}
-              sx={{ pl: 4 }}
-              secondaryAction={
-                <IconButton>
-                  <Delete />
-                </IconButton>
-              }
-            >
-              {setting.reps} {setting.repetition_unit} x {setting.weight}{" "}
-              {setting.weight_unit}
-            </ListItem>
+              settingId={setting.id}
+            />
           ))}
           <ListItem sx={{ mb: 1 }}>
             <Fab size="medium" variant="extended">

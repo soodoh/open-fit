@@ -29,18 +29,15 @@ export const DeleteDayModal = ({
   );
 
   const deleteDay = async () => {
-    authFetcher(`/day/${dayId}/`, {
+    await authFetcher(`/day/${dayId}/`, {
       method: "DELETE",
     });
-    if (!workoutDays) {
-      return;
-    }
     const optimisticUpdate = {
       ...workoutDays,
-      count: workoutDays.count - 1,
-      results: workoutDays.results.filter(
-        (workoutDay) => workoutDay.id === dayId,
-      ),
+      count: (workoutDays?.count ?? 0) - 1,
+      results:
+        workoutDays?.results?.filter((workoutDay) => workoutDay.id === dayId) ??
+        [],
     };
     mutate(optimisticUpdate);
   };
