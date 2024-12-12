@@ -1,4 +1,5 @@
 import { useAuthedSWR } from "@/lib/fetcher";
+import { useSessionDuration } from "@/lib/useSessionDuration";
 import { Day } from "@/types/privateApi/day";
 import { Workout } from "@/types/privateApi/workout";
 import { WorkoutSession } from "@/types/privateApi/workoutSession";
@@ -8,12 +9,14 @@ import {
   CardActions,
   CardContent,
   CardHeader,
+  Chip,
+  Rating,
   Typography,
 } from "@mui/material";
 import moment from "moment";
 import Link from "next/link";
 
-export const SessionCard = ({ sessionId }: { sessionId: number }) => {
+export const SessionSummaryCard = ({ sessionId }: { sessionId: number }) => {
   const { data: session } = useAuthedSWR<WorkoutSession>(
     `/workoutsession/${sessionId}`,
   );
@@ -24,40 +27,44 @@ export const SessionCard = ({ sessionId }: { sessionId: number }) => {
     day?.training ? `/workout/${day.training}` : null,
   );
 
-  const endDate =
-    session?.date && session?.time_end
-      ? `${session.date}T${session?.time_end}`
-      : null;
-  const startDate =
-    session?.date && session?.time_start
-      ? `${session.date}T${session?.time_start}`
-      : null;
-  const durationDate =
-    startDate && endDate
-      ? moment.duration(moment(endDate).diff(moment(startDate)))
-      : null;
-  const durationString = durationDate
-    ? `${durationDate.hours()} hours, ${durationDate.minutes()} mins`
-    : "Not entered";
+  const durationString = useSessionDuration(sessionId);
 
   return (
     <Card>
       <CardHeader
-        title={
+        title={day?.description ?? "Workout Session"}
+        subheader={
           <>
-            <Typography variant="h6">{day?.description}</Typography>
-            <Typography variant="subtitle2">{workout?.name}</Typography>
+            <Typography variant="subtitle2" gutterBottom>
+              {workout?.name}
+            </Typography>
+            <Chip
+              variant="outlined"
+              label={moment(session?.date).format("MM/DD/YYYY")}
+            />
           </>
         }
-        subheader={moment(session?.date).format("MM/DD/YYYY")}
-        // action={<EditRoutineMenu workoutId={workoutId} />}
       />
 
       <CardContent>
+        <Typography
+          variant="body2"
+          sx={{ display: "flex", alignItems: "center" }}
+        >
+          Rating:{" "}
+          {
+            <Rating
+              size="small"
+              max={3}
+              value={session?.impression ? parseInt(session.impression) : null}
+              readOnly
+            />
+          }
+        </Typography>
+        <Typography variant="body2">Duration: {durationString}</Typography>
         {session?.notes && (
           <Typography variant="body1">{session?.notes}</Typography>
         )}
-        <Typography variant="body2">Duration: {durationString}</Typography>
       </CardContent>
 
       <CardActions>

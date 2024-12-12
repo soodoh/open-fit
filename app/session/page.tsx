@@ -1,10 +1,10 @@
 "use client";
-import { Box, Container, Fab, Grid2 as Grid, Typography } from "@mui/material";
+import { Box, Container, Fab, Typography } from "@mui/material";
 import { useAuthedSWR } from "@/lib/fetcher";
 import { Add } from "@mui/icons-material";
 import { PaginatedResponse } from "@/types/response";
 import { WorkoutSession } from "@/types/privateApi/workoutSession";
-import { SessionCard } from "@/components/sessions/SessionCard";
+import { SessionSummaryCard } from "@/components/sessions/SessionSummaryCard";
 
 export default function Sessions() {
   const { data: sessions } =
@@ -26,7 +26,7 @@ export default function Sessions() {
 
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
         {sessions?.results?.map((session) => (
-          <SessionCard key={session.id} sessionId={session.id} />
+          <SessionSummaryCard key={session.id} sessionId={session.id} />
         ))}
       </Box>
     </Container>
