@@ -29,13 +29,12 @@ export const DeleteRoutineModal = ({
     authFetcher(`/workout/${workoutId}/`, {
       method: "DELETE",
     });
-    if (!workouts) {
-      return;
-    }
+    const newWorkouts =
+      workouts?.results?.filter((workout) => workout.id === workoutId) ?? [];
     const optimisticUpdate = {
       ...workouts,
-      count: workouts.count - 1,
-      results: workouts.results.filter((workout) => workout.id === workoutId),
+      count: newWorkouts.length,
+      results: newWorkouts,
     };
     mutate(optimisticUpdate);
   };

@@ -14,18 +14,21 @@ import { WorkoutSetType } from "@/types/privateApi/set";
 export const DeleteSetModal = ({
   open,
   onClose,
-  dayId,
   setId,
 }: {
   open: boolean;
   onClose: () => void;
-  dayId: number;
   setId: number;
 }) => {
   const authFetcher = useAuthFetcher();
+
+  const { data: set } = useSWR<WorkoutSetType>(`/set/${setId}`, authFetcher);
   const { data: workoutSets, mutate: mutateSets } = useSWR<
     PaginatedResponse<WorkoutSetType>
-  >(`/set?exerciseday=${dayId}`, authFetcher);
+  >(
+    set?.exerciseday ? `/set?exerciseday=${set.exerciseday}` : null,
+    authFetcher,
+  );
 
   const deleteSet = async () => {
     await authFetcher(`/set/${setId}/`, { method: "DELETE" });

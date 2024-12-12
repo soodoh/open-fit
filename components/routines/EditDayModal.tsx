@@ -78,15 +78,15 @@ export const EditDayModal = ({
             }),
           });
           onClose();
-          if (!workoutDays) {
-            return;
-          }
 
           if (!dayId) {
+            const newDays = workoutDays?.results
+              ? [...workoutDays.results, data]
+              : [data];
             mutateResults({
               ...workoutDays,
-              count: (workoutDays?.count ?? 0) + 1,
-              results: [...(workoutDays?.results ?? []), data],
+              count: newDays.length,
+              results: newDays,
             });
           } else {
             mutate(data);

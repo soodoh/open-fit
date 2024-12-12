@@ -81,10 +81,13 @@ export const WorkoutSet = ({
         reps: 0,
       }),
     });
+    const newSettings = settings?.results
+      ? [...settings.results, newSet]
+      : [newSet];
     mutateSettings({
       ...settings,
-      count: settings?.count ? settings.count + 1 : 1,
-      results: settings?.results ? [...settings.results, newSet] : [newSet],
+      count: newSettings.length,
+      results: newSettings,
     });
   };
 
@@ -117,7 +120,6 @@ export const WorkoutSet = ({
       <DeleteSetModal
         open={deleteOpen}
         onClose={() => setDelete(false)}
-        dayId={dayId}
         setId={setId}
       />
       <EditSetCommentModal

@@ -19,8 +19,14 @@ import useSWR from "swr";
 export const EditSettingRow = ({ settingId }: { settingId: number }) => {
   const authFetcher = useAuthFetcher();
 
-  const { data: setting, mutate } = useSWR<Setting>(
+  const { data: setting, mutate: mutateSetting } = useSWR<Setting>(
     `/setting/${settingId}`,
+    authFetcher,
+  );
+  const { data: settings, mutate: mutateSettings } = useSWR<
+    PaginatedResponse<Setting>
+  >(
+    typeof setting?.set === "number" ? `/setting?set=${setting.set}` : null,
     authFetcher,
   );
   const { data: repUnits } = useSWR<PaginatedResponse<RepetitionUnit>>(
@@ -63,8 +69,27 @@ export const EditSettingRow = ({ settingId }: { settingId: number }) => {
         weight_unit: parseInt(weightUnit, 10),
       }),
     });
-    mutate(newSetting);
+    mutateSetting(newSetting);
     setEdit(false);
+  };
+
+  const handleDelete = async () => {
+    // Don't delete the only set, delete the parent instead
+    if (settings?.results && settings.results.length <= 1) {
+      return;
+    }
+
+    await authFetcher(`/setting/${settingId}/`, {
+      method: "DELETE",
+    });
+    // Optimistic update
+    const newSettings =
+      settings?.results?.filter((current) => current.id === settingId) ?? [];
+    mutateSettings({
+      ...newSettings,
+      count: newSettings.length,
+      results: newSettings,
+    });
   };
 
   if (!edit) {
@@ -74,9 +99,13 @@ export const EditSettingRow = ({ settingId }: { settingId: number }) => {
         disablePadding
         sx={{ pl: 4 }}
         secondaryAction={
-          <IconButton>
-            <Delete />
-          </IconButton>
+          // Cannot delete the only setting in the set
+          settings?.results &&
+          settings.results.length > 1 && (
+            <IconButton onClick={handleDelete}>
+              <Delete />
+            </IconButton>
+          )
         }
       >
         <ListItemButton onClick={() => setEdit(true)}>

@@ -46,14 +46,14 @@ export const EditRoutineModal = ({
     );
     onClose();
     // Handle optimistic updates
-    if (!workouts) {
-      return;
-    }
     if (!workoutId) {
+      const newWorkouts = workouts?.results
+        ? [data, ...workouts.results]
+        : [data];
       mutateResults({
         ...workouts,
-        count: workouts.count + 1,
-        results: [data, ...workouts.results],
+        count: newWorkouts.length,
+        results: newWorkouts,
       });
     } else {
       mutate(data);
