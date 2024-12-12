@@ -4,11 +4,15 @@ import { Setting } from "@/types/privateApi/setting";
 import { RepetitionUnit } from "@/types/publicApi/repetitionUnit";
 import { WeightUnit } from "@/types/publicApi/weightUnit";
 import { PaginatedResponse } from "@/types/response";
-import { Check, Delete } from "@mui/icons-material";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { Check, Delete, DragHandle } from "@mui/icons-material";
 import {
+  Box,
   IconButton,
   ListItem,
   ListItemButton,
+  ListItemIcon,
   ListItemText,
   MenuItem,
   TextField,
@@ -46,6 +50,8 @@ export const EditSettingRow = ({ settingId }: { settingId: number }) => {
   const [weight, setWeight] = useState<string>("0");
   const [weightUnit, setWeightUnit] = useState<string>(defaultWeightUnit);
   const [edit, setEdit] = useState(false);
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: settingId });
 
   useEffect(() => {
     setReps(setting?.reps?.toString() ?? "0");
@@ -88,12 +94,25 @@ export const EditSettingRow = ({ settingId }: { settingId: number }) => {
     });
   };
 
+  const dragHandle = (
+    <ListItemIcon>
+      <IconButton
+        sx={{ mx: 2, touchAction: "manipulation" }}
+        {...attributes}
+        {...listeners}
+      >
+        <DragHandle />
+      </IconButton>
+    </ListItemIcon>
+  );
+
   if (!edit) {
     return (
       <ListItem
         dense
         disablePadding
-        sx={{ pl: 4 }}
+        ref={setNodeRef}
+        sx={{ transform: CSS.Transform.toString(transform), transition }}
         secondaryAction={
           // Cannot delete the only setting in the set
           settings?.results &&
@@ -104,7 +123,8 @@ export const EditSettingRow = ({ settingId }: { settingId: number }) => {
           )
         }
       >
-        <ListItemButton onClick={() => setEdit(true)}>
+        <ListItemButton onClick={() => setEdit(true)} disableGutters>
+          {dragHandle}
           <ListItemText
             primary={`${setting?.reps ?? 0} ${repUnitLabel}`}
             secondary={`${parseFloat(setting?.weight ?? "0")} ${weightUnitLabel}`}
@@ -116,7 +136,10 @@ export const EditSettingRow = ({ settingId }: { settingId: number }) => {
 
   return (
     <ListItem
-      sx={{ pl: 4, display: "flex", gap: 2 }}
+      dense
+      disablePadding
+      ref={setNodeRef}
+      sx={{ transform: CSS.Transform.toString(transform), transition }}
       component="form"
       onSubmit={handleSubmit}
       secondaryAction={
@@ -125,58 +148,65 @@ export const EditSettingRow = ({ settingId }: { settingId: number }) => {
         </IconButton>
       }
     >
-      <TextField
-        variant="outlined"
-        type="number"
-        label="Reps"
-        slotProps={{
-          htmlInput: { min: 0 },
-        }}
-        value={reps}
-        onChange={(event) => setReps(event.target.value)}
-        sx={{ width: 75 }}
-      />
-      {repUnits?.results && (
+      {dragHandle}
+
+      <Box sx={{ display: "flex", gap: 2, my: 1 }}>
         <TextField
-          select
-          label="Type"
-          value={repUnit}
-          onChange={(event) => setRepUnit(event.target.value)}
-          sx={{ minWidth: 100, maxWidth: 150 }}
-        >
-          {repUnits?.results?.map((repUnit) => (
-            <MenuItem key={`repUnit-${repUnit.id}`} value={repUnit.id}>
-              {repUnit.name}
-            </MenuItem>
-          ))}
-        </TextField>
-      )}
-      <TextField
-        variant="outlined"
-        type="number"
-        label="Weight"
-        slotProps={{
-          htmlInput: { min: 0 },
-        }}
-        value={weight}
-        onChange={(event) => setWeight(event.target.value)}
-        sx={{ minWidth: 75, maxWidth: 100 }}
-      />
-      {weightUnits?.results && (
+          variant="outlined"
+          type="number"
+          label="Reps"
+          slotProps={{
+            htmlInput: { min: 0 },
+          }}
+          value={reps}
+          onChange={(event) => setReps(event.target.value)}
+          sx={{ width: 75 }}
+        />
+        {repUnits?.results && (
+          <TextField
+            select
+            label="Type"
+            value={repUnit}
+            onChange={(event) => setRepUnit(event.target.value)}
+            sx={{ minWidth: 100, maxWidth: 150 }}
+          >
+            {repUnits?.results?.map((repUnit) => (
+              <MenuItem key={`repUnit-${repUnit.id}`} value={repUnit.id}>
+                {repUnit.name}
+              </MenuItem>
+            ))}
+          </TextField>
+        )}
         <TextField
-          select
-          label="Unit"
-          value={weightUnit}
-          onChange={(event) => setWeightUnit(event.target.value)}
-          sx={{ minWidth: 70, maxWidth: 150 }}
-        >
-          {weightUnits?.results?.map((weightUnit) => (
-            <MenuItem key={`weightUnit-${weightUnit.id}`} value={weightUnit.id}>
-              {weightUnit.name}
-            </MenuItem>
-          ))}
-        </TextField>
-      )}
+          variant="outlined"
+          type="number"
+          label="Weight"
+          slotProps={{
+            htmlInput: { min: 0 },
+          }}
+          value={weight}
+          onChange={(event) => setWeight(event.target.value)}
+          sx={{ minWidth: 75, maxWidth: 100 }}
+        />
+        {weightUnits?.results && (
+          <TextField
+            select
+            label="Unit"
+            value={weightUnit}
+            onChange={(event) => setWeightUnit(event.target.value)}
+            sx={{ minWidth: 70, maxWidth: 150 }}
+          >
+            {weightUnits?.results?.map((weightUnit) => (
+              <MenuItem
+                key={`weightUnit-${weightUnit.id}`}
+                value={weightUnit.id}
+              >
+                {weightUnit.name}
+              </MenuItem>
+            ))}
+          </TextField>
+        )}
+      </Box>
     </ListItem>
   );
 };

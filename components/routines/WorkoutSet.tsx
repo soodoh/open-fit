@@ -21,7 +21,12 @@ import {
   Image as ImageIcon,
 } from "@mui/icons-material";
 import { ExerciseBaseInfo } from "@/types/publicApi/exerciseBaseInfo";
-import { useSortable } from "@dnd-kit/sortable";
+import {
+  arrayMove,
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useState } from "react";
 import { EditSettingRow } from "./EditSettingRow";
@@ -29,9 +34,16 @@ import { DeleteSetModal } from "./DeleteSetModal";
 import { useDefaultWeightUnit } from "@/lib/useDefaultWeightUnit";
 import { WorkoutSetType } from "@/types/privateApi/set";
 import { EditSetCommentModal } from "./EditSetCommentModal";
-import { Exercise } from "@/types/publicApi/exercise";
-import useSWR from "swr";
 import { useExercise } from "@/lib/useExercise";
+import {
+  DndContext,
+  DragEndEvent,
+  KeyboardSensor,
+  MouseSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
 
 export const WorkoutSet = ({
   setId,
@@ -48,6 +60,7 @@ export const WorkoutSet = ({
     isLoading: settingLoading,
     mutate: mutateSettings,
   } = useAuthedSWR<PaginatedResponse<Setting>>(`/setting?set=${setId}`);
+  const settingItems = settings?.results ?? [];
 
   const exerciseBaseId = settings?.results?.[0]?.exercise_base;
   const { data: exerciseBaseInfo, isLoading: exerciseLoading } =
@@ -65,6 +78,11 @@ export const WorkoutSet = ({
   const [editComment, setEditComment] = useState(false);
   const [deleteOpen, setDelete] = useState(false);
   const defaultWeightUnit = useDefaultWeightUnit();
+
+  const mouseSensor = useSensor(MouseSensor);
+  const touchSensor = useSensor(TouchSensor);
+  const keyboardSensor = useSensor(KeyboardSensor);
+  const sensors = useSensors(mouseSensor, touchSensor, keyboardSensor);
 
   const isLoading = settingLoading || exerciseLoading;
   const imageUrl = exerciseBaseInfo?.images?.[0]?.image;
@@ -89,6 +107,32 @@ export const WorkoutSet = ({
       count: newSettings.length,
       results: newSettings,
     });
+  };
+
+  const handleSort = async (event: DragEndEvent) => {
+    const dragId = event.active.id;
+    const overId = event.over?.id;
+    if (!Number.isInteger(overId) || dragId === overId) {
+      return;
+    }
+
+    const oldIndex = settingItems.findIndex((setting) => setting.id === dragId);
+    const newIndex = settingItems.findIndex((setting) => setting.id === overId);
+    const newSettings = arrayMove(settingItems, oldIndex, newIndex);
+
+    const patchUpdates = newSettings.reduce((acc, setting, index) => {
+      if (setting.order !== index) {
+        acc.push(
+          authFetcher(`/setting/${setting.id}`, {
+            method: "PATCH",
+            body: JSON.stringify({ order: index }),
+          }),
+        );
+      }
+      return acc;
+    }, [] as Promise<unknown>[]);
+    await Promise.all(patchUpdates);
+    mutateSettings({ ...settings, results: newSettings });
   };
 
   if (isLoading) {
@@ -157,12 +201,19 @@ export const WorkoutSet = ({
             </ListItem>
           )}
 
-          {settings?.results?.map((setting) => (
-            <EditSettingRow
-              key={`setting-${setting.id}`}
-              settingId={setting.id}
-            />
-          ))}
+          <DndContext onDragEnd={handleSort} sensors={sensors}>
+            <SortableContext
+              items={settingItems}
+              strategy={verticalListSortingStrategy}
+            >
+              {settingItems.map((setting) => (
+                <EditSettingRow
+                  key={`setting-${setting.id}`}
+                  settingId={setting.id}
+                />
+              ))}
+            </SortableContext>
+          </DndContext>
 
           <ListItem sx={{ display: "flex", gap: 2 }}>
             <Fab size="medium" variant="extended" onClick={handleAdd}>
