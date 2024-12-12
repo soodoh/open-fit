@@ -1,6 +1,5 @@
 "use client";
-import { useAuthFetcher } from "@/lib/fetcher";
-import useSWR from "swr";
+import { useAuthedSWR } from "@/lib/fetcher";
 import { PaginatedResponse } from "@/types/response";
 import { Workout } from "@/types/privateApi/workout";
 import { Box, Container, Fab, Typography } from "@mui/material";
@@ -11,10 +10,8 @@ import { EditRoutineModal as CreateRoutineModal } from "@/components/routines/Ed
 import { RoutineCard } from "@/components/routines/RoutineCard";
 
 export default function Routines() {
-  const { data: workouts } = useSWR<PaginatedResponse<Workout>>(
-    "/workout",
-    useAuthFetcher(),
-  );
+  const { data: workouts } =
+    useAuthedSWR<PaginatedResponse<Workout>>("/workout");
   const [showEditModal, setEditModal] = useState(false);
 
   return (
@@ -38,7 +35,7 @@ export default function Routines() {
       />
 
       <Grid container spacing={2}>
-        {workouts?.results.map((workout) => (
+        {workouts?.results?.map((workout) => (
           <Grid key={`routine-${workout.id}`} size={{ xs: 12, sm: 6, md: 4 }}>
             <RoutineCard workoutId={workout.id} />
           </Grid>

@@ -1,4 +1,4 @@
-import { fetcher, useAuthFetcher } from "@/lib/fetcher";
+import { fetcher, useAuthedSWR, useAuthFetcher } from "@/lib/fetcher";
 import { useDefaultWeightUnit } from "@/lib/useDefaultWeightUnit";
 import { Setting } from "@/types/privateApi/setting";
 import { RepetitionUnit } from "@/types/publicApi/repetitionUnit";
@@ -19,16 +19,12 @@ import useSWR from "swr";
 export const EditSettingRow = ({ settingId }: { settingId: number }) => {
   const authFetcher = useAuthFetcher();
 
-  const { data: setting, mutate: mutateSetting } = useSWR<Setting>(
+  const { data: setting, mutate: mutateSetting } = useAuthedSWR<Setting>(
     `/setting/${settingId}`,
-    authFetcher,
   );
-  const { data: settings, mutate: mutateSettings } = useSWR<
+  const { data: settings, mutate: mutateSettings } = useAuthedSWR<
     PaginatedResponse<Setting>
-  >(
-    typeof setting?.set === "number" ? `/setting?set=${setting.set}` : null,
-    authFetcher,
-  );
+  >(typeof setting?.set === "number" ? `/setting?set=${setting.set}` : null);
   const { data: repUnits } = useSWR<PaginatedResponse<RepetitionUnit>>(
     "/setting-repetitionunit?ordering=id",
     fetcher,

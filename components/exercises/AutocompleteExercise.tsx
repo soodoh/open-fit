@@ -1,4 +1,4 @@
-import { useAuthFetcher } from "@/lib/fetcher";
+import { useAuthedSWR } from "@/lib/fetcher";
 import type {
   ExerciseSearchData,
   ExerciseSearchResults,
@@ -22,12 +22,11 @@ export const AutocompleteExercise = ({
   value: ExerciseSearchData | null;
   onChange: (exercise: ExerciseSearchData | null) => void;
 }) => {
-  const authFetcher = useAuthFetcher();
   const [searchTerm, setSearchTerm] = useState("");
-  const { data: searchResults, isLoading } = useSWR<ExerciseSearchResults>(
-    searchTerm ? `/exercise/search?language=${2}&term=${searchTerm}` : null,
-    authFetcher,
-  );
+  const { data: searchResults, isLoading } =
+    useAuthedSWR<ExerciseSearchResults>(
+      searchTerm ? `/exercise/search?language=${2}&term=${searchTerm}` : null,
+    );
   const options = useMemo(() => {
     const duplicates = new Set();
     return (

@@ -1,4 +1,4 @@
-import { useAuthFetcher } from "@/lib/fetcher";
+import { useAuthedSWR } from "@/lib/fetcher";
 import { Day } from "@/types/privateApi/day";
 import {
   Box,
@@ -8,7 +8,6 @@ import {
   ListItemButton,
   ListItemText,
 } from "@mui/material";
-import useSWR from "swr";
 import { EditDayMenu } from "./EditDayMenu";
 import moment from "moment";
 import Link from "next/link";
@@ -20,8 +19,7 @@ export const RoutineDayItem = ({
   workoutId: number;
   dayId: number;
 }) => {
-  const authFetcher = useAuthFetcher();
-  const { data: workoutDay } = useSWR<Day>(`/day/${dayId}`, authFetcher);
+  const { data: workoutDay } = useAuthedSWR<Day>(`/day/${dayId}`);
 
   if (!workoutDay) {
     return null;

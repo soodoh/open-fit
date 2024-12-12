@@ -8,7 +8,7 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
-import { useAuthFetcher } from "@/lib/fetcher";
+import { useAuthedSWR, useAuthFetcher } from "@/lib/fetcher";
 import { WorkoutSetType } from "@/types/privateApi/set";
 
 export const DeleteSetModal = ({
@@ -22,13 +22,10 @@ export const DeleteSetModal = ({
 }) => {
   const authFetcher = useAuthFetcher();
 
-  const { data: set } = useSWR<WorkoutSetType>(`/set/${setId}`, authFetcher);
-  const { data: workoutSets, mutate: mutateSets } = useSWR<
+  const { data: set } = useAuthedSWR<WorkoutSetType>(`/set/${setId}`);
+  const { data: workoutSets, mutate: mutateSets } = useAuthedSWR<
     PaginatedResponse<WorkoutSetType>
-  >(
-    set?.exerciseday ? `/set?exerciseday=${set.exerciseday}` : null,
-    authFetcher,
-  );
+  >(set?.exerciseday ? `/set?exerciseday=${set.exerciseday}` : null);
 
   const deleteSet = async () => {
     await authFetcher(`/set/${setId}/`, { method: "DELETE" });

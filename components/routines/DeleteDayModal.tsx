@@ -1,4 +1,3 @@
-import useSWR from "swr";
 import { PaginatedResponse } from "@/types/response";
 import {
   Button,
@@ -8,7 +7,7 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
-import { useAuthFetcher } from "@/lib/fetcher";
+import { useAuthedSWR, useAuthFetcher } from "@/lib/fetcher";
 import { Day } from "@/types/privateApi/day";
 
 export const DeleteDayModal = ({
@@ -23,9 +22,8 @@ export const DeleteDayModal = ({
   dayId: number;
 }) => {
   const authFetcher = useAuthFetcher();
-  const { data: workoutDays, mutate } = useSWR<PaginatedResponse<Day>>(
+  const { data: workoutDays, mutate } = useAuthedSWR<PaginatedResponse<Day>>(
     `/day?training=${workoutId}`,
-    authFetcher,
   );
 
   const deleteDay = async () => {

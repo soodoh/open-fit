@@ -17,7 +17,7 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { PaginatedResponse } from "@/types/response";
-import { fetcher, useAuthFetcher } from "@/lib/fetcher";
+import { fetcher, useAuthedSWR, useAuthFetcher } from "@/lib/fetcher";
 import { Day } from "@/types/privateApi/day";
 import { DaysOfWeek } from "@/types/publicApi/daysOfWeek";
 import moment from "moment";
@@ -34,17 +34,16 @@ export const EditDayModal = ({
   onClose: () => void;
 }) => {
   const authFetcher = useAuthFetcher();
-  const { data: workoutDays, mutate: mutateResults } = useSWR<
+  const { data: workoutDays, mutate: mutateResults } = useAuthedSWR<
     PaginatedResponse<Day>
-  >(`/day?training=${workoutId}`, authFetcher);
+  >(`/day?training=${workoutId}`);
   const { data: daysOfWeek } = useSWR<PaginatedResponse<DaysOfWeek>>(
     `/daysofweek/`,
     fetcher,
   );
 
-  const { data: workoutDay, mutate } = useSWR<Day>(
-    Number.isInteger(dayId) ? `/day/${dayId}` : null,
-    authFetcher,
+  const { data: workoutDay, mutate } = useAuthedSWR<Day>(
+    typeof dayId === "number" ? `/day/${dayId}` : null,
   );
   const [description, setDescription] = useState("");
   const [weekdays, setWeekdays] = useState<number[]>([]);

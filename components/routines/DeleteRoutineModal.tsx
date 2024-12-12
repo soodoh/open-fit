@@ -1,4 +1,3 @@
-import useSWR from "swr";
 import { Workout } from "@/types/privateApi/workout";
 import { PaginatedResponse } from "@/types/response";
 import {
@@ -9,7 +8,7 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
-import { useAuthFetcher } from "@/lib/fetcher";
+import { useAuthedSWR, useAuthFetcher } from "@/lib/fetcher";
 
 export const DeleteRoutineModal = ({
   open,
@@ -21,10 +20,8 @@ export const DeleteRoutineModal = ({
   workoutId: number;
 }) => {
   const authFetcher = useAuthFetcher();
-  const { data: workouts, mutate } = useSWR<PaginatedResponse<Workout>>(
-    "/workout",
-    authFetcher,
-  );
+  const { data: workouts, mutate } =
+    useAuthedSWR<PaginatedResponse<Workout>>("/workout");
   const deleteRoutine = async () => {
     authFetcher(`/workout/${workoutId}/`, {
       method: "DELETE",

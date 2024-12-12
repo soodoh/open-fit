@@ -50,7 +50,6 @@ export default function LoginPage() {
       }),
     });
     setPending(false);
-    localStorage.setItem(ACCESS_TOKEN_KEY, data.access);
     localStorage.setItem(REFRESH_TOKEN_KEY, data.refresh);
     router.push("/");
   };

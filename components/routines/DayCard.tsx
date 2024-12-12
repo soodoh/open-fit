@@ -1,7 +1,6 @@
 "use client";
-import { useAuthFetcher } from "@/lib/fetcher";
+import { useAuthedSWR, useAuthFetcher } from "@/lib/fetcher";
 import { Day } from "@/types/privateApi/day";
-import useSWR from "swr";
 import type { PaginatedResponse } from "@/types/response";
 import type { WorkoutSetType } from "@/types/privateApi/set";
 import {
@@ -41,10 +40,10 @@ export const DayCard = ({
   workoutId: number;
 }) => {
   const authFetcher = useAuthFetcher();
-  const { data: day } = useSWR<Day>(`/day/${dayId}`, authFetcher);
-  const { data: workoutSets, mutate: mutateSets } = useSWR<
+  const { data: day } = useAuthedSWR<Day>(`/day/${dayId}`);
+  const { data: workoutSets, mutate: mutateSets } = useAuthedSWR<
     PaginatedResponse<WorkoutSetType>
-  >(`/set?exerciseday=${dayId}`, authFetcher);
+  >(`/set?exerciseday=${dayId}`);
   const sets = workoutSets?.results ?? [];
 
   const mouseSensor = useSensor(MouseSensor);

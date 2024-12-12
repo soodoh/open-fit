@@ -1,5 +1,5 @@
-import useSWR, { useSWRConfig } from "swr";
-import { useAuthFetcher } from "@/lib/fetcher";
+import { useSWRConfig } from "swr";
+import { useAuthedSWR, useAuthFetcher } from "@/lib/fetcher";
 import { ExerciseSearchData } from "@/types/privateApi/exerciseSearch";
 import { Box, IconButton, TextField } from "@mui/material";
 import { AutocompleteExercise } from "../exercises/AutocompleteExercise";
@@ -12,9 +12,9 @@ import { useDefaultWeightUnit } from "@/lib/useDefaultWeightUnit";
 export const AddExerciseRow = ({ dayId }: { dayId: number }) => {
   const authFetcher = useAuthFetcher();
 
-  const { data: workoutSets, mutate: mutateSets } = useSWR<
+  const { data: workoutSets, mutate: mutateSets } = useAuthedSWR<
     PaginatedResponse<WorkoutSetType>
-  >(`/set?exerciseday=${dayId}`, authFetcher);
+  >(`/set?exerciseday=${dayId}`);
   const { mutate } = useSWRConfig();
 
   const [exercise, setExercise] = useState<ExerciseSearchData | null>(null);

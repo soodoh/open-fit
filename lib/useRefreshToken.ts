@@ -1,26 +1,15 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import useSWR from "swr";
 import { fetcher } from "@/lib/fetcher";
 import { useRouter } from "next/navigation";
 import { REFRESH_TOKEN_KEY } from "@/lib/constants";
 
-function useToken() {
-  const currentToken =
+export function useRefreshToken() {
+  const refreshToken =
     typeof window !== "undefined"
       ? localStorage.getItem(REFRESH_TOKEN_KEY)
       : null;
-  const [refreshToken, setRefreshToken] = useState<string | null>(currentToken);
-
-  useEffect(() => {
-    setRefreshToken(currentToken);
-  }, [currentToken]);
-
-  return refreshToken;
-}
-
-export function useRefreshToken() {
-  const refreshToken = useToken();
   const router = useRouter();
   const { error: isTokenInvalid, isLoading } = useSWR(refreshToken, (token) =>
     fetcher("/token/verify", {
@@ -38,5 +27,5 @@ export function useRefreshToken() {
     }
   }, [isTokenInvalid, isLoading, refreshToken, router]);
 
-  return refreshToken;
+  return !isTokenInvalid && !isLoading ? refreshToken : null;
 }

@@ -1,4 +1,3 @@
-import useSWR from "swr";
 import { Workout } from "@/types/privateApi/workout";
 import {
   Button,
@@ -10,7 +9,7 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { PaginatedResponse } from "@/types/response";
-import { useAuthFetcher } from "@/lib/fetcher";
+import { useAuthedSWR, useAuthFetcher } from "@/lib/fetcher";
 
 export const EditRoutineModal = ({
   open,
@@ -22,12 +21,10 @@ export const EditRoutineModal = ({
   onClose: () => void;
 }) => {
   const authFetcher = useAuthFetcher();
-  const { data: workouts, mutate: mutateResults } = useSWR<
-    PaginatedResponse<Workout>
-  >("/workout", authFetcher);
-  const { data: workout, mutate } = useSWR<Workout>(
+  const { data: workouts, mutate: mutateResults } =
+    useAuthedSWR<PaginatedResponse<Workout>>("/workout");
+  const { data: workout, mutate } = useAuthedSWR<Workout>(
     Number.isInteger(workoutId) ? `/workout/${workoutId}` : null,
-    authFetcher,
   );
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");

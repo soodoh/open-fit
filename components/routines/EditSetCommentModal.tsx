@@ -1,4 +1,3 @@
-import useSWR from "swr";
 import {
   Button,
   Dialog,
@@ -7,7 +6,7 @@ import {
   DialogTitle,
   TextField,
 } from "@mui/material";
-import { useAuthFetcher } from "@/lib/fetcher";
+import { useAuthedSWR, useAuthFetcher } from "@/lib/fetcher";
 import { WorkoutSetType } from "@/types/privateApi/set";
 import { useEffect, useState } from "react";
 
@@ -21,10 +20,7 @@ export const EditSetCommentModal = ({
   setId: number;
 }) => {
   const authFetcher = useAuthFetcher();
-  const { data: set, mutate } = useSWR<WorkoutSetType>(
-    `/set/${setId}`,
-    authFetcher,
-  );
+  const { data: set, mutate } = useAuthedSWR<WorkoutSetType>(`/set/${setId}`);
   const [comment, setComment] = useState(set?.comment ?? "");
 
   useEffect(() => {

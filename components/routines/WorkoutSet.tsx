@@ -1,6 +1,5 @@
-import { useAuthFetcher } from "@/lib/fetcher";
+import { useAuthedSWR, useAuthFetcher } from "@/lib/fetcher";
 import { Setting } from "@/types/privateApi/setting";
-import useSWR from "swr";
 import type { PaginatedResponse } from "@/types/response";
 import {
   Avatar,
@@ -32,7 +31,6 @@ import { WorkoutSetType } from "@/types/privateApi/set";
 import { EditSetCommentModal } from "./EditSetCommentModal";
 
 export const WorkoutSet = ({
-  dayId,
   setId,
   isSortingActive,
 }: {
@@ -46,16 +44,17 @@ export const WorkoutSet = ({
     data: settings,
     isLoading: settingLoading,
     mutate: mutateSettings,
-  } = useSWR<PaginatedResponse<Setting>>(`/setting?set=${setId}`, authFetcher);
+  } = useAuthedSWR<PaginatedResponse<Setting>>(`/setting?set=${setId}`);
 
   const exerciseBaseId = settings?.results?.[0]?.exercise_base;
   const { data: exerciseBaseInfo, isLoading: exerciseLoading } =
-    useSWR<ExerciseBaseInfo>(
-      Number.isInteger(exerciseBaseId) && `/exercisebaseinfo/${exerciseBaseId}`,
-      useAuthFetcher(),
+    useAuthedSWR<ExerciseBaseInfo>(
+      typeof exerciseBaseId === "number"
+        ? `/exercisebaseinfo/${exerciseBaseId}`
+        : null,
     );
 
-  const { data: set } = useSWR<WorkoutSetType>(`/set/${setId}`, authFetcher);
+  const { data: set } = useAuthedSWR<WorkoutSetType>(`/set/${setId}`);
 
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: setId });
