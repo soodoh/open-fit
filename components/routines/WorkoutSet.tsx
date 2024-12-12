@@ -29,6 +29,9 @@ import { DeleteSetModal } from "./DeleteSetModal";
 import { useDefaultWeightUnit } from "@/lib/useDefaultWeightUnit";
 import { WorkoutSetType } from "@/types/privateApi/set";
 import { EditSetCommentModal } from "./EditSetCommentModal";
+import { Exercise } from "@/types/publicApi/exercise";
+import useSWR from "swr";
+import { useExercise } from "@/lib/useExercise";
 
 export const WorkoutSet = ({
   setId,
@@ -65,9 +68,7 @@ export const WorkoutSet = ({
 
   const isLoading = settingLoading || exerciseLoading;
   const imageUrl = exerciseBaseInfo?.images?.[0]?.image;
-  const exercise = exerciseBaseInfo?.exercises?.find(
-    (exercise) => exercise.language === 2,
-  );
+  const exercise = useExercise(exerciseBaseId);
 
   const handleAdd = async () => {
     const newSet = await authFetcher("/setting/", {
