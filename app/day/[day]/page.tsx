@@ -5,19 +5,18 @@ import { redirect } from "next/navigation";
 export default async function Page({
   params,
 }: {
-  params: Promise<{ routine: string; day: string }>;
+  params: Promise<{ day: string }>;
 }) {
-  const { routine, day } = await params;
-  const workoutId = parseInt(routine, 10);
+  const { day } = await params;
   const dayId = parseInt(day, 10);
 
-  if (Number.isNaN(workoutId) || Number.isNaN(dayId)) {
+  if (Number.isNaN(dayId)) {
     redirect("/routines");
   }
 
   return (
     <Container maxWidth="xl" sx={{ my: 3 }}>
-      <DayCard workoutId={workoutId} dayId={dayId} />
+      <DayCard dayId={dayId} />
     </Container>
   );
 }

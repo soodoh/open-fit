@@ -33,10 +33,7 @@ export const RoutineDayItem = ({
           <EditDayMenu dayId={workoutDay.id} workoutId={workoutId} />
         }
       >
-        <ListItemButton
-          component={Link}
-          href={`/routines/${workoutId}/${dayId}`}
-        >
+        <ListItemButton component={Link} href={`/day/${dayId}`}>
           <ListItemText
             primary={workoutDay.description}
             secondary={

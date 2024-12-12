@@ -24,27 +24,25 @@ import moment from "moment";
 
 export const EditDayModal = ({
   open,
-  workoutId,
   dayId,
   onClose,
 }: {
   open: boolean;
-  workoutId: number;
   dayId: number | null;
   onClose: () => void;
 }) => {
   const authFetcher = useAuthFetcher();
+  const { data: workoutDay, mutate } = useAuthedSWR<Day>(
+    typeof dayId === "number" ? `/day/${dayId}` : null,
+  );
   const { data: workoutDays, mutate: mutateResults } = useAuthedSWR<
     PaginatedResponse<Day>
-  >(`/day?training=${workoutId}`);
+  >(workoutDay?.training ? `/day?training=${workoutDay.training}` : null);
   const { data: daysOfWeek } = useSWR<PaginatedResponse<DaysOfWeek>>(
     `/daysofweek/`,
     fetcher,
   );
 
-  const { data: workoutDay, mutate } = useAuthedSWR<Day>(
-    typeof dayId === "number" ? `/day/${dayId}` : null,
-  );
   const [description, setDescription] = useState("");
   const [weekdays, setWeekdays] = useState<number[]>([]);
 
@@ -57,6 +55,11 @@ export const EditDayModal = ({
     const set = new Set(event.target.value as number[]);
     setWeekdays(Array.from(set).sort((a, b) => a - b));
   };
+
+  const workoutId = workoutDay?.training;
+  if (!workoutId) {
+    return null;
+  }
 
   return (
     <Dialog

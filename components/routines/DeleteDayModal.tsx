@@ -13,18 +13,19 @@ import { Day } from "@/types/privateApi/day";
 export const DeleteDayModal = ({
   open,
   onClose,
-  workoutId,
   dayId,
 }: {
   open: boolean;
   onClose: () => void;
-  workoutId: number;
   dayId: number;
 }) => {
   const authFetcher = useAuthFetcher();
-  const { data: workoutDays, mutate } = useAuthedSWR<PaginatedResponse<Day>>(
-    `/day?training=${workoutId}`,
+  const { data: workoutDay } = useAuthedSWR<Day>(
+    typeof dayId === "number" ? `/day/${dayId}` : null,
   );
+  const { data: workoutDays, mutate: mutateDays } = useAuthedSWR<
+    PaginatedResponse<Day>
+  >(workoutDay?.training ? `/day?training=${workoutDay.training}` : null);
 
   const deleteDay = async () => {
     await authFetcher(`/day/${dayId}/`, {
@@ -38,7 +39,7 @@ export const DeleteDayModal = ({
       count: newDays.length,
       results: newDays,
     };
-    mutate(optimisticUpdate);
+    mutateDays(optimisticUpdate);
   };
 
   return (

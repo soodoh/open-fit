@@ -32,13 +32,7 @@ import {
 import { AddExerciseRow } from "./AddExerciseRow";
 import { useState } from "react";
 
-export const DayCard = ({
-  dayId,
-  workoutId,
-}: {
-  dayId: number;
-  workoutId: number;
-}) => {
+export const DayCard = ({ dayId }: { dayId: number }) => {
   const authFetcher = useAuthFetcher();
   const { data: day } = useAuthedSWR<Day>(`/day/${dayId}`);
   const { data: workoutSets, mutate: mutateSets } = useAuthedSWR<
@@ -100,7 +94,7 @@ export const DayCard = ({
             </Box>
           </>
         }
-        action={<EditDayMenu workoutId={workoutId} dayId={dayId} />}
+        action={<EditDayMenu dayId={dayId} />}
       />
 
       <CardContent>
