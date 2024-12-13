@@ -1,4 +1,4 @@
-import { useAuthedSWR } from "@/lib/fetcher";
+import { fetcher } from "@/lib/fetcher";
 import type {
   ExerciseSearchData,
   ExerciseSearchResults,
@@ -13,6 +13,7 @@ import {
   TextField,
 } from "@mui/material";
 import { useMemo, useState } from "react";
+import useSWR from "swr";
 
 export const AutocompleteExercise = ({
   value,
@@ -22,10 +23,11 @@ export const AutocompleteExercise = ({
   onChange: (exercise: ExerciseSearchData | null) => void;
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const { data: searchResults, isLoading } =
-    useAuthedSWR<ExerciseSearchResults>(
-      searchTerm ? `/exercise/search?language=${2}&term=${searchTerm}` : null,
-    );
+  const { data: searchResults, isLoading } = useSWR<ExerciseSearchResults>(
+    searchTerm ? `/exercise/search?language=${2}&term=${searchTerm}` : null,
+    fetcher,
+    { keepPreviousData: true },
+  );
   const options = useMemo(() => {
     const duplicates = new Set();
     return (
