@@ -1,6 +1,6 @@
 import { SessionPage } from "@/components/sessions/SessionPage";
 import { ArrowBack } from "@mui/icons-material";
-import { Card, CardHeader, Container, Fab } from "@mui/material";
+import { Container, Fab } from "@mui/material";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -23,7 +23,7 @@ export default async function Page({
         color="primary"
         sx={{ gap: 1, mb: 2 }}
         LinkComponent={Link}
-        href="/sessions"
+        href="/session"
       >
         <ArrowBack />
         Sessions

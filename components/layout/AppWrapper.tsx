@@ -3,6 +3,8 @@ import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
 import { type ReactNode } from "react";
 import { Header } from "./Header";
 import { Roboto } from "next/font/google";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 
 const roboto = Roboto({
   weight: ["300", "400", "500", "700"],
@@ -37,9 +39,11 @@ export const AppWrapper = ({ children }: Readonly<{ children: ReactNode }>) => {
 
   return (
     <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Header />
-      {children}
+      <LocalizationProvider dateAdapter={AdapterMoment}>
+        <CssBaseline />
+        <Header />
+        {children}
+      </LocalizationProvider>
     </ThemeProvider>
   );
 };

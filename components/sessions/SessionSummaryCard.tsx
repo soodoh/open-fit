@@ -4,39 +4,47 @@ import { Day } from "@/types/privateApi/day";
 import { Workout } from "@/types/privateApi/workout";
 import { WorkoutSession } from "@/types/privateApi/workoutSession";
 import {
+  Box,
   Button,
   Card,
+  CardActionArea,
   CardActions,
   CardContent,
   CardHeader,
   Chip,
+  List,
+  ListItem,
+  ListItemText,
   Rating,
   Typography,
 } from "@mui/material";
 import moment from "moment";
 import Link from "next/link";
+import { EditSessionMenu } from "./EditSessionMenu";
 
 export const SessionSummaryCard = ({ sessionId }: { sessionId: number }) => {
   const { data: session } = useAuthedSWR<WorkoutSession>(
     `/workoutsession/${sessionId}`,
   );
-  const { data: day } = useAuthedSWR<Day>(
-    session?.workout ? `/day/${session.workout}` : null,
-  );
   const { data: workout } = useAuthedSWR<Workout>(
-    day?.training ? `/workout/${day.training}` : null,
+    session?.workout ? `/workout/${session.workout}` : null,
   );
 
   const durationString = useSessionDuration(sessionId);
 
   return (
-    <Card>
+    <Card
+      sx={{
+        minWidth: 300,
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
       <CardHeader
-        title={day?.description ?? "Workout Session"}
-        subheader={
+        title={
           <>
-            <Typography variant="subtitle2" gutterBottom>
-              {workout?.name}
+            <Typography variant="h6" gutterBottom sx={{ mr: 2 }}>
+              {workout?.name || "Unknown Routine"}
             </Typography>
             <Chip
               variant="outlined"
@@ -44,31 +52,42 @@ export const SessionSummaryCard = ({ sessionId }: { sessionId: number }) => {
             />
           </>
         }
+        disableTypography
+        action={<EditSessionMenu sessionId={sessionId} />}
       />
 
-      <CardContent>
-        <Typography
-          variant="body2"
-          sx={{ display: "flex", alignItems: "center" }}
-        >
-          Rating:{" "}
-          {
-            <Rating
-              size="small"
-              max={3}
-              value={session?.impression ? parseInt(session.impression) : null}
-              readOnly
+      <CardContent sx={{ py: 0, flexGrow: 1 }}>
+        <List dense>
+          <ListItem disableGutters>
+            <ListItemText primary="Duration" secondary={durationString} />
+          </ListItem>
+
+          <ListItem disableGutters>
+            <ListItemText
+              primary="General Impression"
+              secondary={
+                <Rating
+                  size="small"
+                  max={3}
+                  value={
+                    session?.impression ? parseInt(session.impression) : null
+                  }
+                  readOnly
+                />
+              }
             />
-          }
-        </Typography>
-        <Typography variant="body2">Duration: {durationString}</Typography>
-        {session?.notes && (
-          <Typography variant="body1">{session?.notes}</Typography>
-        )}
+          </ListItem>
+
+          {session?.notes && (
+            <ListItem disableGutters>
+              <ListItemText primary="Notes" secondary={session.notes} />
+            </ListItem>
+          )}
+        </List>
       </CardContent>
 
-      <CardActions>
-        <Button LinkComponent={Link} href={`/session/${session?.id}`}>
+      <CardActions sx={{ alignSelf: "flex-end" }}>
+        <Button LinkComponent={Link} href={`/session/${sessionId}`}>
           View Session
         </Button>
       </CardActions>

@@ -7,6 +7,7 @@ export const SessionLogItem = ({
   exerciseBaseId: number;
 }) => {
   const exercise = useExercise(exerciseBaseId);
+  console.log(exercise);
   // const { data: workoutLogs } = useAuthedSWR<PaginatedResponse<WorkoutLog>>(
   //   session?.date ? `/workoutlog?ordering=id&date=${session.date}` : null,
   // );
