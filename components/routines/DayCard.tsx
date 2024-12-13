@@ -12,7 +12,7 @@ import {
   List,
   Typography,
 } from "@mui/material";
-import { WorkoutSet as WorkoutSet } from "./WorkoutSet";
+import { WorkoutSet } from "./WorkoutSet";
 import { EditDayMenu } from "./EditDayMenu";
 import moment from "moment";
 import {
@@ -31,14 +31,17 @@ import {
 } from "@dnd-kit/sortable";
 import { AddExerciseRow } from "./AddExerciseRow";
 import { useState } from "react";
+import { getDay, getSet, getSets } from "@/lib/urls";
+import { EditDayModal } from "./EditDayModal";
+import { useSWRConfig } from "swr";
 
 export const DayCard = ({ dayId }: { dayId: number }) => {
   const authFetcher = useAuthFetcher();
-  const { data: day } = useAuthedSWR<Day>(`/day/${dayId}`);
-  const { data: workoutSets, mutate: mutateSets } = useAuthedSWR<
-    PaginatedResponse<WorkoutSetType>
-  >(`/set?exerciseday=${dayId}`);
-  const sets = workoutSets?.results ?? [];
+  const { data: day } = useAuthedSWR<Day>(getDay(dayId));
+  const { mutate } = useSWRConfig();
+  const { data: workoutSets } = useAuthedSWR<PaginatedResponse<WorkoutSetType>>(
+    getSets(dayId),
+  );
 
   const mouseSensor = useSensor(MouseSensor);
   const touchSensor = useSensor(TouchSensor);
@@ -46,30 +49,44 @@ export const DayCard = ({ dayId }: { dayId: number }) => {
   const sensors = useSensors(mouseSensor, touchSensor, keyboardSensor);
 
   const [isSortingActive, setSortingState] = useState(true);
+  const [edit, setEdit] = useState(false);
 
   const handleSort = async (event: DragEndEvent) => {
     const dragId = event.active.id;
     const overId = event.over?.id;
-    if (!Number.isInteger(overId) || dragId === overId) {
+    if (
+      !Number.isInteger(overId) ||
+      dragId === overId ||
+      !workoutSets?.results
+    ) {
       return;
     }
-    const oldIndex = sets.findIndex((set) => set.id === dragId);
-    const newIndex = sets.findIndex((set) => set.id === overId);
-    const newSets = arrayMove(sets, oldIndex, newIndex);
+    const oldIndex = workoutSets.results.findIndex((set) => set.id === dragId);
+    const newIndex = workoutSets.results.findIndex((set) => set.id === overId);
+    const newSets = arrayMove(workoutSets.results, oldIndex, newIndex);
 
-    const patchUpdates = newSets.reduce((acc, set, index) => {
-      if (set.order !== index) {
-        acc.push(
-          authFetcher(`/set/${set.id}`, {
+    const setPromises = Promise.all(
+      newSets.reduce((acc, set, index) => {
+        if (set.order !== index) {
+          const setPromise = authFetcher(getSet(set.id), {
             method: "PATCH",
             body: JSON.stringify({ order: index }),
-          }),
-        );
-      }
-      return acc;
-    }, [] as Promise<unknown>[]);
-    await Promise.all(patchUpdates);
-    mutateSets({ ...workoutSets, results: newSets });
+          });
+          acc.push(setPromise);
+        }
+        return acc;
+      }, [] as Promise<unknown>[]),
+    );
+
+    mutate(getSets(dayId), setPromises, {
+      populateCache: false,
+      optimisticData: {
+        ...workoutSets,
+        results: newSets,
+      },
+      revalidate: false,
+      rollbackOnError: true,
+    });
     setSortingState(true);
   };
 
@@ -77,52 +94,63 @@ export const DayCard = ({ dayId }: { dayId: number }) => {
     return null;
   }
   return (
-    <Card>
-      <CardHeader
-        title={
-          <>
-            <Typography variant="h5" gutterBottom>
-              {day.description}
-            </Typography>
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-              {day.day?.map((weekday) => (
-                <Chip
-                  key={`day-${dayId}-weekday-${weekday}`}
-                  label={moment().set("weekday", weekday).format("dddd")}
-                />
-              ))}
-            </Box>
-          </>
-        }
-        action={<EditDayMenu dayId={dayId} />}
+    <>
+      <EditDayModal
+        open={edit}
+        onClose={() => setEdit(false)}
+        dayId={dayId}
+        workoutId={day.training}
       />
 
-      <CardContent>
-        <AddExerciseRow dayId={dayId} />
-      </CardContent>
+      <Card>
+        <CardHeader
+          title={
+            <>
+              <Typography variant="h5" gutterBottom>
+                {day.description}
+              </Typography>
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                {day.day?.map((weekday) => (
+                  <Chip
+                    key={`day-${dayId}-weekday-${weekday}`}
+                    label={moment().set("weekday", weekday).format("dddd")}
+                  />
+                ))}
+              </Box>
+            </>
+          }
+          action={<EditDayMenu dayId={dayId} />}
+        />
 
-      <List dense disablePadding>
-        <DndContext
-          onDragEnd={handleSort}
-          onDragStart={() => setSortingState(false)}
-          onDragCancel={() => setSortingState(true)}
-          onDragAbort={() => setSortingState(true)}
-          sensors={sensors}
-        >
-          <SortableContext items={sets} strategy={verticalListSortingStrategy}>
-            {sets.map((set) => {
-              return (
-                <WorkoutSet
-                  key={`set-${set.id}`}
-                  dayId={dayId}
-                  setId={set.id}
-                  isSortingActive={isSortingActive}
-                />
-              );
-            })}
-          </SortableContext>
-        </DndContext>
-      </List>
-    </Card>
+        <CardContent>
+          <AddExerciseRow dayId={dayId} />
+        </CardContent>
+
+        <List dense disablePadding>
+          <DndContext
+            onDragEnd={handleSort}
+            onDragStart={() => setSortingState(false)}
+            onDragCancel={() => setSortingState(true)}
+            onDragAbort={() => setSortingState(true)}
+            sensors={sensors}
+          >
+            <SortableContext
+              items={workoutSets?.results ?? []}
+              strategy={verticalListSortingStrategy}
+            >
+              {workoutSets?.results?.map((set) => {
+                return (
+                  <WorkoutSet
+                    key={`set-${set.id}`}
+                    setId={set.id}
+                    isSortingActive={isSortingActive}
+                  />
+                );
+              })}
+            </SortableContext>
+          </DndContext>
+        </List>
+      </Card>
+    </>
   );
 };

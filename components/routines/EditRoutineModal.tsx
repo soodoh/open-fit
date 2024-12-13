@@ -8,8 +8,9 @@ import {
   TextField,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import { PaginatedResponse } from "@/types/response";
 import { useAuthedSWR, useAuthFetcher } from "@/lib/fetcher";
+import { useSWRConfig } from "swr";
+import { getWorkout, WORKOUTS } from "@/lib/urls";
 
 export const EditRoutineModal = ({
   open,
@@ -17,22 +18,21 @@ export const EditRoutineModal = ({
   onClose,
 }: {
   open: boolean;
-  workoutId: number | null;
+  workoutId?: number;
   onClose: () => void;
 }) => {
   const authFetcher = useAuthFetcher();
-  const { data: workouts, mutate: mutateResults } =
-    useAuthedSWR<PaginatedResponse<Workout>>("/workout");
-  const { data: workout, mutate } = useAuthedSWR<Workout>(
-    Number.isInteger(workoutId) ? `/workout/${workoutId}` : null,
+  const { mutate } = useSWRConfig();
+  const { data: workout, mutate: mutateWorkout } = useAuthedSWR<Workout>(
+    getWorkout(workoutId),
   );
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const data = await authFetcher(
-      workoutId ? `/workout/${workoutId}` : "/workout/",
+    const updateWorkout: Promise<Workout> = authFetcher(
+      workoutId ? getWorkout(workoutId) : WORKOUTS,
       {
         method: workoutId ? "PUT" : "POST",
         body: JSON.stringify({
@@ -44,16 +44,30 @@ export const EditRoutineModal = ({
     onClose();
     // Handle optimistic updates
     if (!workoutId) {
-      const newWorkouts = workouts?.results
-        ? [data, ...workouts.results]
-        : [data];
-      mutateResults({
-        ...workouts,
-        count: newWorkouts.length,
-        results: newWorkouts,
+      mutate(WORKOUTS, updateWorkout, {
+        populateCache: (newWorkout: Workout, cachedWorkouts) => {
+          const newResults = cachedWorkouts?.results
+            ? [newWorkout, ...cachedWorkouts.results]
+            : [newWorkout];
+          return {
+            ...cachedWorkouts,
+            count: newResults.length,
+            results: newResults,
+          };
+        },
+        revalidate: false,
+        rollbackOnError: true,
       });
     } else {
-      mutate(data);
+      mutateWorkout(updateWorkout, {
+        optimisticData: (cachedWorkout) => ({
+          ...cachedWorkout,
+          name,
+          description,
+        }),
+        revalidate: true,
+        rollbackOnError: true,
+      });
     }
   };
 

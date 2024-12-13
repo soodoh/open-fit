@@ -1,7 +1,7 @@
 export type WorkoutSetType = {
-  id: number;
+  id?: number;
   exerciseday?: number;
   sets?: number;
-  order: number;
+  order?: number;
   comment?: string;
 };

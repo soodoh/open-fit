@@ -7,11 +7,12 @@ import { PaginatedResponse } from "@/types/response";
 import { Typography, Card, CardHeader, List, Divider } from "@mui/material";
 import { EditRoutineMenu } from "./EditRoutineMenu";
 import { RoutineDayItem } from "./RoutineDayItem";
+import { getDays, getWorkout } from "@/lib/urls";
 
-export const RoutineCard = ({ workoutId }: { workoutId: number }) => {
-  const { data: workout } = useAuthedSWR<Workout>(`/workout/${workoutId}`);
+export const RoutineCard = ({ workoutId }: { workoutId?: number }) => {
+  const { data: workout } = useAuthedSWR<Workout>(getWorkout(workoutId));
   const { data: workoutDays } = useAuthedSWR<PaginatedResponse<Day>>(
-    `/day?training=${workoutId}`,
+    getDays(workoutId),
   );
 
   if (!workout) {
@@ -36,7 +37,7 @@ export const RoutineCard = ({ workoutId }: { workoutId: number }) => {
 
       <List dense disablePadding sx={{ flexGrow: 1 }}>
         <Divider />
-        {workoutDays?.results.map((workoutDay) => {
+        {workoutDays?.results?.map((workoutDay) => {
           return (
             <RoutineDayItem
               key={`workout-${workoutId}-day-${workoutDay.id}`}

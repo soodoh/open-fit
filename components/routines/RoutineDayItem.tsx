@@ -11,15 +11,16 @@ import {
 import { EditDayMenu } from "./EditDayMenu";
 import moment from "moment";
 import Link from "next/link";
+import { getDay } from "@/lib/urls";
 
 export const RoutineDayItem = ({
   workoutId,
   dayId,
 }: {
-  workoutId: number;
-  dayId: number;
+  workoutId?: number;
+  dayId?: number;
 }) => {
-  const { data: workoutDay } = useAuthedSWR<Day>(`/day/${dayId}`);
+  const { data: workoutDay } = useAuthedSWR<Day>(getDay(dayId));
 
   if (!workoutDay) {
     return null;
@@ -30,7 +31,7 @@ export const RoutineDayItem = ({
         dense
         disablePadding
         secondaryAction={
-          <EditDayMenu dayId={workoutDay.id} workoutId={workoutId} />
+          <EditDayMenu workoutId={workoutId} dayId={workoutDay.id} />
         }
       >
         <ListItemButton component={Link} href={`/day/${dayId}`}>
@@ -46,9 +47,9 @@ export const RoutineDayItem = ({
                   mt: 0.5,
                 }}
               >
-                {workoutDay.day.map((weekday) => (
+                {workoutDay?.day?.map((weekday) => (
                   <Chip
-                    key={`workout-${workoutId}-weekday-${weekday}`}
+                    key={`day-${dayId}-weekday-${weekday}`}
                     component="span"
                     label={moment().set("weekday", weekday).format("ddd")}
                   />

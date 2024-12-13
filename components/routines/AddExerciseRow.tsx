@@ -8,13 +8,15 @@ import { type FormEvent, useState } from "react";
 import { WorkoutSetType } from "@/types/privateApi/set";
 import { Add } from "@mui/icons-material";
 import { useDefaultWeightUnit } from "@/lib/useDefaultWeightUnit";
+import { getSets, getSettings, SET, SETTING } from "@/lib/urls";
+import { Setting } from "@/types/privateApi/setting";
 
 export const AddExerciseRow = ({ dayId }: { dayId: number }) => {
   const authFetcher = useAuthFetcher();
 
-  const { data: workoutSets, mutate: mutateSets } = useAuthedSWR<
-    PaginatedResponse<WorkoutSetType>
-  >(`/set?exerciseday=${dayId}`);
+  const { data: workoutSets } = useAuthedSWR<PaginatedResponse<WorkoutSetType>>(
+    getSets(dayId),
+  );
   const { mutate } = useSWRConfig();
 
   const [exercise, setExercise] = useState<ExerciseSearchData | null>(null);
@@ -28,7 +30,7 @@ export const AddExerciseRow = ({ dayId }: { dayId: number }) => {
     }
 
     const totalSets = parseInt(numSets, 10) || 1;
-    const newSet = await authFetcher("/set/", {
+    const setPromise = authFetcher(SET, {
       method: "POST",
       body: JSON.stringify({
         exerciseday: dayId,
@@ -36,14 +38,25 @@ export const AddExerciseRow = ({ dayId }: { dayId: number }) => {
         sets: totalSets,
       }),
     });
-    const newSets = [newSet, ...(workoutSets?.results ?? [])];
-    mutateSets({ ...workoutSets, results: newSets });
+    mutate(getSets(dayId), setPromise, {
+      populateCache: (newSet: WorkoutSetType, cachedSets) => {
+        const newSets = [newSet, ...(workoutSets?.results ?? [])];
+        return {
+          ...cachedSets,
+          count: newSets.length,
+          results: newSets,
+        };
+      },
+      revalidate: false,
+      rollbackOnError: true,
+    });
 
     // Add settings based on numSets
+    const newSet = await setPromise;
     const postPromises = [];
     for (let i = 0; i < totalSets; i++) {
       postPromises.push(
-        authFetcher("/setting/", {
+        authFetcher(SETTING, {
           method: "POST",
           body: JSON.stringify({
             set: newSet.id,
@@ -55,10 +68,12 @@ export const AddExerciseRow = ({ dayId }: { dayId: number }) => {
         }),
       );
     }
-    const newSettings = await Promise.all(postPromises);
-    mutate(`setting?set=${newSet.id}`, {
-      count: totalSets,
-      results: newSettings,
+    mutate(getSettings(newSet.id), Promise.all(postPromises), {
+      populateCache: (newSettings: Setting[], cachedSettings) => ({
+        ...cachedSettings,
+        count: newSettings.length,
+        results: newSettings,
+      }),
     });
 
     setExercise(null);

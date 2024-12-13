@@ -1,6 +1,7 @@
 import { fetcher, useAuthedSWR, useAuthFetcher } from "@/lib/fetcher";
 import { useDefaultWeightUnit } from "@/lib/useDefaultWeightUnit";
 import { WorkoutLog } from "@/types/privateApi/workoutLog";
+import { WorkoutSession } from "@/types/privateApi/workoutSession";
 import { RepetitionUnit } from "@/types/publicApi/repetitionUnit";
 import { WeightUnit } from "@/types/publicApi/weightUnit";
 import { PaginatedResponse } from "@/types/response";
@@ -17,32 +18,42 @@ import {
 import { type FormEvent, useEffect, useState } from "react";
 import useSWR from "swr";
 
-export const EditLogRow = ({ logId }: { logId: number }) => {
+export const EditLogRow = ({
+  sessionId,
+  logId,
+}: {
+  sessionId: number;
+  logId: number;
+}) => {
   const authFetcher = useAuthFetcher();
 
-  const { data: workoutLog, mutate } = useAuthedSWR<WorkoutLog>(
-    `/workoutlog/${logId}`,
-  );
   const { data: repUnits } = useSWR<PaginatedResponse<RepetitionUnit>>(
     "/setting-repetitionunit?ordering=id",
     fetcher,
   );
-  const repUnitLabel = repUnits?.results?.find(
-    (unit) => unit.id === workoutLog?.repetition_unit,
-  )?.name;
   const { data: weightUnits } = useSWR<PaginatedResponse<WeightUnit>>(
     "/setting-weightunit?ordering=id",
     fetcher,
   );
+  const { data: workoutLog, mutate } = useAuthedSWR<WorkoutLog>(
+    `/workoutlog/${logId}`,
+  );
+  const { data: session } = useAuthedSWR<WorkoutSession>(
+    `/workoutsession/${sessionId}`,
+  );
   const { data: workoutLogs, mutate: mutateLogs } = useAuthedSWR<
     PaginatedResponse<WorkoutLog>
   >(
-    workoutLog?.exercise_base
-      ? `/workoutlog?ordering=id&exercise_base=${workoutLog.exercise_base}`
+    session?.date && workoutLog?.exercise_base
+      ? `/workoutlog?ordering=id&date=${session.date}&exercise_base=${workoutLog.exercise_base}`
       : null,
   );
+
   const weightUnitLabel = weightUnits?.results?.find(
     (unit) => unit.id === workoutLog?.weight_unit,
+  )?.name;
+  const repUnitLabel = repUnits?.results?.find(
+    (unit) => unit.id === workoutLog?.repetition_unit,
   )?.name;
 
   const defaultWeightUnit = useDefaultWeightUnit().toString();
@@ -61,16 +72,18 @@ export const EditLogRow = ({ logId }: { logId: number }) => {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const newLog = await authFetcher(`/workoutlog/${logId}/`, {
-      method: "PATCH",
-      body: JSON.stringify({
-        reps: parseInt(reps, 10),
-        repetition_unit: parseInt(repUnit, 10),
-        weight,
-        weight_unit: parseInt(weightUnit, 10),
+    mutate(
+      authFetcher(`/workoutlog/${logId}/`, {
+        method: "PATCH",
+        body: JSON.stringify({
+          reps: parseInt(reps, 10),
+          repetition_unit: parseInt(repUnit, 10),
+          weight,
+          weight_unit: parseInt(weightUnit, 10),
+        }),
       }),
-    });
-    mutate(newLog);
+      { revalidate: false },
+    );
     setEdit(false);
   };
 
@@ -122,6 +135,7 @@ export const EditLogRow = ({ logId }: { logId: number }) => {
     >
       <Box sx={{ display: "flex", gap: 2, my: 1 }}>
         <TextField
+          size="small"
           variant="outlined"
           type="number"
           label="Reps"
@@ -135,6 +149,7 @@ export const EditLogRow = ({ logId }: { logId: number }) => {
         {repUnits?.results && (
           <TextField
             select
+            size="small"
             label="Type"
             value={repUnit}
             onChange={(event) => setRepUnit(event.target.value)}
@@ -148,6 +163,7 @@ export const EditLogRow = ({ logId }: { logId: number }) => {
           </TextField>
         )}
         <TextField
+          size="small"
           variant="outlined"
           type="number"
           label="Weight"
@@ -161,6 +177,7 @@ export const EditLogRow = ({ logId }: { logId: number }) => {
         {weightUnits?.results && (
           <TextField
             select
+            size="small"
             label="Unit"
             value={weightUnit}
             onChange={(event) => setWeightUnit(event.target.value)}

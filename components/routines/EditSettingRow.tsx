@@ -1,4 +1,10 @@
 import { fetcher, useAuthedSWR, useAuthFetcher } from "@/lib/fetcher";
+import {
+  getSetting,
+  getSettings,
+  REPETITION_UNITS,
+  WEIGHT_UNITS,
+} from "@/lib/urls";
 import { useDefaultWeightUnit } from "@/lib/useDefaultWeightUnit";
 import { Setting } from "@/types/privateApi/setting";
 import { RepetitionUnit } from "@/types/publicApi/repetitionUnit";
@@ -24,20 +30,20 @@ export const EditSettingRow = ({ settingId }: { settingId: number }) => {
   const authFetcher = useAuthFetcher();
 
   const { data: setting, mutate: mutateSetting } = useAuthedSWR<Setting>(
-    `/setting/${settingId}`,
+    getSetting(settingId),
   );
   const { data: settings, mutate: mutateSettings } = useAuthedSWR<
     PaginatedResponse<Setting>
-  >(typeof setting?.set === "number" ? `/setting?set=${setting.set}` : null);
+  >(getSettings(setting?.set));
   const { data: repUnits } = useSWR<PaginatedResponse<RepetitionUnit>>(
-    "/setting-repetitionunit?ordering=id",
+    REPETITION_UNITS,
     fetcher,
   );
   const repUnitLabel = repUnits?.results?.find(
     (unit) => unit.id === setting?.repetition_unit,
   )?.name;
   const { data: weightUnits } = useSWR<PaginatedResponse<WeightUnit>>(
-    "/setting-weightunit?ordering=id",
+    WEIGHT_UNITS,
     fetcher,
   );
   const weightUnitLabel = weightUnits?.results?.find(
@@ -62,7 +68,7 @@ export const EditSettingRow = ({ settingId }: { settingId: number }) => {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const newSetting = await authFetcher(`/setting/${settingId}/`, {
+    const newSetting = await authFetcher(getSetting(settingId), {
       method: "PATCH",
       body: JSON.stringify({
         reps: parseInt(reps, 10),
@@ -81,16 +87,24 @@ export const EditSettingRow = ({ settingId }: { settingId: number }) => {
       return;
     }
 
-    await authFetcher(`/setting/${settingId}/`, {
+    const deletePromise = authFetcher(getSetting(settingId), {
       method: "DELETE",
     });
     // Optimistic update
-    const newSettings =
-      settings?.results?.filter((current) => current.id === settingId) ?? [];
-    mutateSettings({
-      ...newSettings,
-      count: newSettings.length,
-      results: newSettings,
+    mutateSettings(deletePromise, {
+      populateCache: (_, cachedSettings) => {
+        const newSettings =
+          cachedSettings?.results?.filter(
+            (current) => current.id !== settingId,
+          ) ?? [];
+        return {
+          ...cachedSettings,
+          count: newSettings.length,
+          results: newSettings,
+        };
+      },
+      revalidate: false,
+      rollbackOnError: true,
     });
   };
 

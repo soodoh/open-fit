@@ -8,10 +8,10 @@ import { Grid2 as Grid } from "@mui/material";
 import { useState } from "react";
 import { EditRoutineModal as CreateRoutineModal } from "@/components/routines/EditRoutineModal";
 import { RoutineCard } from "@/components/routines/RoutineCard";
+import { WORKOUTS } from "@/lib/urls";
 
 export default function Routines() {
-  const { data: workouts } =
-    useAuthedSWR<PaginatedResponse<Workout>>("/workout");
+  const { data: workouts } = useAuthedSWR<PaginatedResponse<Workout>>(WORKOUTS);
   const [showEditModal, setEditModal] = useState(false);
 
   return (
@@ -31,7 +31,6 @@ export default function Routines() {
       <CreateRoutineModal
         open={showEditModal}
         onClose={() => setEditModal(false)}
-        workoutId={null}
       />
 
       <Grid container spacing={2}>

@@ -1,4 +1,4 @@
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 import {
   Box,
   Button,
@@ -21,25 +21,26 @@ import { fetcher, useAuthedSWR, useAuthFetcher } from "@/lib/fetcher";
 import { Day } from "@/types/privateApi/day";
 import { DaysOfWeek } from "@/types/publicApi/daysOfWeek";
 import moment from "moment";
+import { DAY, DAYS_OF_WEEK, getDay, getDays } from "@/lib/urls";
 
 export const EditDayModal = ({
   open,
   dayId,
+  workoutId,
   onClose,
 }: {
   open: boolean;
-  dayId: number | null;
+  dayId?: number;
+  workoutId?: number;
   onClose: () => void;
 }) => {
   const authFetcher = useAuthFetcher();
-  const { data: workoutDay, mutate } = useAuthedSWR<Day>(
-    typeof dayId === "number" ? `/day/${dayId}` : null,
+  const { mutate } = useSWRConfig();
+  const { data: workoutDay, mutate: mutateDay } = useAuthedSWR<Day>(
+    getDay(dayId),
   );
-  const { data: workoutDays, mutate: mutateResults } = useAuthedSWR<
-    PaginatedResponse<Day>
-  >(workoutDay?.training ? `/day?training=${workoutDay.training}` : null);
   const { data: daysOfWeek } = useSWR<PaginatedResponse<DaysOfWeek>>(
-    `/daysofweek/`,
+    DAYS_OF_WEEK,
     fetcher,
   );
 
@@ -56,11 +57,6 @@ export const EditDayModal = ({
     setWeekdays(Array.from(set).sort((a, b) => a - b));
   };
 
-  const workoutId = workoutDay?.training;
-  if (!workoutId) {
-    return null;
-  }
-
   return (
     <Dialog
       open={open}
@@ -71,8 +67,8 @@ export const EditDayModal = ({
         component: "form",
         onSubmit: async (event: React.FormEvent<HTMLFormElement>) => {
           event.preventDefault();
-          const data = await authFetcher(dayId ? `/day/${dayId}` : "/day/", {
-            method: dayId ? "PUT" : "POST",
+          const dayPromise = authFetcher(dayId ? getDay(dayId) : DAY, {
+            method: dayId ? "PATCH" : "POST",
             body: JSON.stringify({
               training: workoutId,
               description,
@@ -82,16 +78,31 @@ export const EditDayModal = ({
           onClose();
 
           if (!dayId) {
-            const newDays = workoutDays?.results
-              ? [...workoutDays.results, data]
-              : [data];
-            mutateResults({
-              ...workoutDays,
-              count: newDays.length,
-              results: newDays,
+            mutate(getDays(workoutId), dayPromise, {
+              populateCache: (newDay: Day, cachedDays) => {
+                const newResults = cachedDays?.results
+                  ? [...cachedDays.results, newDay]
+                  : [newDay];
+                return {
+                  ...cachedDays,
+                  count: newResults.length,
+                  results: newResults,
+                };
+              },
+              revalidate: false,
+              rollbackOnError: true,
             });
           } else {
-            mutate(data);
+            mutateDay(dayPromise, {
+              optimisticData: (cachedDay) => ({
+                ...cachedDay,
+                training: workoutId,
+                description,
+                day: weekdays,
+              }),
+              revalidate: true,
+              rollbackOnError: true,
+            });
           }
         },
       }}

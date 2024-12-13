@@ -19,7 +19,7 @@ enum Modal {
   DELETE = "delete",
 }
 
-export const EditRoutineMenu = ({ workoutId }: { workoutId: number }) => {
+export const EditRoutineMenu = ({ workoutId }: { workoutId?: number }) => {
   const [modal, setModal] = useState<Modal | null>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const menuOpen = Boolean(anchorEl);
@@ -37,7 +37,6 @@ export const EditRoutineMenu = ({ workoutId }: { workoutId: number }) => {
         open={modal === Modal.ADD}
         onClose={handleClose}
         workoutId={workoutId}
-        dayId={null}
       />
       <EditRoutineModal
         open={modal === Modal.EDIT}

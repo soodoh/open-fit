@@ -1,5 +1,4 @@
 import { Workout } from "@/types/privateApi/workout";
-import { PaginatedResponse } from "@/types/response";
 import {
   Button,
   Dialog,
@@ -8,7 +7,9 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
-import { useAuthedSWR, useAuthFetcher } from "@/lib/fetcher";
+import { useAuthFetcher } from "@/lib/fetcher";
+import { getWorkout, WORKOUTS } from "@/lib/urls";
+import { useSWRConfig } from "swr";
 
 export const DeleteRoutineModal = ({
   open,
@@ -17,23 +18,29 @@ export const DeleteRoutineModal = ({
 }: {
   open: boolean;
   onClose: () => void;
-  workoutId: number;
+  workoutId?: number;
 }) => {
   const authFetcher = useAuthFetcher();
-  const { data: workouts, mutate } =
-    useAuthedSWR<PaginatedResponse<Workout>>("/workout");
+  const { mutate } = useSWRConfig();
   const deleteRoutine = async () => {
-    authFetcher(`/workout/${workoutId}/`, {
+    const deletePromise = authFetcher(getWorkout(workoutId), {
       method: "DELETE",
     });
-    const newWorkouts =
-      workouts?.results?.filter((workout) => workout.id === workoutId) ?? [];
-    const optimisticUpdate = {
-      ...workouts,
-      count: newWorkouts.length,
-      results: newWorkouts,
-    };
-    mutate(optimisticUpdate);
+    mutate(WORKOUTS, deletePromise, {
+      populateCache: (_, cachedWorkouts) => {
+        const newResults =
+          cachedWorkouts?.results?.filter(
+            (workout: Workout) => workout.id !== workoutId,
+          ) ?? [];
+        return {
+          ...cachedWorkouts,
+          count: newResults.length,
+          results: newResults,
+        };
+      },
+      revalidate: false,
+      rollbackOnError: true,
+    });
   };
 
   return (

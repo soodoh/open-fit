@@ -9,6 +9,7 @@ import {
 import { useAuthedSWR, useAuthFetcher } from "@/lib/fetcher";
 import { WorkoutSetType } from "@/types/privateApi/set";
 import { useEffect, useState } from "react";
+import { getSet } from "@/lib/urls";
 
 export const EditSetCommentModal = ({
   open,
@@ -20,7 +21,7 @@ export const EditSetCommentModal = ({
   setId: number;
 }) => {
   const authFetcher = useAuthFetcher();
-  const { data: set, mutate } = useAuthedSWR<WorkoutSetType>(`/set/${setId}`);
+  const { data: set, mutate } = useAuthedSWR<WorkoutSetType>(getSet(setId));
   const [comment, setComment] = useState(set?.comment ?? "");
 
   useEffect(() => {
@@ -30,13 +31,20 @@ export const EditSetCommentModal = ({
   }, [open, set?.comment]);
 
   const updateSet = async () => {
-    const newSet = await authFetcher(`/set/${setId}/`, {
+    const newSet = authFetcher(getSet(setId), {
       method: "PATCH",
       body: JSON.stringify({
         comment,
       }),
     });
-    mutate(newSet);
+    mutate(newSet, {
+      optimisticData: (cachedSet) => ({
+        ...cachedSet,
+        comment,
+      }),
+      revalidate: true,
+      rollbackOnError: true,
+    });
   };
 
   return (

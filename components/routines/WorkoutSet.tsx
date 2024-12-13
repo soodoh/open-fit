@@ -43,27 +43,26 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
+import { getSet, getSetting, getSettings, SETTING } from "@/lib/urls";
+import { useSWRConfig } from "swr";
 
 export const WorkoutSet = ({
   setId,
   isSortingActive,
 }: {
-  dayId: number;
   setId: number;
   isSortingActive: boolean;
 }) => {
   const authFetcher = useAuthFetcher();
 
-  const {
-    data: settings,
-    isLoading: settingLoading,
-    mutate: mutateSettings,
-  } = useAuthedSWR<PaginatedResponse<Setting>>(`/setting?set=${setId}`);
-  const settingItems = settings?.results ?? [];
+  const { mutate } = useSWRConfig();
+  const { data: settings, isLoading: settingLoading } = useAuthedSWR<
+    PaginatedResponse<Setting>
+  >(getSettings(setId));
 
   const exerciseBaseId = settings?.results?.[0]?.exercise_base;
 
-  const { data: set } = useAuthedSWR<WorkoutSetType>(`/set/${setId}`);
+  const { data: set } = useAuthedSWR<WorkoutSetType>(getSet(setId));
 
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: setId });
@@ -81,7 +80,7 @@ export const WorkoutSet = ({
   const isLoading = settingLoading || !exercise;
 
   const handleAdd = async () => {
-    const newSet = await authFetcher("/setting/", {
+    const settingPromise = authFetcher(SETTING, {
       method: "POST",
       body: JSON.stringify({
         set: setId,
@@ -91,40 +90,59 @@ export const WorkoutSet = ({
         reps: 0,
       }),
     });
-    const newSettings = settings?.results
-      ? [...settings.results, newSet]
-      : [newSet];
-    mutateSettings({
-      ...settings,
-      count: newSettings.length,
-      results: newSettings,
+    mutate(getSettings(setId), settingPromise, {
+      populateCache: (newSetting: Setting, cachedSettings) => {
+        const newResults = cachedSettings?.results
+          ? [...cachedSettings.results, newSetting]
+          : [newSetting];
+        return {
+          ...cachedSettings,
+          count: newResults.length,
+          results: newResults,
+        };
+      },
+      revalidate: false,
+      rollbackOnError: true,
     });
   };
 
   const handleSort = async (event: DragEndEvent) => {
     const dragId = event.active.id;
     const overId = event.over?.id;
-    if (!Number.isInteger(overId) || dragId === overId) {
+    if (!Number.isInteger(overId) || dragId === overId || !settings?.results) {
       return;
     }
 
-    const oldIndex = settingItems.findIndex((setting) => setting.id === dragId);
-    const newIndex = settingItems.findIndex((setting) => setting.id === overId);
-    const newSettings = arrayMove(settingItems, oldIndex, newIndex);
+    const oldIndex = settings.results.findIndex(
+      (setting) => setting.id === dragId,
+    );
+    const newIndex = settings.results.findIndex(
+      (setting) => setting.id === overId,
+    );
+    const newSettings = arrayMove(settings.results, oldIndex, newIndex);
 
-    const patchUpdates = newSettings.reduce((acc, setting, index) => {
-      if (setting.order !== index) {
-        acc.push(
-          authFetcher(`/setting/${setting.id}`, {
-            method: "PATCH",
-            body: JSON.stringify({ order: index }),
-          }),
-        );
-      }
-      return acc;
-    }, [] as Promise<unknown>[]);
-    await Promise.all(patchUpdates);
-    mutateSettings({ ...settings, results: newSettings });
+    const settingPromises = Promise.all(
+      newSettings.reduce((acc, setting, index) => {
+        if (setting.order !== index) {
+          acc.push(
+            authFetcher(getSetting(setting.id), {
+              method: "PATCH",
+              body: JSON.stringify({ order: index }),
+            }),
+          );
+        }
+        return acc;
+      }, [] as Promise<unknown>[]),
+    );
+    mutate(getSettings(setId), settingPromises, {
+      populateCache: false,
+      optimisticData: {
+        ...settings,
+        results: newSettings,
+      },
+      revalidate: false,
+      rollbackOnError: true,
+    });
   };
 
   if (isLoading) {
@@ -195,10 +213,10 @@ export const WorkoutSet = ({
 
           <DndContext onDragEnd={handleSort} sensors={sensors}>
             <SortableContext
-              items={settingItems}
+              items={settings?.results ?? []}
               strategy={verticalListSortingStrategy}
             >
-              {settingItems.map((setting) => (
+              {settings?.results?.map((setting) => (
                 <EditSettingRow
                   key={`setting-${setting.id}`}
                   settingId={setting.id}
