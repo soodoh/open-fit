@@ -14,6 +14,7 @@ import {
   Rating,
   Typography,
   Grid2 as Grid,
+  Divider,
 } from "@mui/material";
 import moment from "moment";
 import { useMemo } from "react";
@@ -60,6 +61,8 @@ export const SessionPage = ({ sessionId }: { sessionId: number }) => {
         action={<EditSessionMenu sessionId={sessionId} />}
         disableTypography
       />
+
+      <Divider />
       <CardContent>
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, sm: 4 }}>
@@ -75,6 +78,7 @@ export const SessionPage = ({ sessionId }: { sessionId: number }) => {
               size="large"
               max={3}
               value={session?.impression ? parseInt(session.impression) : null}
+              readOnly
             />
           </Grid>
 
@@ -86,12 +90,14 @@ export const SessionPage = ({ sessionId }: { sessionId: number }) => {
           )}
         </Grid>
       </CardContent>
+      <Divider />
 
-      <List>
+      <List disablePadding>
         {exerciseIds.map((exerciseBaseId) => (
           <SessionLogItem
             key={`exercise-${exerciseBaseId}`}
             exerciseBaseId={exerciseBaseId}
+            sessionId={sessionId}
           />
         ))}
       </List>

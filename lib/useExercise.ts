@@ -3,7 +3,12 @@ import { Exercise } from "@/types/publicApi/exercise";
 import useSWR from "swr";
 import { fetcher } from "./fetcher";
 
-export function useExercise(exerciseBaseId?: number): Exercise | null {
+type ExerciseMap = {
+  exercise: Exercise | null;
+  imageUrl: string | null;
+};
+
+export function useExercise(exerciseBaseId?: number): ExerciseMap {
   const { data: exerciseBaseInfo } = useSWR<ExerciseBaseInfo>(
     typeof exerciseBaseId === "number"
       ? `/exercisebaseinfo/${exerciseBaseId}`
@@ -11,9 +16,10 @@ export function useExercise(exerciseBaseId?: number): Exercise | null {
     fetcher,
   );
   // TODO support other languages
-  const exercise = exerciseBaseInfo?.exercises?.find(
-    (exercise) => exercise.language === 2,
-  );
+  const exercise =
+    exerciseBaseInfo?.exercises?.find((exercise) => exercise.language === 2) ??
+    null;
+  const imageUrl = exerciseBaseInfo?.images?.[0]?.image ?? null;
 
-  return exercise ?? null;
+  return { exercise, imageUrl };
 }

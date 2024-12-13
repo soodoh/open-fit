@@ -20,7 +20,6 @@ import {
   Error,
   Image as ImageIcon,
 } from "@mui/icons-material";
-import { ExerciseBaseInfo } from "@/types/publicApi/exerciseBaseInfo";
 import {
   arrayMove,
   SortableContext,
@@ -63,12 +62,6 @@ export const WorkoutSet = ({
   const settingItems = settings?.results ?? [];
 
   const exerciseBaseId = settings?.results?.[0]?.exercise_base;
-  const { data: exerciseBaseInfo, isLoading: exerciseLoading } =
-    useAuthedSWR<ExerciseBaseInfo>(
-      typeof exerciseBaseId === "number"
-        ? `/exercisebaseinfo/${exerciseBaseId}`
-        : null,
-    );
 
   const { data: set } = useAuthedSWR<WorkoutSetType>(`/set/${setId}`);
 
@@ -84,9 +77,8 @@ export const WorkoutSet = ({
   const keyboardSensor = useSensor(KeyboardSensor);
   const sensors = useSensors(mouseSensor, touchSensor, keyboardSensor);
 
-  const isLoading = settingLoading || exerciseLoading;
-  const imageUrl = exerciseBaseInfo?.images?.[0]?.image;
-  const exercise = useExercise(exerciseBaseId);
+  const { exercise, imageUrl } = useExercise(exerciseBaseId);
+  const isLoading = settingLoading || !exercise;
 
   const handleAdd = async () => {
     const newSet = await authFetcher("/setting/", {
