@@ -1,3 +1,8 @@
+const LOG_QUERY_LIMIT = 300;
+
+export const NEW_SESSION = "/workoutsession/";
+export const SESSIONS = "/workoutsession/";
+export const WORKOUT_LOG = "/workoutlog/";
 export const WORKOUTS = "/workout/";
 export const SETTING = "/setting/";
 export const SET = "/set/";
@@ -30,3 +35,17 @@ export const getSettings = (setId?: number) =>
 
 export const getSetting = (settingId?: number) =>
   isValidId(settingId) ? `/setting/${settingId}` : null;
+
+export const getSession = (sessionId?: number) =>
+  isValidId(sessionId) ? `/workoutsession/${sessionId}` : null;
+
+export const getWorkoutLog = (logId?: number) =>
+  isValidId(logId) ? `/workoutlog/${logId}` : null;
+
+export const getWorkoutLogs = (date?: string) =>
+  date ? `/workoutlog?ordering=id&limit=${LOG_QUERY_LIMIT}&date=${date}` : null;
+
+export const getWorkoutLogSets = (date?: string, exerciseBaseId?: number) =>
+  date && isValidId(exerciseBaseId)
+    ? `/workoutlog?ordering=id&date=${date}&exercise_base=${exerciseBaseId}`
+    : null;

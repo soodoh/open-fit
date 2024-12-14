@@ -31,6 +31,10 @@ export const EditRoutineModal = ({
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (!name) {
+      return;
+    }
+
     const updateWorkout: Promise<Workout> = authFetcher(
       workoutId ? getWorkout(workoutId) : WORKOUTS,
       {

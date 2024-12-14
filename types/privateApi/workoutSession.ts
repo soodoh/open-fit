@@ -5,12 +5,12 @@ export enum Impression {
 }
 
 export type WorkoutSession = {
-  id: number;
-  user: number;
+  id?: number;
+  user?: number;
   workout: number;
   date: string;
-  notes: string;
+  notes: string | null;
   impression: `${Impression}`;
-  time_start: string;
-  time_end: string;
+  time_start: string | null;
+  time_end: string | null;
 };

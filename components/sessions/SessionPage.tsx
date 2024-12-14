@@ -20,20 +20,13 @@ import moment from "moment";
 import { useMemo } from "react";
 import { SessionLogItem } from "./SessionLogItem";
 import { EditSessionMenu } from "./EditSessionMenu";
-
-const LOG_QUERY_LIMIT = 300;
+import { getSession, getWorkout, getWorkoutLogs } from "@/lib/urls";
 
 export const SessionPage = ({ sessionId }: { sessionId: number }) => {
-  const { data: session } = useAuthedSWR<WorkoutSession>(
-    `/workoutsession/${sessionId}`,
-  );
-  const { data: workout } = useAuthedSWR<Workout>(
-    session?.workout ? `/workout/${session.workout}` : null,
-  );
+  const { data: session } = useAuthedSWR<WorkoutSession>(getSession(sessionId));
+  const { data: workout } = useAuthedSWR<Workout>(getWorkout(session?.workout));
   const { data: workoutLogs } = useAuthedSWR<PaginatedResponse<WorkoutLog>>(
-    session?.date
-      ? `/workoutlog?ordering=id&limit=${LOG_QUERY_LIMIT}&date=${session.date}`
-      : null,
+    getWorkoutLogs(session?.date),
   );
   const exerciseIds = useMemo(() => {
     const uniqueIds = new Set(

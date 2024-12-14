@@ -1,13 +1,10 @@
 import { useAuthedSWR } from "@/lib/fetcher";
 import { useSessionDuration } from "@/lib/useSessionDuration";
-import { Day } from "@/types/privateApi/day";
 import { Workout } from "@/types/privateApi/workout";
 import { WorkoutSession } from "@/types/privateApi/workoutSession";
 import {
-  Box,
   Button,
   Card,
-  CardActionArea,
   CardActions,
   CardContent,
   CardHeader,
@@ -21,14 +18,11 @@ import {
 import moment from "moment";
 import Link from "next/link";
 import { EditSessionMenu } from "./EditSessionMenu";
+import { getSession, getWorkout } from "@/lib/urls";
 
-export const SessionSummaryCard = ({ sessionId }: { sessionId: number }) => {
-  const { data: session } = useAuthedSWR<WorkoutSession>(
-    `/workoutsession/${sessionId}`,
-  );
-  const { data: workout } = useAuthedSWR<Workout>(
-    session?.workout ? `/workout/${session.workout}` : null,
-  );
+export const SessionSummaryCard = ({ sessionId }: { sessionId?: number }) => {
+  const { data: session } = useAuthedSWR<WorkoutSession>(getSession(sessionId));
+  const { data: workout } = useAuthedSWR<Workout>(getWorkout(session?.workout));
 
   const durationString = useSessionDuration(sessionId);
 

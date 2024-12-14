@@ -16,7 +16,7 @@ enum Modal {
   DELETE = "delete",
 }
 
-export const EditSessionMenu = ({ sessionId }: { sessionId: number }) => {
+export const EditSessionMenu = ({ sessionId }: { sessionId?: number }) => {
   const [modal, setModal] = useState<Modal | null>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const menuOpen = Boolean(anchorEl);

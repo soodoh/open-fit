@@ -1,4 +1,11 @@
 import { fetcher, useAuthedSWR, useAuthFetcher } from "@/lib/fetcher";
+import {
+  getSession,
+  getWorkoutLog,
+  getWorkoutLogSets,
+  REPETITION_UNITS,
+  WEIGHT_UNITS,
+} from "@/lib/urls";
 import { useDefaultWeightUnit } from "@/lib/useDefaultWeightUnit";
 import { WorkoutLog } from "@/types/privateApi/workoutLog";
 import { WorkoutSession } from "@/types/privateApi/workoutSession";
@@ -28,26 +35,20 @@ export const EditLogRow = ({
   const authFetcher = useAuthFetcher();
 
   const { data: repUnits } = useSWR<PaginatedResponse<RepetitionUnit>>(
-    "/setting-repetitionunit?ordering=id",
+    REPETITION_UNITS,
     fetcher,
   );
   const { data: weightUnits } = useSWR<PaginatedResponse<WeightUnit>>(
-    "/setting-weightunit?ordering=id",
+    WEIGHT_UNITS,
     fetcher,
   );
   const { data: workoutLog, mutate } = useAuthedSWR<WorkoutLog>(
-    `/workoutlog/${logId}`,
+    getWorkoutLog(logId),
   );
-  const { data: session } = useAuthedSWR<WorkoutSession>(
-    `/workoutsession/${sessionId}`,
-  );
+  const { data: session } = useAuthedSWR<WorkoutSession>(getSession(sessionId));
   const { data: workoutLogs, mutate: mutateLogs } = useAuthedSWR<
     PaginatedResponse<WorkoutLog>
-  >(
-    session?.date && workoutLog?.exercise_base
-      ? `/workoutlog?ordering=id&date=${session.date}&exercise_base=${workoutLog.exercise_base}`
-      : null,
-  );
+  >(getWorkoutLogSets(session?.date, workoutLog?.exercise_base));
 
   const weightUnitLabel = weightUnits?.results?.find(
     (unit) => unit.id === workoutLog?.weight_unit,
@@ -73,7 +74,7 @@ export const EditLogRow = ({
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     mutate(
-      authFetcher(`/workoutlog/${logId}/`, {
+      authFetcher(getWorkoutLog(logId), {
         method: "PATCH",
         body: JSON.stringify({
           reps: parseInt(reps, 10),
@@ -88,7 +89,7 @@ export const EditLogRow = ({
   };
 
   const handleDelete = async () => {
-    await authFetcher(`/workoutlog/${logId}/`, {
+    await authFetcher(getWorkoutLog(logId), {
       method: "DELETE",
     });
     // Optimistic update

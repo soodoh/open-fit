@@ -23,6 +23,7 @@ import { useExercise } from "@/lib/useExercise";
 import { WorkoutSession } from "@/types/privateApi/workoutSession";
 import { WorkoutLog } from "@/types/privateApi/workoutLog";
 import { EditLogRow } from "./EditLogRow";
+import { getSession, getWorkoutLogSets, WORKOUT_LOG } from "@/lib/urls";
 
 export const SessionLogItem = ({
   sessionId,
@@ -33,16 +34,10 @@ export const SessionLogItem = ({
 }) => {
   const authFetcher = useAuthFetcher();
 
-  const { data: session } = useAuthedSWR<WorkoutSession>(
-    `/workoutsession/${sessionId}`,
-  );
+  const { data: session } = useAuthedSWR<WorkoutSession>(getSession(sessionId));
   const { data: workoutLogs, mutate: mutateLogs } = useAuthedSWR<
     PaginatedResponse<WorkoutLog>
-  >(
-    session?.date
-      ? `/workoutlog?ordering=id&date=${session.date}&exercise_base=${exerciseBaseId}`
-      : null,
-  );
+  >(getWorkoutLogSets(session?.date, exerciseBaseId));
 
   const logs = workoutLogs?.results ?? [];
   const { exercise, imageUrl } = useExercise(exerciseBaseId);
@@ -51,7 +46,7 @@ export const SessionLogItem = ({
   const defaultWeightUnit = useDefaultWeightUnit();
 
   const handleAdd = async () => {
-    const newLog = await authFetcher("/workoutlog/", {
+    const newLog = await authFetcher(WORKOUT_LOG, {
       method: "POST",
       body: JSON.stringify({
         workout: session?.workout,
