@@ -166,6 +166,7 @@ export const EditSettingRow = ({ settingId }: { settingId: number }) => {
 
       <Box sx={{ display: "flex", gap: 2, my: 1 }}>
         <TextField
+          size="small"
           variant="outlined"
           type="number"
           label="Reps"
@@ -178,6 +179,7 @@ export const EditSettingRow = ({ settingId }: { settingId: number }) => {
         />
         {repUnits?.results && (
           <TextField
+            size="small"
             select
             label="Type"
             value={repUnit}
@@ -192,6 +194,7 @@ export const EditSettingRow = ({ settingId }: { settingId: number }) => {
           </TextField>
         )}
         <TextField
+          size="small"
           variant="outlined"
           type="number"
           label="Weight"
@@ -204,6 +207,7 @@ export const EditSettingRow = ({ settingId }: { settingId: number }) => {
         />
         {weightUnits?.results && (
           <TextField
+            size="small"
             select
             label="Unit"
             value={weightUnit}

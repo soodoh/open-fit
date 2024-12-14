@@ -50,7 +50,7 @@ export const WorkoutSet = ({
   setId,
   isSortingActive,
 }: {
-  setId: number;
+  setId?: number;
   isSortingActive: boolean;
 }) => {
   const authFetcher = useAuthFetcher();
@@ -65,7 +65,7 @@ export const WorkoutSet = ({
   const { data: set } = useAuthedSWR<WorkoutSetType>(getSet(setId));
 
   const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: setId });
+    useSortable({ id: setId ?? -1 });
   const [edit, setEdit] = useState(false);
   const [editComment, setEditComment] = useState(false);
   const [deleteOpen, setDelete] = useState(false);

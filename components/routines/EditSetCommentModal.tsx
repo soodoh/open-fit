@@ -18,7 +18,7 @@ export const EditSetCommentModal = ({
 }: {
   open: boolean;
   onClose: () => void;
-  setId: number;
+  setId?: number;
 }) => {
   const authFetcher = useAuthFetcher();
   const { data: set, mutate } = useAuthedSWR<WorkoutSetType>(getSet(setId));

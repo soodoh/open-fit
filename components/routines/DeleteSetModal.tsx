@@ -18,7 +18,7 @@ export const DeleteSetModal = ({
 }: {
   open: boolean;
   onClose: () => void;
-  setId: number;
+  setId?: number;
 }) => {
   const authFetcher = useAuthFetcher();
 

@@ -90,7 +90,7 @@ export const DayCard = ({ dayId }: { dayId: number }) => {
     setSortingState(true);
   };
 
-  if (!day) {
+  if (!day || !workoutSets?.results) {
     return null;
   }
   return (
@@ -102,7 +102,7 @@ export const DayCard = ({ dayId }: { dayId: number }) => {
         workoutId={day.training}
       />
 
-      <Card>
+      <Card sx={{ pb: 2 }}>
         <CardHeader
           title={
             <>
@@ -135,7 +135,7 @@ export const DayCard = ({ dayId }: { dayId: number }) => {
             sensors={sensors}
           >
             <SortableContext
-              items={workoutSets?.results ?? []}
+              items={workoutSets.results}
               strategy={verticalListSortingStrategy}
             >
               {workoutSets?.results?.map((set) => {
