@@ -10,6 +10,7 @@ import {
   MenuList,
 } from "@mui/material";
 import { EditSessionModal } from "./EditSessionModal";
+import { DeleteSessionModal } from "./DeleteSessionModal";
 
 enum Modal {
   EDIT = "edit",
@@ -30,6 +31,12 @@ export const EditSessionMenu = ({ sessionId }: { sessionId?: number }) => {
 
   return (
     <>
+      <DeleteSessionModal
+        open={modal === Modal.DELETE}
+        onClose={handleClose}
+        sessionId={sessionId}
+      />
+
       <EditSessionModal
         open={modal === Modal.EDIT}
         onClose={handleClose}
