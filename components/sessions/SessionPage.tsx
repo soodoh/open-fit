@@ -21,6 +21,7 @@ import { useMemo } from "react";
 import { SessionLogItem } from "./SessionLogItem";
 import { EditSessionMenu } from "./EditSessionMenu";
 import { getSession, getWorkout, getWorkoutLogs } from "@/lib/urls";
+import { AddLogRow } from "./AddLogRow";
 
 export const SessionPage = ({ sessionId }: { sessionId: number }) => {
   const { data: session } = useAuthedSWR<WorkoutSession>(getSession(sessionId));
@@ -28,11 +29,15 @@ export const SessionPage = ({ sessionId }: { sessionId: number }) => {
   const { data: workoutLogs } = useAuthedSWR<PaginatedResponse<WorkoutLog>>(
     getWorkoutLogs(session?.date),
   );
-  const exerciseIds = useMemo(() => {
-    const uniqueIds = new Set(
-      workoutLogs?.results?.map((log) => log.exercise_base),
-    );
-    return Array.from(uniqueIds);
+  const exerciseLogGroups = useMemo(() => {
+    const exerciseMap = new Map();
+    for (const log of workoutLogs?.results ?? []) {
+      if (!exerciseMap.has(log.exercise_base)) {
+        exerciseMap.set(log.exercise_base, []);
+      }
+      exerciseMap.get(log.exercise_base).push(log);
+    }
+    return Array.from(exerciseMap.entries());
   }, [workoutLogs]);
 
   const durationString = useSessionDuration(sessionId);
@@ -85,12 +90,17 @@ export const SessionPage = ({ sessionId }: { sessionId: number }) => {
       </CardContent>
       <Divider />
 
+      <CardContent>
+        <AddLogRow sessionId={sessionId} />
+      </CardContent>
+
       <List disablePadding>
-        {exerciseIds.map((exerciseBaseId) => (
+        {exerciseLogGroups.map(([exerciseBaseId, logs]) => (
           <SessionLogItem
             key={`exercise-${exerciseBaseId}`}
             exerciseBaseId={exerciseBaseId}
             sessionId={sessionId}
+            logs={logs}
           />
         ))}
       </List>

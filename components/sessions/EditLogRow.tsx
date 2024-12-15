@@ -2,7 +2,7 @@ import { fetcher, useAuthedSWR, useAuthFetcher } from "@/lib/fetcher";
 import {
   getSession,
   getWorkoutLog,
-  getWorkoutLogSets,
+  getWorkoutLogs,
   REPETITION_UNITS,
   WEIGHT_UNITS,
 } from "@/lib/urls";
@@ -23,7 +23,7 @@ import {
   TextField,
 } from "@mui/material";
 import { type FormEvent, useEffect, useState } from "react";
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 
 export const EditLogRow = ({
   sessionId,
@@ -42,13 +42,11 @@ export const EditLogRow = ({
     WEIGHT_UNITS,
     fetcher,
   );
-  const { data: workoutLog, mutate } = useAuthedSWR<WorkoutLog>(
+  const { data: workoutLog, mutate: mutateLog } = useAuthedSWR<WorkoutLog>(
     getWorkoutLog(logId),
   );
   const { data: session } = useAuthedSWR<WorkoutSession>(getSession(sessionId));
-  const { data: workoutLogs, mutate: mutateLogs } = useAuthedSWR<
-    PaginatedResponse<WorkoutLog>
-  >(getWorkoutLogSets(session?.date, workoutLog?.exercise_base));
+  const { mutate } = useSWRConfig();
 
   const weightUnitLabel = weightUnits?.results?.find(
     (unit) => unit.id === workoutLog?.weight_unit,
@@ -73,32 +71,52 @@ export const EditLogRow = ({
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    mutate(
-      authFetcher(getWorkoutLog(logId), {
-        method: "PATCH",
-        body: JSON.stringify({
-          reps: parseInt(reps, 10),
-          repetition_unit: parseInt(repUnit, 10),
-          weight,
-          weight_unit: parseInt(weightUnit, 10),
-        }),
+    if (!workoutLog) {
+      return;
+    }
+    const updatePromise = authFetcher(getWorkoutLog(logId), {
+      method: "PATCH",
+      body: JSON.stringify({
+        reps: parseInt(reps, 10),
+        repetition_unit: parseInt(repUnit, 10),
+        weight,
+        weight_unit: parseInt(weightUnit, 10),
       }),
-      { revalidate: false },
-    );
+    });
+    mutateLog(updatePromise, {
+      optimisticData: {
+        ...workoutLog,
+        reps: parseInt(reps, 10),
+        repetition_unit: parseInt(repUnit, 10),
+        weight,
+        weight_unit: parseInt(weightUnit, 10),
+      },
+      revalidate: false,
+      rollbackOnError: true,
+    });
     setEdit(false);
   };
 
   const handleDelete = async () => {
-    await authFetcher(getWorkoutLog(logId), {
+    if (!session?.date) {
+      return;
+    }
+    const deletePromise = authFetcher(getWorkoutLog(logId), {
       method: "DELETE",
     });
     // Optimistic update
-    const newLogs =
-      workoutLogs?.results?.filter((current) => current.id === logId) ?? [];
-    mutateLogs({
-      ...workoutLogs,
-      count: newLogs.length,
-      results: newLogs,
+    mutate(getWorkoutLogs(session.date), deletePromise, {
+      populateCache: (_, cachedLogs?: PaginatedResponse<WorkoutLog>) => {
+        const newLogs =
+          cachedLogs?.results?.filter((current) => current.id !== logId) ?? [];
+        return {
+          ...cachedLogs,
+          count: newLogs.length,
+          results: newLogs,
+        };
+      },
+      revalidate: false,
+      rollbackOnError: true,
     });
   };
 

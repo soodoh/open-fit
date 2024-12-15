@@ -23,45 +23,54 @@ import { useExercise } from "@/lib/useExercise";
 import { WorkoutSession } from "@/types/privateApi/workoutSession";
 import { WorkoutLog } from "@/types/privateApi/workoutLog";
 import { EditLogRow } from "./EditLogRow";
-import { getSession, getWorkoutLogSets, WORKOUT_LOG } from "@/lib/urls";
+import { getSession, getWorkoutLogs, WORKOUT_LOG } from "@/lib/urls";
+import { useSWRConfig } from "swr";
 
 export const SessionLogItem = ({
   sessionId,
   exerciseBaseId,
+  logs,
 }: {
   sessionId: number;
   exerciseBaseId: number;
+  logs: WorkoutLog[];
 }) => {
   const authFetcher = useAuthFetcher();
 
+  const { mutate } = useSWRConfig();
   const { data: session } = useAuthedSWR<WorkoutSession>(getSession(sessionId));
-  const { data: workoutLogs, mutate: mutateLogs } = useAuthedSWR<
-    PaginatedResponse<WorkoutLog>
-  >(getWorkoutLogSets(session?.date, exerciseBaseId));
-
-  const logs = workoutLogs?.results ?? [];
   const { exercise, imageUrl } = useExercise(exerciseBaseId);
 
   const [open, setOpen] = useState(false);
   const defaultWeightUnit = useDefaultWeightUnit();
 
   const handleAdd = async () => {
-    const newLog = await authFetcher(WORKOUT_LOG, {
+    if (!session?.date) {
+      return;
+    }
+    const logPromise = authFetcher(WORKOUT_LOG, {
       method: "POST",
       body: JSON.stringify({
-        workout: session?.workout,
+        workout: session.workout,
         exercise_base: exerciseBaseId,
         weight_unit: defaultWeightUnit,
         reps: 0,
         weight: 0,
-        date: session?.date,
+        date: session.date,
       }),
     });
-    const newLogItems = logs ? [...logs, newLog] : [newLog];
-    mutateLogs({
-      ...workoutLogs,
-      count: newLogItems.length,
-      results: newLogItems,
+    mutate(getWorkoutLogs(session.date), logPromise, {
+      populateCache: (
+        newLog: WorkoutLog,
+        cachedLogs?: PaginatedResponse<WorkoutLog>,
+      ) => {
+        const newLogs = cachedLogs?.results
+          ? [...cachedLogs.results, newLog]
+          : [newLog];
+        return { ...cachedLogs, count: newLogs.length, results: newLogs };
+      },
+      revalidate: false,
+      rollbackOnError: true,
     });
   };
 
