@@ -68,7 +68,11 @@ export const EditSettingRow = ({ settingId }: { settingId: number }) => {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const newSetting = await authFetcher(getSetting(settingId), {
+    if (!setting) {
+      return;
+    }
+
+    const settingPromise = authFetcher(getSetting(settingId), {
       method: "PATCH",
       body: JSON.stringify({
         reps: parseInt(reps, 10),
@@ -77,7 +81,17 @@ export const EditSettingRow = ({ settingId }: { settingId: number }) => {
         weight_unit: parseInt(weightUnit, 10),
       }),
     });
-    mutateSetting(newSetting);
+    mutateSetting(settingPromise, {
+      optimisticData: {
+        ...setting,
+        reps: parseInt(reps, 10),
+        repetition_unit: parseInt(repUnit, 10),
+        weight,
+        weight_unit: parseInt(weightUnit, 10),
+      },
+      revalidate: false,
+      rollbackOnError: true,
+    });
     setEdit(false);
   };
 

@@ -88,6 +88,7 @@ export const WorkoutSet = ({
         weight: 0,
         weight_unit: defaultWeightUnit,
         reps: 0,
+        order: settings?.results ? settings.results.length : 0,
       }),
     });
     mutate(getSettings(setId), settingPromise, {
@@ -140,7 +141,7 @@ export const WorkoutSet = ({
         ...settings,
         results: newSettings,
       },
-      revalidate: false,
+      revalidate: true,
       rollbackOnError: true,
     });
   };
