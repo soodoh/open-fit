@@ -1,32 +1,12 @@
 services:
-  web:
-    image: wger/server:latest
-    container_name: wger-web
-    env_file:
-      - ./.env
-    volumes:
-      - ./static:/home/wger/static
+  db:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
     ports:
-      - "8000:8000"
-    # We use something here that never ends. The server is started manually
-    command: tail -f /dev/null
-    healthcheck:
-      test: wget --no-verbose --tries=1 --spider http://localhost:8000
-      interval: 10s
-      timeout: 5s
-      start_period: 300s
-      retries: 5
-    restart: unless-stopped
-
-  cache:
-    image: redis
-    container_name: wger-redis
-    expose:
-      - 6379
-    healthcheck:
-      test: redis-cli ping
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
-    restart: unless-stopped
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
