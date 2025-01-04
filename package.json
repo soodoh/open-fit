@@ -19,6 +19,7 @@
     "@mui/material": "^6.1.10",
     "@mui/material-nextjs": "^6.1.9",
     "@mui/x-date-pickers": "^7.23.2",
+    "bcrypt": "^5.1.1",
     "moment": "^2.30.1",
     "next": "15.0.4",
     "next-auth": "^4.24.11",
@@ -29,6 +30,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/node": "^22.10.1",
     "@types/pg": "^8",
     "@types/react": "^19.0.0",
