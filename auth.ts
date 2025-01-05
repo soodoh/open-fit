@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from "bcrypt";
 import { prisma } from "./lib/prisma";
+import { PrismaAdapter } from "@auth/prisma-adapter";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   session: {
@@ -10,6 +11,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   pages: {
     signIn: "/login",
   },
+  adapter: PrismaAdapter({ prisma }),
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -36,11 +38,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           throw new Error("Invalid credentials.");
         }
 
-        return {
-          id: user.id.toString(),
-          email: user.email,
-          password: user.password,
-        };
+        return user;
       },
     }),
   ],

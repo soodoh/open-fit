@@ -3,6 +3,7 @@
 import { z } from "zod";
 import bcrypt from "bcrypt";
 import { prisma } from "@/lib/prisma";
+import { signIn } from "@/auth";
 
 const SignUpSchema = z.object({
   email: z.string().email({ message: "Must be a valid email address" }),
@@ -72,6 +73,8 @@ export async function signUp(
       role: "USER",
     },
   });
+  // Log in
+  await signIn("credentials", { email, password });
 
   return { email: "", password: "" };
 }

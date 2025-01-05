@@ -1,5 +1,5 @@
 "use client";
-import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from "@/lib/constants";
+
 import {
   Button,
   ListItemIcon,
@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import { useState, type MouseEvent } from "react";
 import { Logout, Settings, AccountCircle } from "@mui/icons-material";
+import { signOut } from "next-auth/react";
 
 export const AccountNavItem = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -20,11 +21,6 @@ export const AccountNavItem = () => {
 
   const handleClose = () => {
     setAnchorEl(null);
-  };
-
-  const logout = () => {
-    localStorage.removeItem(REFRESH_TOKEN_KEY);
-    handleClose();
   };
 
   return (
@@ -57,7 +53,7 @@ export const AccountNavItem = () => {
           </ListItemIcon>
           <ListItemText>Profile</ListItemText>
         </MenuItem>
-        <MenuItem onClick={logout}>
+        <MenuItem onClick={() => signOut({ redirectTo: "/login" })}>
           <ListItemIcon>
             <Logout />
           </ListItemIcon>

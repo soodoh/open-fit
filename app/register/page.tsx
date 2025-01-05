@@ -1,11 +1,11 @@
-import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { SignUpForm } from "@/components/auth/signUpForm";
+import { auth } from "@/auth";
 
 export default async function RegisterPage() {
-  const session = await getServerSession();
+  const session = await auth();
 
-  if (session) {
+  if (session?.user) {
     redirect("/");
   }
 
