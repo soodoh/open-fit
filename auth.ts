@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import db from "@/lib/db";
 import { compare } from "bcrypt";
+import { prisma } from "./lib/prisma";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   session: {
@@ -14,26 +14,33 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        username: {},
+        email: {},
         password: {},
       },
       authorize: async (credentials) => {
-        const response = await db.query(
-          "SELECT * FROM users WHERE username=$1",
-          [credentials?.username],
-        );
-        const user = response.rows[0];
-
-        const passwordCorrect = await compare(
-          credentials?.password ?? "",
-          user.password,
-        );
-
-        if (!user || !passwordCorrect) {
+        if (!credentials?.email || !credentials?.password) {
+          return null;
+        }
+        const user = await prisma.user.findUnique({
+          where: { email: credentials?.email },
+        });
+        if (!user) {
           throw new Error("Invalid credentials.");
         }
 
-        return user;
+        const passwordCorrect = await compare(
+          credentials.password,
+          user.password,
+        );
+        if (!passwordCorrect) {
+          throw new Error("Invalid credentials.");
+        }
+
+        return {
+          id: user.id.toString(),
+          email: user.email,
+          password: user.password,
+        };
       },
     }),
   ],

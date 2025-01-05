@@ -6,10 +6,9 @@ import { useActionState } from "react";
 
 export const SignUpForm = () => {
   const [state, action, isPending] = useActionState(signUp, {
-    username: "",
+    email: "",
     password: "",
   });
-  console.log("YOO", state);
 
   return (
     <Container
@@ -27,12 +26,12 @@ export const SignUpForm = () => {
       <TextField
         sx={{ mb: 2 }}
         fullWidth
-        name="username"
-        label="Username"
+        name="email"
+        label="Email"
         variant="outlined"
-        error={!!state.errors?.username}
-        helperText={state.errors?.username?.[0]}
-        defaultValue={state.username}
+        error={!!state.errors?.email}
+        helperText={state.errors?.email?.[0]}
+        defaultValue={state.email}
       />
       <TextField
         sx={{ mb: 3 }}

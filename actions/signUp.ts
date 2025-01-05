@@ -1,14 +1,11 @@
 "use server";
 
 import { z } from "zod";
-import db from "@/lib/db";
 import bcrypt from "bcrypt";
+import { prisma } from "@/lib/prisma";
 
 const SignUpSchema = z.object({
-  username: z
-    .string()
-    .min(3, { message: "Be at least 3 characters long" })
-    .max(20, { message: "Be at most 20 characters long" }),
+  email: z.string().email({ message: "Must be a valid email address" }),
   password: z
     .string()
     .min(8, { message: "Be at least 8 characters long" })
@@ -22,11 +19,10 @@ const SignUpSchema = z.object({
 });
 
 export type SignUpActionState = {
-  newUserId?: number;
-  username?: string;
+  email?: string;
   password?: string;
   errors?: {
-    username?: string[];
+    email?: string[];
     password?: string[];
   };
 };
@@ -35,32 +31,32 @@ export async function signUp(
   _prevState: SignUpActionState,
   form: FormData,
 ): Promise<SignUpActionState> {
-  const username = form.get("username") as string;
+  const email = form.get("email") as string;
   const password = form.get("password") as string;
 
   const validatedFields = SignUpSchema.safeParse({
-    username,
+    email,
     password,
   });
 
   if (!validatedFields.success) {
     return {
-      username,
+      email,
       password,
       errors: validatedFields.error.flatten().fieldErrors,
     };
   }
 
   // Check if the username already exists
-  const userExists = await db.query("SELECT 1 FROM users WHERE username = $1", [
-    username,
-  ]);
-  if (!!userExists?.rowCount) {
+  const userExists = await prisma.user.findUnique({
+    where: { email },
+  });
+  if (userExists) {
     return {
-      username,
+      email,
       password,
       errors: {
-        username: ["Username already exists."],
+        email: ["Email already exists."],
       },
     };
   }
@@ -69,10 +65,13 @@ export async function signUp(
   const hashedPassword = await bcrypt.hash(password, saltRounds);
 
   // Insert the new user into the database
-  const result = await db.query(
-    "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id",
-    [username, hashedPassword],
-  );
+  await prisma.user.create({
+    data: {
+      email,
+      password: hashedPassword,
+      role: "USER",
+    },
+  });
 
-  return { newUserId: result.rows[0].id };
+  return { email: "", password: "" };
 }

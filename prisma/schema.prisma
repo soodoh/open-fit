@@ -1,0 +1,160 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  role      Role
+  email     String    @unique
+  password  String
+  firstname String?
+  lastname  String?
+  Routine   Routine[]
+}
+
+model Routine {
+  id          Int          @id @default(autoincrement())
+  user        User         @relation(fields: [userId], references: [id])
+  userId      Int
+  title       String
+  description String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  RoutineDay  RoutineDay[]
+}
+
+enum Weekday {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+model RoutineDay {
+  id          Int               @id @default(autoincrement())
+  routine     Routine           @relation(fields: [routineId], references: [id])
+  routineId   Int
+  day         Weekday[]
+  title       String
+  description String?
+  setGroups   WorkoutSetGroup[]
+}
+
+enum SetGroupType {
+  NORMAL
+  SUPERSET
+  DROPSET
+  MYO
+}
+
+model WorkoutSetGroup {
+  id           Int          @id @default(autoincrement())
+  routineDay   RoutineDay   @relation(fields: [routineDayId], references: [id])
+  routineDayId Int
+  sets         WorkoutSet[]
+  type         SetGroupType @default(NORMAL)
+  order        Int
+  comment      String?
+
+  @@unique([routineDayId, order])
+  @@index([routineDayId])
+}
+
+model WorkoutSet {
+  id               Int             @id @default(autoincrement())
+  setGroup         WorkoutSetGroup @relation(fields: [setGroupId], references: [id])
+  setGroupId       Int
+  exercise         Exercise        @relation(fields: [exerciseId], references: [id])
+  exerciseId       Int
+  reps             Int
+  repetitionUnit   RepetitionUnit  @relation(fields: [repetitionUnitId], references: [id])
+  repetitionUnitId Int
+  weight           Float           @default(0)
+  weightUnit       WeightUnit      @relation(fields: [weightUnitId], references: [id])
+  weightUnitId     Int
+  order            Int
+
+  @@unique([setGroupId, order])
+  @@index([setGroupId])
+}
+
+enum ExerciseForce {
+  PUSH
+  PULL
+}
+
+enum ExerciseLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum MuscleGroup {
+  ABS
+  CHEST
+  HAMSTRINGS
+  CALVES
+}
+
+enum ExerciseCategory {
+  STRENGTH
+  CARDIO
+  STRETCHING
+}
+
+enum ExerciseMechanic {
+  COMPOUND
+  ISOLATION
+}
+
+model Exercise {
+  id               Int               @id @default(autoincrement())
+  title            String
+  equipment        Equipment?        @relation(fields: [equipmentId], references: [id])
+  equipmentId      Int?
+  force            ExerciseForce
+  level            ExerciseLevel
+  mechanic         ExerciseMechanic?
+  primaryMuscles   MuscleGroup[]
+  secondaryMuscles MuscleGroup[]
+  instructions     String[]
+  category         ExerciseCategory
+  images           String[]
+  workoutSets      WorkoutSet[]
+}
+
+model Equipment {
+  id          Int        @id @default(autoincrement())
+  name        String
+  description String?
+  image       String?
+  exercise    Exercise[]
+}
+
+model RepetitionUnit {
+  id   Int          @id @default(autoincrement())
+  name String       @unique
+  sets WorkoutSet[]
+}
+
+model WeightUnit {
+  id   Int          @id @default(autoincrement())
+  name String       @unique
+  sets WorkoutSet[]
+}
