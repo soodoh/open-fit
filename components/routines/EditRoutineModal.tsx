@@ -1,4 +1,4 @@
-import { Workout } from "@/types/privateApi/workout";
+import { editRoutine, type RoutineActionState } from "@/actions/editRoutine";
 import {
   Button,
   Dialog,
@@ -7,78 +7,33 @@ import {
   DialogTitle,
   TextField,
 } from "@mui/material";
-import { useEffect, useState } from "react";
-import { useAuthedSWR, useAuthFetcher } from "@/lib/fetcher";
-import { useSWRConfig } from "swr";
-import { getWorkout, WORKOUTS } from "@/lib/urls";
+import type { Routine } from "@prisma/client";
+import { useActionState } from "react";
 
 export const EditRoutineModal = ({
   open,
-  workoutId,
   onClose,
+  routine,
 }: {
+  routine?: Routine;
   open: boolean;
-  workoutId?: number;
   onClose: () => void;
 }) => {
-  const authFetcher = useAuthFetcher();
-  const { mutate } = useSWRConfig();
-  const { data: workout, mutate: mutateWorkout } = useAuthedSWR<Workout>(
-    getWorkout(workoutId),
-  );
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!name) {
-      return;
-    }
-
-    const updateWorkout: Promise<Workout> = authFetcher(
-      workoutId ? getWorkout(workoutId) : WORKOUTS,
-      {
-        method: workoutId ? "PUT" : "POST",
-        body: JSON.stringify({
-          name,
-          description,
-        }),
+  const [state, action, isPending] = useActionState(
+    async (_prevState: RoutineActionState, formData: FormData) => {
+      const nextState = await editRoutine(formData, routine?.id);
+      if (!nextState.errors) {
+        onClose();
+      }
+      return nextState;
+    },
+    {
+      data: {
+        name: routine?.name ?? "",
+        description: routine?.description ?? "",
       },
-    );
-    onClose();
-    // Handle optimistic updates
-    if (!workoutId) {
-      mutate(WORKOUTS, updateWorkout, {
-        populateCache: (newWorkout: Workout, cachedWorkouts) => {
-          const newResults = cachedWorkouts?.results
-            ? [newWorkout, ...cachedWorkouts.results]
-            : [newWorkout];
-          return {
-            ...cachedWorkouts,
-            count: newResults.length,
-            results: newResults,
-          };
-        },
-        revalidate: false,
-        rollbackOnError: true,
-      });
-    } else {
-      mutateWorkout(updateWorkout, {
-        optimisticData: (cachedWorkout) => ({
-          ...cachedWorkout,
-          name,
-          description,
-        }),
-        revalidate: true,
-        rollbackOnError: true,
-      });
-    }
-  };
-
-  useEffect(() => {
-    setName(workout?.name ?? "");
-    setDescription(workout?.description ?? "");
-  }, [workout]);
+    },
+  );
 
   return (
     <Dialog
@@ -86,33 +41,41 @@ export const EditRoutineModal = ({
       onClose={onClose}
       PaperProps={{
         component: "form",
-        onSubmit: handleSubmit,
+        action,
       }}
     >
-      <DialogTitle>{workoutId ? "Edit Routine" : "New Routine"}</DialogTitle>
+      <DialogTitle>{routine ? "Edit Routine" : "New Routine"}</DialogTitle>
 
       <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
         <TextField
           id="routine-name"
           variant="filled"
           label="Name"
-          value={name}
-          onChange={(event) => setName(event.target.value)}
+          name="name"
+          placeholder="Routine name"
+          required
+          error={!!state.errors?.name}
+          helperText={state.errors?.name?.[0]}
+          defaultValue={state.data.name}
         />
         <TextField
           variant="filled"
           multiline
           rows={4}
           label="Description"
-          value={description}
           placeholder="Routine description"
-          onChange={(event) => setDescription(event.target.value)}
+          name="description"
+          error={!!state.errors?.description}
+          helperText={state.errors?.description?.[0]}
+          defaultValue={state.data.description}
         />
       </DialogContent>
 
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-        <Button type="submit">Save</Button>
+        <Button type="submit" disabled={isPending}>
+          Save
+        </Button>
       </DialogActions>
     </Dialog>
   );

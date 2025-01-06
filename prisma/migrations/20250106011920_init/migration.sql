@@ -78,7 +78,7 @@ CREATE TABLE "VerificationToken" (
 CREATE TABLE "Routine" (
     "id" SERIAL NOT NULL,
     "userId" TEXT NOT NULL,
-    "title" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
     "description" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -90,8 +90,8 @@ CREATE TABLE "Routine" (
 CREATE TABLE "RoutineDay" (
     "id" SERIAL NOT NULL,
     "routineId" INTEGER NOT NULL,
-    "day" "Weekday"[],
-    "title" TEXT NOT NULL,
+    "weekdays" "Weekday"[],
+    "name" TEXT NOT NULL,
     "description" TEXT,
 
     CONSTRAINT "RoutineDay_pkey" PRIMARY KEY ("id")

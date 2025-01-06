@@ -1,4 +1,4 @@
-import { Workout } from "@/types/privateApi/workout";
+import { deleteRoutine } from "@/actions/deleteRoutine";
 import {
   Button,
   Dialog,
@@ -7,48 +7,29 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
-import { useAuthFetcher } from "@/lib/fetcher";
-import { getWorkout, WORKOUTS } from "@/lib/urls";
-import { useSWRConfig } from "swr";
 
 export const DeleteRoutineModal = ({
   open,
   onClose,
-  workoutId,
+  routineId,
 }: {
   open: boolean;
   onClose: () => void;
-  workoutId?: number;
+  routineId: number;
 }) => {
-  const authFetcher = useAuthFetcher();
-  const { mutate } = useSWRConfig();
-  const deleteRoutine = async () => {
-    const deletePromise = authFetcher(getWorkout(workoutId), {
-      method: "DELETE",
-    });
-    mutate(WORKOUTS, deletePromise, {
-      populateCache: (_, cachedWorkouts) => {
-        const newResults =
-          cachedWorkouts?.results?.filter(
-            (workout: Workout) => workout.id !== workoutId,
-          ) ?? [];
-        return {
-          ...cachedWorkouts,
-          count: newResults.length,
-          results: newResults,
-        };
-      },
-      revalidate: false,
-      rollbackOnError: true,
-    });
-  };
-
   return (
     <Dialog
       open={open}
       onClose={onClose}
       aria-labelledby="delete-routine-title"
       aria-describedby="delete-routine-description"
+      PaperProps={{
+        component: "form",
+        action: async () => {
+          await deleteRoutine(routineId);
+          onClose();
+        },
+      }}
     >
       <DialogTitle id="delete-routine-title">Delete Workout</DialogTitle>
       <DialogContent>
@@ -58,14 +39,7 @@ export const DeleteRoutineModal = ({
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>No</Button>
-        <Button
-          onClick={() => {
-            deleteRoutine();
-            onClose();
-          }}
-        >
-          Yes
-        </Button>
+        <Button type="submit">Yes</Button>
       </DialogActions>
     </Dialog>
   );

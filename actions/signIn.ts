@@ -37,10 +37,10 @@ export async function signIn(
   }
 
   try {
-    await auth("credentials", { email, password });
-    return { email: "", password: "" };
+    await auth("credentials", { email, password, redirectTo: "/" });
+    return { email, password };
   } catch (err) {
-    console.log(err);
+    console.error(err);
     return {
       email,
       password,

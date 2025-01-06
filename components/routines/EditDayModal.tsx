@@ -1,4 +1,3 @@
-import useSWR, { useSWRConfig } from "swr";
 import {
   Box,
   Button,
@@ -15,46 +14,28 @@ import {
   type SelectChangeEvent,
   TextField,
 } from "@mui/material";
-import { useEffect, useState } from "react";
-import { PaginatedResponse } from "@/types/response";
-import { fetcher, useAuthedSWR, useAuthFetcher } from "@/lib/fetcher";
-import { Day } from "@/types/privateApi/day";
-import { DaysOfWeek } from "@/types/publicApi/daysOfWeek";
+import { useState } from "react";
 import moment from "moment";
-import { DAY, DAYS_OF_WEEK, getDay, getDays } from "@/lib/urls";
+import { type RoutineDay, Weekday } from "@prisma/client";
 
 export const EditDayModal = ({
   open,
-  dayId,
-  workoutId,
   onClose,
+  routineDay,
 }: {
   open: boolean;
-  dayId?: number;
-  workoutId?: number;
   onClose: () => void;
+  routineDay?: RoutineDay;
 }) => {
-  const authFetcher = useAuthFetcher();
-  const { mutate } = useSWRConfig();
-  const { data: workoutDay, mutate: mutateDay } = useAuthedSWR<Day>(
-    getDay(dayId),
-  );
-  const { data: daysOfWeek } = useSWR<PaginatedResponse<DaysOfWeek>>(
-    DAYS_OF_WEEK,
-    fetcher,
-  );
+  const [selectedWeekdays, setWeekdays] = useState<Weekday[]>([]);
 
-  const [description, setDescription] = useState("");
-  const [weekdays, setWeekdays] = useState<number[]>([]);
-
-  useEffect(() => {
-    setDescription(workoutDay?.description ?? "");
-    setWeekdays(workoutDay?.day ?? []);
-  }, [workoutDay]);
-
-  const handleWeekdayChange = (event: SelectChangeEvent<number[]>) => {
-    const set = new Set(event.target.value as number[]);
-    setWeekdays(Array.from(set).sort((a, b) => a - b));
+  const handleWeekdayChange = (event: SelectChangeEvent<Weekday[]>) => {
+    const newWeekdays = event.target.value as Weekday[];
+    setWeekdays(
+      newWeekdays.sort((a, b) =>
+        moment(a, "dddd").isBefore(moment(b, "dddd")) ? -1 : 1,
+      ),
+    );
   };
 
   return (
@@ -65,50 +46,10 @@ export const EditDayModal = ({
       fullWidth
       PaperProps={{
         component: "form",
-        onSubmit: async (event: React.FormEvent<HTMLFormElement>) => {
-          event.preventDefault();
-          const dayPromise = authFetcher(dayId ? getDay(dayId) : DAY, {
-            method: dayId ? "PATCH" : "POST",
-            body: JSON.stringify({
-              training: workoutId,
-              description,
-              day: weekdays,
-            }),
-          });
-          onClose();
-
-          if (!dayId) {
-            mutate(getDays(workoutId), dayPromise, {
-              populateCache: (newDay: Day, cachedDays) => {
-                const newResults = cachedDays?.results
-                  ? [...cachedDays.results, newDay]
-                  : [newDay];
-                return {
-                  ...cachedDays,
-                  count: newResults.length,
-                  results: newResults,
-                };
-              },
-              revalidate: false,
-              rollbackOnError: true,
-            });
-          } else {
-            mutateDay(dayPromise, {
-              optimisticData: (cachedDay) => ({
-                ...cachedDay,
-                training: workoutId,
-                description,
-                day: weekdays,
-              }),
-              revalidate: true,
-              rollbackOnError: true,
-            });
-          }
-        },
       }}
     >
       <DialogTitle>
-        {workoutId ? "Edit Workout Day" : "New Workout Day"}
+        {routineDay ? "Edit Workout Day" : "New Workout Day"}
       </DialogTitle>
       <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
         <TextField
@@ -118,37 +59,38 @@ export const EditDayModal = ({
           id="workoutDay-description"
           variant="filled"
           label="Description"
-          value={description}
-          onChange={(event) => setDescription(event.target.value)}
+          name="description"
+          defaultValue={routineDay?.description}
         />
         <FormControl fullWidth>
-          <InputLabel id={`${workoutId}-${dayId}-weekday-label`}>
+          <InputLabel id={`${routineDay?.id ?? "new"}-weekday-label`}>
             Weekdays
           </InputLabel>
           <Select
-            labelId={`${workoutId}-${dayId}-weekday-label`}
-            id={`${workoutId}-${dayId}-weekday`}
+            labelId={`${routineDay?.id ?? "new"}-weekday-label`}
+            id={`${routineDay?.id ?? "new"}-weekday`}
             multiple
-            value={weekdays}
+            name="weekdays"
             onChange={handleWeekdayChange}
+            value={selectedWeekdays}
             input={<OutlinedInput label="Weekdays" />}
             renderValue={(selected) => (
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                 {selected.map((value) => (
                   <Chip
                     key={`weekday-${value}`}
-                    label={moment().set("weekday", value).format("dddd")}
+                    label={moment(value, "dddd").format("dddd")}
                   />
                 ))}
               </Box>
             )}
           >
-            {daysOfWeek?.results?.map((dayOfWeek, index) => (
+            {Object.values(Weekday).map((weekday) => (
               <MenuItem
-                key={`${workoutId}-${dayId}-${dayOfWeek.day_of_week}`}
-                value={index + 1}
+                key={`${routineDay?.id ?? "new"}-${weekday}`}
+                value={weekday}
               >
-                {dayOfWeek.day_of_week}
+                {moment(weekday, "dddd").format("dddd")}
               </MenuItem>
             ))}
           </Select>

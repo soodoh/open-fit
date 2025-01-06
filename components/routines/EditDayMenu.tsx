@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { EditDayModal } from "./EditDayModal";
 import { Delete, Edit, MoreVert } from "@mui/icons-material";
@@ -11,19 +12,14 @@ import {
   MenuList,
 } from "@mui/material";
 import { DeleteDayModal } from "./DeleteDayModal";
+import { RoutineDay } from "@prisma/client";
 
 enum Modal {
   EDIT = "edit",
   DELETE = "delete",
 }
 
-export const EditDayMenu = ({
-  dayId,
-  workoutId,
-}: {
-  workoutId?: number;
-  dayId?: number;
-}) => {
+export const EditDayMenu = ({ routineDay }: { routineDay: RoutineDay }) => {
   const [modal, setModal] = useState<Modal | null>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const menuOpen = Boolean(anchorEl);
@@ -40,18 +36,17 @@ export const EditDayMenu = ({
       <EditDayModal
         open={modal === Modal.EDIT}
         onClose={handleClose}
-        dayId={dayId}
-        workoutId={workoutId}
+        routineDay={routineDay}
       />
       <DeleteDayModal
         open={modal === Modal.DELETE}
         onClose={handleClose}
-        dayId={dayId}
+        dayId={routineDay.id}
       />
 
       <Menu
-        id={`edit-day-actions-${dayId}-menu`}
-        aria-labelledby={`edit-day-actions-${dayId}`}
+        id={`edit-day-actions-${routineDay.id}-menu`}
+        aria-labelledby={`edit-day-actions-${routineDay.id}`}
         open={menuOpen}
         onClose={() => setAnchorEl(null)}
         anchorEl={anchorEl}
@@ -76,9 +71,11 @@ export const EditDayMenu = ({
       </Menu>
 
       <IconButton
-        aria-label={`Edit actions for workout day ${dayId}`}
-        id={`edit-day-actions-${dayId}`}
-        aria-controls={menuOpen ? `edit-day-actions-${dayId}-menu` : undefined}
+        aria-label={`Edit actions for workout day ${routineDay.id}`}
+        id={`edit-day-actions-${routineDay.id}`}
+        aria-controls={
+          menuOpen ? `edit-day-actions-${routineDay.id}-menu` : undefined
+        }
         aria-haspopup="true"
         aria-expanded={menuOpen ? "true" : undefined}
         onClick={(event: React.MouseEvent<HTMLElement>) => {

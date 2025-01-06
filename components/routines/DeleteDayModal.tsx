@@ -6,10 +6,6 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
-import { useAuthedSWR, useAuthFetcher } from "@/lib/fetcher";
-import { Day } from "@/types/privateApi/day";
-import { getDay, getDays } from "@/lib/urls";
-import { useSWRConfig } from "swr";
 
 export const DeleteDayModal = ({
   open,
@@ -18,31 +14,8 @@ export const DeleteDayModal = ({
 }: {
   open: boolean;
   onClose: () => void;
-  dayId?: number;
+  dayId: number;
 }) => {
-  const authFetcher = useAuthFetcher();
-  const { mutate } = useSWRConfig();
-  const { data: workoutDay } = useAuthedSWR<Day>(getDay(dayId));
-
-  const deleteDay = async () => {
-    const deletePromise = authFetcher(getDay(dayId), {
-      method: "DELETE",
-    });
-    mutate(getDays(workoutDay?.training), deletePromise, {
-      populateCache: (_, cachedDays) => {
-        const newResults =
-          cachedDays?.results?.filter((day: Day) => day.id !== dayId) ?? [];
-        return {
-          ...cachedDays,
-          count: newResults.length,
-          results: newResults,
-        };
-      },
-      revalidate: false,
-      rollbackOnError: true,
-    });
-  };
-
   return (
     <Dialog
       open={open}
@@ -60,7 +33,6 @@ export const DeleteDayModal = ({
         <Button onClick={onClose}>No</Button>
         <Button
           onClick={() => {
-            deleteDay();
             onClose();
           }}
         >

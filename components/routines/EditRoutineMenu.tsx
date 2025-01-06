@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { DeleteRoutineModal } from "./DeleteRoutineModal";
 import { EditRoutineModal } from "@/components/routines/EditRoutineModal";
@@ -12,6 +13,7 @@ import {
   MenuList,
 } from "@mui/material";
 import { EditDayModal as AddDayModal } from "./EditDayModal";
+import type { Routine } from "@prisma/client";
 
 enum Modal {
   EDIT = "edit",
@@ -19,7 +21,7 @@ enum Modal {
   DELETE = "delete",
 }
 
-export const EditRoutineMenu = ({ workoutId }: { workoutId?: number }) => {
+export const EditRoutineMenu = ({ routine }: { routine: Routine }) => {
   const [modal, setModal] = useState<Modal | null>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const menuOpen = Boolean(anchorEl);
@@ -33,26 +35,22 @@ export const EditRoutineMenu = ({ workoutId }: { workoutId?: number }) => {
 
   return (
     <>
-      <AddDayModal
-        open={modal === Modal.ADD}
-        onClose={handleClose}
-        workoutId={workoutId}
-      />
+      <AddDayModal open={modal === Modal.ADD} onClose={handleClose} />
       <EditRoutineModal
         open={modal === Modal.EDIT}
         onClose={handleClose}
-        workoutId={workoutId}
+        routine={routine}
       />
       <DeleteRoutineModal
         open={modal === Modal.DELETE}
         onClose={handleClose}
-        workoutId={workoutId}
+        routineId={routine.id}
       />
       <IconButton
-        aria-label={`Edit actions for workout ${workoutId}`}
-        id={`edit-workout-actions-${workoutId}`}
+        aria-label={`Edit routine: ${routine.name}`}
+        id={`edit-workout-actions-${routine.id}`}
         aria-controls={
-          menuOpen ? `edit-workout-actions-${workoutId}-menu` : undefined
+          menuOpen ? `edit-workout-actions-${routine.id}-menu` : undefined
         }
         aria-haspopup="true"
         aria-expanded={menuOpen ? "true" : undefined}
@@ -63,8 +61,8 @@ export const EditRoutineMenu = ({ workoutId }: { workoutId?: number }) => {
         <MoreVert />
       </IconButton>
       <Menu
-        id={`edit-workout-actions-${workoutId}-menu`}
-        aria-labelledby={`edit-workout-actions-${workoutId}`}
+        id={`edit-workout-actions-${routine.id}-menu`}
+        aria-labelledby={`edit-workout-actions-${routine.id}`}
         open={!!anchorEl}
         onClose={() => setAnchorEl(null)}
         anchorEl={anchorEl}

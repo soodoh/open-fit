@@ -1,35 +1,26 @@
-"use client";
 import moment from "moment";
-import { useAuthedSWR } from "@/lib/fetcher";
-import { Day } from "@/types/privateApi/day";
-import { Workout } from "@/types/privateApi/workout";
-import { PaginatedResponse } from "@/types/response";
 import { Typography, Card, CardHeader, List, Divider } from "@mui/material";
 import { EditRoutineMenu } from "./EditRoutineMenu";
+import type { Prisma } from "@prisma/client";
 import { RoutineDayItem } from "./RoutineDayItem";
-import { getDays, getWorkout } from "@/lib/urls";
 
-export const RoutineCard = ({ workoutId }: { workoutId?: number }) => {
-  const { data: workout } = useAuthedSWR<Workout>(getWorkout(workoutId));
-  const { data: workoutDays } = useAuthedSWR<PaginatedResponse<Day>>(
-    getDays(workoutId),
-  );
-
-  if (!workout) {
-    return null;
-  }
+export async function RoutineCard({
+  routine,
+}: {
+  routine: Prisma.RoutineGetPayload<{ include: { routineDays: true } }>;
+}) {
   return (
     <Card sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
       <CardHeader
-        action={<EditRoutineMenu workoutId={workoutId} />}
-        title={workout.name}
+        action={<EditRoutineMenu routine={routine} />}
+        title={routine.name}
         subheader={
           <>
-            {workout.description && (
-              <Typography variant="subtitle2">{workout.description}</Typography>
+            {routine.description && (
+              <Typography variant="subtitle2">{routine.description}</Typography>
             )}
             <Typography variant="caption" gutterBottom>
-              {moment(workout.creation_date).format("MM/DD/YYYY")}
+              {`Last Updated: ${moment(routine.updatedAt).format("MM/DD/YYYY")}`}
             </Typography>
           </>
         }
@@ -37,16 +28,15 @@ export const RoutineCard = ({ workoutId }: { workoutId?: number }) => {
 
       <List dense disablePadding sx={{ flexGrow: 1 }}>
         <Divider />
-        {workoutDays?.results?.map((workoutDay) => {
+        {routine.routineDays.map((routineDay) => {
           return (
             <RoutineDayItem
-              key={`workout-${workoutId}-day-${workoutDay.id}`}
-              workoutId={workoutId}
-              dayId={workoutDay.id}
+              key={`day-${routineDay.id}`}
+              routineDay={routineDay}
             />
           );
         })}
       </List>
     </Card>
   );
-};
+}

@@ -75,11 +75,11 @@ model Routine {
   id          Int          @id @default(autoincrement())
   user        User         @relation(fields: [userId], references: [id])
   userId      String
-  title       String
+  name        String
   description String?
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
-  RoutineDay  RoutineDay[]
+  routineDays RoutineDay[]
 }
 
 enum Weekday {
@@ -96,8 +96,8 @@ model RoutineDay {
   id          Int               @id @default(autoincrement())
   routine     Routine           @relation(fields: [routineId], references: [id])
   routineId   Int
-  day         Weekday[]
-  title       String
+  weekdays    Weekday[]
+  name        String
   description String?
   setGroups   WorkoutSetGroup[]
 }
