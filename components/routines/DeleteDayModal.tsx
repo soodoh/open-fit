@@ -1,3 +1,4 @@
+import { deleteDay } from "@/actions/deleteDay";
 import {
   Button,
   Dialog,
@@ -32,7 +33,8 @@ export const DeleteDayModal = ({
       <DialogActions>
         <Button onClick={onClose}>No</Button>
         <Button
-          onClick={() => {
+          onClick={async () => {
+            await deleteDay(dayId);
             onClose();
           }}
         >

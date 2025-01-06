@@ -35,7 +35,11 @@ export const EditRoutineMenu = ({ routine }: { routine: Routine }) => {
 
   return (
     <>
-      <AddDayModal open={modal === Modal.ADD} onClose={handleClose} />
+      <AddDayModal
+        open={modal === Modal.ADD}
+        onClose={handleClose}
+        routineId={routine.id}
+      />
       <EditRoutineModal
         open={modal === Modal.EDIT}
         onClose={handleClose}

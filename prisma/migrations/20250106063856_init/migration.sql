@@ -91,8 +91,7 @@ CREATE TABLE "RoutineDay" (
     "id" SERIAL NOT NULL,
     "routineId" INTEGER NOT NULL,
     "weekdays" "Weekday"[],
-    "name" TEXT NOT NULL,
-    "description" TEXT,
+    "description" TEXT NOT NULL,
 
     CONSTRAINT "RoutineDay_pkey" PRIMARY KEY ("id")
 );

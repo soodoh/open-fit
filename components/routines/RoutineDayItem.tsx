@@ -32,7 +32,7 @@ export const RoutineDayItem = ({ routineDay }: { routineDay: RoutineDay }) => {
                   mt: 0.5,
                 }}
               >
-                {routineDay.days.map((weekday) => (
+                {routineDay.weekdays.map((weekday) => (
                   <Chip
                     key={`${routineDay.id}-${weekday}`}
                     component="span"

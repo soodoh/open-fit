@@ -37,6 +37,7 @@ export const EditDayMenu = ({ routineDay }: { routineDay: RoutineDay }) => {
         open={modal === Modal.EDIT}
         onClose={handleClose}
         routineDay={routineDay}
+        routineId={routineDay.routineId}
       />
       <DeleteDayModal
         open={modal === Modal.DELETE}

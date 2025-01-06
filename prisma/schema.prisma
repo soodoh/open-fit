@@ -97,8 +97,7 @@ model RoutineDay {
   routine     Routine           @relation(fields: [routineId], references: [id])
   routineId   Int
   weekdays    Weekday[]
-  name        String
-  description String?
+  description String
   setGroups   WorkoutSetGroup[]
 }
 

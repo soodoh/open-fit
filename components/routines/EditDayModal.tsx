@@ -17,17 +17,22 @@ import {
 import { useState } from "react";
 import moment from "moment";
 import { type RoutineDay, Weekday } from "@prisma/client";
+import { editDay } from "@/actions/editDay";
 
 export const EditDayModal = ({
   open,
   onClose,
+  routineId,
   routineDay,
 }: {
   open: boolean;
   onClose: () => void;
+  routineId: number;
   routineDay?: RoutineDay;
 }) => {
-  const [selectedWeekdays, setWeekdays] = useState<Weekday[]>([]);
+  const [selectedWeekdays, setWeekdays] = useState<Weekday[]>(
+    routineDay?.weekdays ?? [],
+  );
 
   const handleWeekdayChange = (event: SelectChangeEvent<Weekday[]>) => {
     const newWeekdays = event.target.value as Weekday[];
@@ -38,6 +43,16 @@ export const EditDayModal = ({
     );
   };
 
+  const action = async (formData: FormData) => {
+    await editDay(
+      formData.get("description") as string,
+      routineId,
+      selectedWeekdays,
+      routineDay?.id,
+    );
+    onClose();
+  };
+
   return (
     <Dialog
       open={open}
@@ -46,17 +61,19 @@ export const EditDayModal = ({
       fullWidth
       PaperProps={{
         component: "form",
+        action,
       }}
     >
       <DialogTitle>
         {routineDay ? "Edit Workout Day" : "New Workout Day"}
       </DialogTitle>
+
       <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
         <TextField
           fullWidth
           sx={{ mb: 1 }}
           margin="normal"
-          id="workoutDay-description"
+          id="workoutDay-name"
           variant="filled"
           label="Description"
           name="description"
@@ -70,7 +87,6 @@ export const EditDayModal = ({
             labelId={`${routineDay?.id ?? "new"}-weekday-label`}
             id={`${routineDay?.id ?? "new"}-weekday`}
             multiple
-            name="weekdays"
             onChange={handleWeekdayChange}
             value={selectedWeekdays}
             input={<OutlinedInput label="Weekdays" />}
