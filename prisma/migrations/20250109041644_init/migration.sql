@@ -8,19 +8,22 @@ CREATE TYPE "Weekday" AS ENUM ('MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FR
 CREATE TYPE "SetGroupType" AS ENUM ('NORMAL', 'SUPERSET', 'DROPSET', 'MYO');
 
 -- CreateEnum
-CREATE TYPE "ExerciseForce" AS ENUM ('PUSH', 'PULL');
+CREATE TYPE "ExerciseForce" AS ENUM ('push', 'pull', 'static');
 
 -- CreateEnum
-CREATE TYPE "ExerciseLevel" AS ENUM ('BEGINNER', 'INTERMEDIATE', 'ADVANCED');
+CREATE TYPE "ExerciseLevel" AS ENUM ('beginner', 'intermediate', 'expert');
 
 -- CreateEnum
-CREATE TYPE "MuscleGroup" AS ENUM ('ABS', 'CHEST', 'HAMSTRINGS', 'CALVES');
+CREATE TYPE "MuscleGroup" AS ENUM ('abdominals', 'chest', 'quadriceps', 'hamstrings', 'glutes', 'adductors', 'abductors', 'calves', 'forearms', 'shoulders', 'biceps', 'triceps', 'traps', 'lats', 'middle_back', 'lower_back', 'neck');
 
 -- CreateEnum
-CREATE TYPE "ExerciseCategory" AS ENUM ('STRENGTH', 'CARDIO', 'STRETCHING');
+CREATE TYPE "ExerciseCategory" AS ENUM ('strength', 'cardio', 'stretching', 'plyometrics', 'powerlifting', 'strongman', 'olympic_weightlifting');
 
 -- CreateEnum
-CREATE TYPE "ExerciseMechanic" AS ENUM ('COMPOUND', 'ISOLATION');
+CREATE TYPE "ExerciseMechanic" AS ENUM ('compound', 'isolation');
+
+-- CreateEnum
+CREATE TYPE "Equipment" AS ENUM ('body_only', 'machine', 'cable', 'foam_roll', 'dumbbell', 'barbell', 'ez_curl_bar', 'kettlebells', 'medicine_ball', 'exercise_ball', 'bands', 'other');
 
 -- CreateTable
 CREATE TABLE "User" (
@@ -124,9 +127,9 @@ CREATE TABLE "WorkoutSet" (
 -- CreateTable
 CREATE TABLE "Exercise" (
     "id" SERIAL NOT NULL,
-    "title" TEXT NOT NULL,
-    "equipmentId" INTEGER,
-    "force" "ExerciseForce" NOT NULL,
+    "name" TEXT NOT NULL,
+    "equipment" "Equipment",
+    "force" "ExerciseForce",
     "level" "ExerciseLevel" NOT NULL,
     "mechanic" "ExerciseMechanic",
     "primaryMuscles" "MuscleGroup"[],
@@ -136,16 +139,6 @@ CREATE TABLE "Exercise" (
     "images" TEXT[],
 
     CONSTRAINT "Exercise_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "Equipment" (
-    "id" SERIAL NOT NULL,
-    "name" TEXT NOT NULL,
-    "description" TEXT,
-    "image" TEXT,
-
-    CONSTRAINT "Equipment_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -214,6 +207,3 @@ ALTER TABLE "WorkoutSet" ADD CONSTRAINT "WorkoutSet_repetitionUnitId_fkey" FOREI
 
 -- AddForeignKey
 ALTER TABLE "WorkoutSet" ADD CONSTRAINT "WorkoutSet_weightUnitId_fkey" FOREIGN KEY ("weightUnitId") REFERENCES "WeightUnit"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Exercise" ADD CONSTRAINT "Exercise_equipmentId_fkey" FOREIGN KEY ("equipmentId") REFERENCES "Equipment"("id") ON DELETE SET NULL ON UPDATE CASCADE;

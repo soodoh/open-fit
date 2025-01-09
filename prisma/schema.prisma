@@ -140,40 +140,72 @@ model WorkoutSet {
 }
 
 enum ExerciseForce {
-  PUSH
-  PULL
+  push
+  pull
+  static
 }
 
 enum ExerciseLevel {
-  BEGINNER
-  INTERMEDIATE
-  ADVANCED
+  beginner
+  intermediate
+  expert
 }
 
 enum MuscleGroup {
-  ABS
-  CHEST
-  HAMSTRINGS
-  CALVES
+  abdominals
+  chest
+  quadriceps
+  hamstrings
+  glutes
+  adductors
+  abductors
+  calves
+  forearms
+  shoulders
+  biceps
+  triceps
+  traps
+  lats
+  middle_back
+  lower_back
+  neck
 }
 
 enum ExerciseCategory {
-  STRENGTH
-  CARDIO
-  STRETCHING
+  strength
+  cardio
+  stretching
+  plyometrics
+  powerlifting
+  strongman
+  olympic_weightlifting
 }
 
 enum ExerciseMechanic {
-  COMPOUND
-  ISOLATION
+  compound
+  isolation
+}
+
+enum Equipment {
+  body_only
+  machine
+  cable
+  foam_roll
+  dumbbell
+  barbell
+  ez_curl_bar
+  kettlebells
+  medicine_ball
+  exercise_ball
+  bands
+  other
 }
 
 model Exercise {
   id               Int               @id @default(autoincrement())
-  title            String
-  equipment        Equipment?        @relation(fields: [equipmentId], references: [id])
-  equipmentId      Int?
-  force            ExerciseForce
+  name             String
+  equipment        Equipment?
+  force            ExerciseForce?
   level            ExerciseLevel
   mechanic         ExerciseMechanic?
   primaryMuscles   MuscleGroup[]
@@ -182,14 +214,6 @@ model Exercise {
   category         ExerciseCategory
   images           String[]
   workoutSets      WorkoutSet[]
-}
-
-model Equipment {
-  id          Int        @id @default(autoincrement())
-  name        String
-  description String?
-  image       String?
-  exercise    Exercise[]
 }
 
 model RepetitionUnit {
