@@ -1,8 +1,5 @@
 "use client";
-import { useAuthedSWR, useAuthFetcher } from "@/lib/fetcher";
-import { Day } from "@/types/privateApi/day";
-import type { PaginatedResponse } from "@/types/response";
-import type { WorkoutSetType } from "@/types/privateApi/set";
+
 import {
   Box,
   Card,
@@ -12,7 +9,7 @@ import {
   List,
   Typography,
 } from "@mui/material";
-import { WorkoutSet } from "./WorkoutSet";
+import { WorkoutSetGroup } from "./WorkoutSetGroup";
 import { EditDayMenu } from "./EditDayMenu";
 import moment from "moment";
 import {
@@ -31,18 +28,18 @@ import {
 } from "@dnd-kit/sortable";
 import { AddExerciseRow } from "./AddExerciseRow";
 import { useState } from "react";
-import { getDay, getSet, getSets } from "@/lib/urls";
 import { EditDayModal } from "./EditDayModal";
-import { useSWRConfig } from "swr";
+import { reorderSetGroups } from "@/actions/reorderSetGroups";
+import { revalidatePath } from "next/cache";
+import type { RoutineDayWithSets } from "@/types/routineDay";
+import type { Units } from "@/actions/getUnits";
 
-export const DayCard = ({ dayId }: { dayId: number }) => {
-  const authFetcher = useAuthFetcher();
-  const { data: day } = useAuthedSWR<Day>(getDay(dayId));
-  const { mutate } = useSWRConfig();
-  const { data: workoutSets } = useAuthedSWR<PaginatedResponse<WorkoutSetType>>(
-    getSets(dayId),
-  );
-
+export const DayCard = ({
+  routineDay,
+}: {
+  routineDay: RoutineDayWithSets;
+  units: Units;
+}) => {
   const mouseSensor = useSensor(MouseSensor);
   const touchSensor = useSensor(TouchSensor);
   const keyboardSensor = useSensor(KeyboardSensor);
@@ -57,49 +54,25 @@ export const DayCard = ({ dayId }: { dayId: number }) => {
     if (
       !Number.isInteger(overId) ||
       dragId === overId ||
-      !workoutSets?.results
+      !routineDay.setGroups.length
     ) {
       return;
     }
-    const oldIndex = workoutSets.results.findIndex((set) => set.id === dragId);
-    const newIndex = workoutSets.results.findIndex((set) => set.id === overId);
-    const newSets = arrayMove(workoutSets.results, oldIndex, newIndex);
-
-    const setPromises = Promise.all(
-      newSets.reduce((acc, set, index) => {
-        if (set.order !== index) {
-          const setPromise = authFetcher(getSet(set.id), {
-            method: "PATCH",
-            body: JSON.stringify({ order: index }),
-          });
-          acc.push(setPromise);
-        }
-        return acc;
-      }, [] as Promise<unknown>[]),
-    );
-
-    mutate(getSets(dayId), setPromises, {
-      populateCache: false,
-      optimisticData: {
-        ...workoutSets,
-        results: newSets,
-      },
-      revalidate: false,
-      rollbackOnError: true,
-    });
+    const oldIndex = routineDay.setGroups.findIndex((set) => set.id === dragId);
+    const newIndex = routineDay.setGroups.findIndex((set) => set.id === overId);
+    const newSets = arrayMove(routineDay.setGroups, oldIndex, newIndex);
+    await reorderSetGroups(newSets);
+    revalidatePath(`/day/${routineDay.id}`);
     setSortingState(true);
   };
 
-  if (!day || !workoutSets?.results) {
-    return null;
-  }
   return (
     <>
       <EditDayModal
         open={edit}
         onClose={() => setEdit(false)}
-        dayId={dayId}
-        workoutId={day.training}
+        routineDay={routineDay}
+        routineId={routineDay.routineId}
       />
 
       <Card sx={{ pb: 2 }}>
@@ -107,23 +80,23 @@ export const DayCard = ({ dayId }: { dayId: number }) => {
           title={
             <>
               <Typography variant="h5" gutterBottom>
-                {day.description}
+                {routineDay.description}
               </Typography>
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                {day.day?.map((weekday) => (
+                {routineDay.weekdays.map((weekday) => (
                   <Chip
-                    key={`day-${dayId}-weekday-${weekday}`}
-                    label={moment().set("weekday", weekday).format("dddd")}
+                    key={`day-${routineDay.id}-weekday-${weekday}`}
+                    label={moment(weekday, "dddd").format("dddd")}
                   />
                 ))}
               </Box>
             </>
           }
-          action={<EditDayMenu dayId={dayId} />}
+          action={<EditDayMenu routineDay={routineDay} />}
         />
 
         <CardContent>
-          <AddExerciseRow dayId={dayId} />
+          <AddExerciseRow dayId={routineDay.id} />
         </CardContent>
 
         <List dense disablePadding>
@@ -135,14 +108,14 @@ export const DayCard = ({ dayId }: { dayId: number }) => {
             sensors={sensors}
           >
             <SortableContext
-              items={workoutSets.results}
+              items={routineDay.setGroups}
               strategy={verticalListSortingStrategy}
             >
-              {workoutSets?.results?.map((set) => {
+              {routineDay.setGroups.map((setGroup) => {
                 return (
-                  <WorkoutSet
-                    key={`set-${set.id}`}
-                    setId={set.id}
+                  <WorkoutSetGroup
+                    key={`set-${setGroup.id}`}
+                    setGroup={setGroup}
                     isSortingActive={isSortingActive}
                   />
                 );

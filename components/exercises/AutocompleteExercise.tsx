@@ -1,8 +1,3 @@
-import { fetcher } from "@/lib/fetcher";
-import type {
-  ExerciseSearchData,
-  ExerciseSearchResults,
-} from "@/types/privateApi/exerciseSearch";
 import { Image as ImageIcon } from "@mui/icons-material";
 import {
   Autocomplete,
@@ -12,35 +7,22 @@ import {
   ListItemText,
   TextField,
 } from "@mui/material";
-import { useMemo, useState } from "react";
+import { useState } from "react";
+import { searchExercise } from "@/actions/searchExercise";
+import { Exercise } from "@prisma/client";
 import useSWR from "swr";
 
 export const AutocompleteExercise = ({
   value,
   onChange,
 }: {
-  value: ExerciseSearchData | null;
-  onChange: (exercise: ExerciseSearchData | null) => void;
+  value: Exercise | null;
+  onChange: (exercise: Exercise | null) => void;
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const { data: searchResults, isLoading } = useSWR<ExerciseSearchResults>(
-    searchTerm ? `/exercise/search?language=${2}&term=${searchTerm}` : null,
-    fetcher,
-    { keepPreviousData: true },
-  );
-  const options = useMemo(() => {
-    const duplicates = new Set();
-    return (
-      searchResults?.suggestions?.reduce((newResults, result) => {
-        if (!result || duplicates.has(result.data.id)) {
-          return newResults;
-        }
-        duplicates.add(result.data.id);
-        newResults.push(result.data);
-        return newResults;
-      }, [] as ExerciseSearchData[]) ?? []
-    );
-  }, [searchResults?.suggestions]);
+  const { data: options } = useSWR(searchTerm, searchExercise, {
+    keepPreviousData: true,
+  });
 
   return (
     <Autocomplete
@@ -48,12 +30,12 @@ export const AutocompleteExercise = ({
       fullWidth
       value={value}
       inputValue={searchTerm}
-      options={options}
+      options={options ?? []}
       isOptionEqualToValue={(option, value) => option?.id === value?.id}
       getOptionLabel={(option) => option?.name ?? "Unknown"}
       getOptionKey={(option) => `exercise-${option?.id}`}
       filterOptions={(option) => option}
-      loading={isLoading}
+      // loading={isLoading}
       noOptionsText="No exercises found"
       onChange={(_, selectedExercise) => {
         onChange(selectedExercise);
@@ -72,10 +54,10 @@ export const AutocompleteExercise = ({
         return (
           <ListItem key={key} {...optionProps}>
             <ListItemAvatar>
-              {option.image_thumbnail ? (
+              {option.images[0] ? (
                 <Avatar
                   alt={`${option.name} thumbnail`}
-                  src={`https://wger.pauld.link${option.image_thumbnail}`}
+                  src={`/exercises/${option.images[0]}`}
                 />
               ) : (
                 <Avatar>
@@ -83,7 +65,10 @@ export const AutocompleteExercise = ({
                 </Avatar>
               )}
             </ListItemAvatar>
-            <ListItemText primary={option.name} secondary={option.category} />
+            <ListItemText
+              primary={option.name}
+              secondary={option.primaryMuscles.join(", ")}
+            />
           </ListItem>
         );
       }}

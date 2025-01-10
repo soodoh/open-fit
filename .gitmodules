@@ -1,3 +1,0 @@
-[submodule "prisma/exercise-db"]
-	path = prisma/exercise-db
-	url = https://github.com/yuhonas/free-exercise-db.git

@@ -1,8 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearchPostgres"]
 }
 
 datasource db {
@@ -26,7 +24,12 @@ model User {
 
   role     Role
   password String
-  Routine  Routine[]
+
+  Routine                 Routine[]
+  defaultRepetitionUnit   RepetitionUnit @relation(fields: [defaultRepetitionUnitId], references: [id])
+  defaultRepetitionUnitId Int            @default(1)
+  defaultWeightUnit       WeightUnit     @relation(fields: [defaultWeightUnitId], references: [id])
+  defaultWeightUnitId     Int            @default(1)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -203,7 +206,7 @@ enum Equipment {
 
 model Exercise {
   id               Int               @id @default(autoincrement())
-  name             String
+  name             String            @unique
   equipment        Equipment?
   force            ExerciseForce?
   level            ExerciseLevel
@@ -217,13 +220,15 @@ model Exercise {
 }
 
 model RepetitionUnit {
-  id   Int          @id @default(autoincrement())
-  name String       @unique
-  sets WorkoutSet[]
+  id    Int          @id @default(autoincrement())
+  name  String       @unique
+  sets  WorkoutSet[]
+  users User[]
 }
 
 model WeightUnit {
-  id   Int          @id @default(autoincrement())
-  name String       @unique
-  sets WorkoutSet[]
+  id    Int          @id @default(autoincrement())
+  name  String       @unique
+  sets  WorkoutSet[]
+  users User[]
 }

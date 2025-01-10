@@ -1,4 +1,6 @@
+import { auth } from "@/auth";
 import { DayCard } from "@/components/routines/DayCard";
+import { prisma } from "@/lib/prisma";
 import { ArrowBack } from "@mui/icons-material";
 import { Container, Fab } from "@mui/material";
 import Link from "next/link";
@@ -9,10 +11,26 @@ export default async function Page({
 }: {
   params: Promise<{ day: string }>;
 }) {
+  const session = await auth();
+  if (!session?.user) {
+    redirect("/login");
+  }
+
   const { day } = await params;
   const dayId = parseInt(day, 10);
-
-  if (Number.isNaN(dayId)) {
+  const routineDay = await prisma.routineDay.findUnique({
+    where: { id: dayId },
+    include: {
+      setGroups: {
+        include: {
+          sets: {
+            include: { exercise: true, repetitionUnit: true, weightUnit: true },
+          },
+        },
+      },
+    },
+  });
+  if (!routineDay) {
     redirect("/routines");
   }
 
@@ -28,7 +46,7 @@ export default async function Page({
         <ArrowBack />
         Routines
       </Fab>
-      <DayCard dayId={dayId} />
+      <DayCard routineDay={routineDay} />
     </Container>
   );
 }

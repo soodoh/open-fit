@@ -6,46 +6,21 @@ import {
   DialogTitle,
   TextField,
 } from "@mui/material";
-import { useAuthedSWR, useAuthFetcher } from "@/lib/fetcher";
-import { WorkoutSetType } from "@/types/privateApi/set";
-import { useEffect, useState } from "react";
-import { getSet } from "@/lib/urls";
+import type { WorkoutSetGroup } from "@prisma/client";
+import { useState } from "react";
 
 export const EditSetCommentModal = ({
   open,
   onClose,
-  setId,
+  setGroup,
 }: {
   open: boolean;
   onClose: () => void;
-  setId?: number;
+  setGroup: WorkoutSetGroup;
 }) => {
-  const authFetcher = useAuthFetcher();
-  const { data: set, mutate } = useAuthedSWR<WorkoutSetType>(getSet(setId));
-  const [comment, setComment] = useState(set?.comment ?? "");
+  const [comment, setComment] = useState(setGroup.comment ?? "");
 
-  useEffect(() => {
-    if (open && set?.comment) {
-      setComment(set.comment);
-    }
-  }, [open, set?.comment]);
-
-  const updateSet = async () => {
-    const newSet = authFetcher(getSet(setId), {
-      method: "PATCH",
-      body: JSON.stringify({
-        comment,
-      }),
-    });
-    mutate(newSet, {
-      optimisticData: (cachedSet) => ({
-        ...cachedSet,
-        comment,
-      }),
-      revalidate: true,
-      rollbackOnError: true,
-    });
-  };
+  const updateSet = async () => {};
 
   return (
     <Dialog

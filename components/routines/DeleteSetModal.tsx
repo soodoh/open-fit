@@ -1,3 +1,4 @@
+import { deleteSetGroup } from "@/actions/deleteSetGroup";
 import {
   Button,
   Dialog,
@@ -6,40 +7,18 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
-import { useAuthedSWR, useAuthFetcher } from "@/lib/fetcher";
-import { WorkoutSetType } from "@/types/privateApi/set";
-import { getSet, getSets } from "@/lib/urls";
-import { useSWRConfig } from "swr";
+import type { WorkoutSetGroup } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 
-export const DeleteSetModal = ({
+export const DeleteSetGroupModal = ({
   open,
   onClose,
-  setId,
+  setGroup,
 }: {
   open: boolean;
   onClose: () => void;
-  setId?: number;
+  setGroup: WorkoutSetGroup;
 }) => {
-  const authFetcher = useAuthFetcher();
-
-  const { mutate } = useSWRConfig();
-  const { data: set } = useAuthedSWR<WorkoutSetType>(getSet(setId));
-
-  const deleteSet = async () => {
-    const deletePromise = authFetcher(getSet(setId), { method: "DELETE" });
-    mutate(getSets(set?.exerciseday), deletePromise, {
-      populateCache: (_, cachedSets) => ({
-        ...cachedSets,
-        results:
-          cachedSets?.results?.filter(
-            (set: WorkoutSetType) => set.id !== setId,
-          ) ?? [],
-      }),
-      revalidate: false,
-      rollbackOnError: true,
-    });
-  };
-
   return (
     <Dialog
       open={open}
@@ -56,8 +35,9 @@ export const DeleteSetModal = ({
       <DialogActions>
         <Button onClick={onClose}>No</Button>
         <Button
-          onClick={() => {
-            deleteSet();
+          onClick={async () => {
+            await deleteSetGroup(setGroup.id);
+            revalidatePath(`/day/${setGroup.routineDayId}`);
             onClose();
           }}
         >

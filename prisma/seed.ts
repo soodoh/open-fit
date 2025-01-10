@@ -1,26 +1,61 @@
 import {
-  Equipment,
-  ExerciseCategory,
-  ExerciseForce,
-  ExerciseLevel,
-  ExerciseMechanic,
-  MuscleGroup,
+  type Equipment,
+  type ExerciseCategory,
+  type ExerciseForce,
+  type ExerciseLevel,
+  type ExerciseMechanic,
+  type MuscleGroup,
+  Role,
   PrismaClient,
 } from "@prisma/client";
-import exerciseData from "./exercise-db/dist/exercises.json";
+import { exercises } from "./defaultExercises";
+import bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
 
 async function main() {
-  await prisma.user.create({
-    data: {
+  // Repetition Units
+  for (const repetitionUnit of [
+    "Repetitions",
+    "Until Failure",
+    "Seconds",
+    "Minutes",
+    "Miles",
+    "Kilometers",
+  ]) {
+    await prisma.repetitionUnit.upsert({
+      where: { name: repetitionUnit },
+      update: {},
+      create: {
+        name: repetitionUnit,
+      },
+    });
+  }
+  // Weight Units
+  for (const weightUnit of ["lb", "kg", "Body Weight", "Plates"]) {
+    await prisma.weightUnit.upsert({
+      where: { name: weightUnit },
+      update: {},
+      create: {
+        name: weightUnit,
+      },
+    });
+  }
+
+  // Admin user
+  const hashedPassword = await bcrypt.hash("adminadmin", 10);
+  await prisma.user.upsert({
+    where: { email: "admin@admin.com" },
+    update: {},
+    create: {
       email: "admin@admin.com",
-      password: "adminadmin",
-      role: "ADMIN",
+      password: hashedPassword,
+      role: Role.ADMIN,
     },
   });
 
-  for (const exercise of exerciseData) {
+  // Exercises
+  for (const exercise of exercises) {
     const mapSnakeCase = (value: string | null) => {
       if (!value) {
         return null;
@@ -28,8 +63,10 @@ async function main() {
       return value.replace(/\s+/g, "_").replace(/\W/g, "").toLowerCase();
     };
 
-    await prisma.exercise.create({
-      data: {
+    await prisma.exercise.upsert({
+      where: { name: exercise.name },
+      update: {},
+      create: {
         name: exercise.name,
         equipment: mapSnakeCase(exercise.equipment) as Equipment | null,
         force: exercise.force as ExerciseForce,

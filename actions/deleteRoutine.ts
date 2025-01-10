@@ -15,7 +15,7 @@ export async function deleteRoutine(routineId: number): Promise<boolean> {
       where: { id: routineId },
     });
   } catch (err) {
-    console.log(err);
+    console.error(err);
     return false;
   }
 

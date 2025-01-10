@@ -51,6 +51,7 @@ export const EditDayModal = ({
       routineDay?.id,
     );
     onClose();
+    setWeekdays([]);
   };
 
   return (
