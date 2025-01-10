@@ -45,12 +45,12 @@ export const Header = () => {
             </Link>
             <Link
               component={NextLink}
-              href="/nutrition"
+              href="/logs"
               sx={{
                 color: "primary.contrastText",
               }}
             >
-              Nutrition
+              Logs
             </Link>
           </Box>
           <AccountNavItem />
