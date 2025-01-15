@@ -37,27 +37,28 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { revalidatePath } from "next/cache";
 import { reorderSets } from "@/actions/reorderSets";
 import { SetGroupWithSets } from "@/types/routineDay";
-import useSWR from "swr";
-import { getUnits, Units } from "@/actions/getUnits";
+import { type Units } from "@/actions/getUnits";
+import type { SetWithUnits } from "@/types/routineDay";
 
 export const WorkoutSetGroup = ({
   setGroup,
   isSortingActive,
+  units,
 }: {
   setGroup: SetGroupWithSets;
   isSortingActive: boolean;
+  units: Units;
 }) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: setGroup.id });
   const [edit, setEdit] = useState(false);
   const [editComment, setEditComment] = useState(false);
   const [deleteOpen, setDelete] = useState(false);
-  const { data: units } = useSWR<Units>("units", () => getUnits());
+  const [sets, optimisticUpdateSets] = useState<SetWithUnits[]>(setGroup.sets);
 
-  const exercise = setGroup.sets[0]?.exercise;
+  const exercise = sets[0]?.exercise;
 
   const mouseSensor = useSensor(MouseSensor);
   const touchSensor = useSensor(TouchSensor);
@@ -73,11 +74,11 @@ export const WorkoutSetGroup = ({
       return;
     }
 
-    const oldIndex = setGroup.sets.findIndex((set) => set.id === dragId);
-    const newIndex = setGroup.sets.findIndex((set) => set.id === overId);
-    const newSettings = arrayMove(setGroup.sets, oldIndex, newIndex);
-    await reorderSets(newSettings);
-    revalidatePath(`/day/${setGroup.routineDayId}`);
+    const oldIndex = sets.findIndex((set) => set.id === dragId);
+    const newIndex = sets.findIndex((set) => set.id === overId);
+    const newSets = arrayMove(sets, oldIndex, newIndex);
+    optimisticUpdateSets(newSets);
+    await reorderSets(newSets);
   };
 
   const EditActions =
@@ -124,7 +125,7 @@ export const WorkoutSetGroup = ({
             {exercise ? (
               <Avatar
                 alt={`${exercise.name} set item`}
-                src={exercise.images[0]}
+                src={`/exercises/${exercise.images[0]}`}
               />
             ) : (
               <Avatar>{exercise ? <ImageIcon /> : <Error />}</Avatar>
@@ -132,7 +133,7 @@ export const WorkoutSetGroup = ({
           </ListItemAvatar>
           <ListItemText
             primary={exercise.name}
-            secondary={`${setGroup.sets.length} sets`}
+            secondary={`${sets.length} sets`}
           />
         </ListItemButton>
       </ListItem>
@@ -145,21 +146,19 @@ export const WorkoutSetGroup = ({
             </ListItem>
           )}
 
-          <DndContext onDragEnd={handleSort} sensors={sensors}>
+          <DndContext id="sets" onDragEnd={handleSort} sensors={sensors}>
             <SortableContext
-              items={setGroup.sets}
+              items={sets}
               strategy={verticalListSortingStrategy}
             >
-              {setGroup.sets.map(
-                (set) =>
-                  units && (
-                    <WorkoutSetRow
-                      key={`set-${set.id}`}
-                      set={set}
-                      units={units}
-                    />
-                  ),
-              )}
+              {sets.map((set) => (
+                <WorkoutSetRow
+                  key={`set-${set.id}`}
+                  routineDayId={setGroup.routineDayId}
+                  set={set}
+                  units={units}
+                />
+              ))}
             </SortableContext>
           </DndContext>
 

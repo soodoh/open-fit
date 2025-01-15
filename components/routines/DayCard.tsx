@@ -9,7 +9,6 @@ import {
   List,
   Typography,
 } from "@mui/material";
-import { WorkoutSetGroup } from "./WorkoutSetGroup";
 import { EditDayMenu } from "./EditDayMenu";
 import moment from "moment";
 import {
@@ -30,16 +29,20 @@ import { AddExerciseRow } from "./AddExerciseRow";
 import { useState } from "react";
 import { EditDayModal } from "./EditDayModal";
 import { reorderSetGroups } from "@/actions/reorderSetGroups";
-import { revalidatePath } from "next/cache";
-import type { RoutineDayWithSets } from "@/types/routineDay";
+import type { RoutineDayWithSets, SetGroupWithSets } from "@/types/routineDay";
 import type { Units } from "@/actions/getUnits";
+import { WorkoutSetGroup } from "./WorkoutSetGroup";
 
 export const DayCard = ({
   routineDay,
+  units,
 }: {
   routineDay: RoutineDayWithSets;
   units: Units;
 }) => {
+  const [setGroups, optimisticUpdateSetGroups] = useState<SetGroupWithSets[]>(
+    routineDay.setGroups,
+  );
   const mouseSensor = useSensor(MouseSensor);
   const touchSensor = useSensor(TouchSensor);
   const keyboardSensor = useSensor(KeyboardSensor);
@@ -51,18 +54,14 @@ export const DayCard = ({
   const handleSort = async (event: DragEndEvent) => {
     const dragId = event.active.id;
     const overId = event.over?.id;
-    if (
-      !Number.isInteger(overId) ||
-      dragId === overId ||
-      !routineDay.setGroups.length
-    ) {
+    if (!Number.isInteger(overId) || dragId === overId || !setGroups.length) {
       return;
     }
-    const oldIndex = routineDay.setGroups.findIndex((set) => set.id === dragId);
-    const newIndex = routineDay.setGroups.findIndex((set) => set.id === overId);
-    const newSets = arrayMove(routineDay.setGroups, oldIndex, newIndex);
-    await reorderSetGroups(newSets);
-    revalidatePath(`/day/${routineDay.id}`);
+    const oldIndex = setGroups.findIndex((set) => set.id === dragId);
+    const newIndex = setGroups.findIndex((set) => set.id === overId);
+    const newSetGroups = arrayMove(setGroups, oldIndex, newIndex);
+    optimisticUpdateSetGroups(newSetGroups);
+    await reorderSetGroups(newSetGroups);
     setSortingState(true);
   };
 
@@ -101,6 +100,7 @@ export const DayCard = ({
 
         <List dense disablePadding>
           <DndContext
+            id="set-groups"
             onDragEnd={handleSort}
             onDragStart={() => setSortingState(false)}
             onDragCancel={() => setSortingState(true)}
@@ -108,14 +108,15 @@ export const DayCard = ({
             sensors={sensors}
           >
             <SortableContext
-              items={routineDay.setGroups}
+              items={setGroups}
               strategy={verticalListSortingStrategy}
             >
-              {routineDay.setGroups.map((setGroup) => {
+              {setGroups.map((setGroup) => {
                 return (
                   <WorkoutSetGroup
                     key={`set-${setGroup.id}`}
                     setGroup={setGroup}
+                    units={units}
                     isSortingActive={isSortingActive}
                   />
                 );

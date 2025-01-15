@@ -20,7 +20,7 @@ export const AutocompleteExercise = ({
   onChange: (exercise: Exercise | null) => void;
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const { data: options } = useSWR(searchTerm, searchExercise, {
+  const { data: options, isLoading } = useSWR(searchTerm, searchExercise, {
     keepPreviousData: true,
   });
 
@@ -35,7 +35,7 @@ export const AutocompleteExercise = ({
       getOptionLabel={(option) => option?.name ?? "Unknown"}
       getOptionKey={(option) => `exercise-${option?.id}`}
       filterOptions={(option) => option}
-      // loading={isLoading}
+      loading={isLoading}
       noOptionsText="No exercises found"
       onChange={(_, selectedExercise) => {
         onChange(selectedExercise);

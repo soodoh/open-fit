@@ -1,4 +1,6 @@
-import { Units } from "@/actions/getUnits";
+import { deleteSet } from "@/actions/deleteSet";
+import { editSet } from "@/actions/editSet";
+import type { Units } from "@/actions/getUnits";
 import type { SetWithUnits } from "@/types/routineDay";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -13,34 +15,35 @@ import {
   MenuItem,
   TextField,
 } from "@mui/material";
-import { type FormEvent, useState } from "react";
+import { useState } from "react";
 
 export const WorkoutSetRow = ({
+  routineDayId,
   set,
-  units: {
-    defaultRepetitionUnit,
-    repetitionUnits,
-    defaultWeightUnit,
-    weightUnits,
-  },
+  units,
 }: {
+  routineDayId: number;
   set: SetWithUnits;
   units: Units;
 }) => {
-  const [reps, setReps] = useState<string>("0");
-  const [repUnit, setRepUnit] = useState<string>(defaultRepetitionUnit.name);
-  const [weight, setWeight] = useState<string>("0");
-  const [weightUnit, setWeightUnit] = useState<string>(defaultWeightUnit.name);
+  const [reps, setReps] = useState<string>(`${set.reps}`);
+  const [repUnit, setRepUnit] = useState<string>(`${set.repetitionUnitId}`);
+  const [weight, setWeight] = useState<string>(`${set.weight}`);
+  const [weightUnit, setWeightUnit] = useState<string>(`${set.weightUnitId}`);
   const [edit, setEdit] = useState(false);
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: set.id });
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleSubmit = async () => {
+    await editSet({
+      id: set.id,
+      weight: parseFloat(weight),
+      weightUnitId: parseInt(weightUnit, 10),
+      reps: parseInt(reps, 10),
+      repetitionUnitId: parseInt(repUnit, 10),
+    });
     setEdit(false);
   };
-
-  const handleDelete = async () => {};
 
   const dragHandle = (
     <ListItemIcon>
@@ -62,7 +65,7 @@ export const WorkoutSetRow = ({
         ref={setNodeRef}
         sx={{ transform: CSS.Transform.toString(transform), transition }}
         secondaryAction={
-          <IconButton onClick={handleDelete}>
+          <IconButton onClick={() => deleteSet(routineDayId, set.id)}>
             <Delete />
           </IconButton>
         }
@@ -85,7 +88,7 @@ export const WorkoutSetRow = ({
       ref={setNodeRef}
       sx={{ transform: CSS.Transform.toString(transform), transition }}
       component="form"
-      onSubmit={handleSubmit}
+      action={handleSubmit}
       secondaryAction={
         <IconButton type="submit">
           <Check />
@@ -107,22 +110,22 @@ export const WorkoutSetRow = ({
           onChange={(event) => setReps(event.target.value)}
           sx={{ width: 75 }}
         />
-        {
-          <TextField
-            size="small"
-            select
-            label="Type"
-            value={repUnit}
-            onChange={(event) => setRepUnit(event.target.value)}
-            sx={{ minWidth: 100, maxWidth: 150 }}
-          >
-            {repetitionUnits.map((repUnit) => (
-              <MenuItem key={`repUnit-${repUnit.id}`} value={repUnit.id}>
-                {repUnit.name}
-              </MenuItem>
-            ))}
-          </TextField>
-        }
+
+        <TextField
+          size="small"
+          select
+          label="Type"
+          value={repUnit}
+          onChange={(event) => setRepUnit(event.target.value)}
+          sx={{ minWidth: 100, maxWidth: 150 }}
+        >
+          {units.repetitionUnits.map((unit) => (
+            <MenuItem key={`repUnit-${unit.id}`} value={unit.id}>
+              {unit.name}
+            </MenuItem>
+          ))}
+        </TextField>
+
         <TextField
           size="small"
           variant="outlined"
@@ -135,25 +138,21 @@ export const WorkoutSetRow = ({
           onChange={(event) => setWeight(event.target.value)}
           sx={{ minWidth: 75, maxWidth: 100 }}
         />
-        {
-          <TextField
-            size="small"
-            select
-            label="Unit"
-            value={weightUnit}
-            onChange={(event) => setWeightUnit(event.target.value)}
-            sx={{ minWidth: 70, maxWidth: 150 }}
-          >
-            {weightUnits.map((weightUnit) => (
-              <MenuItem
-                key={`weightUnit-${weightUnit.id}`}
-                value={weightUnit.id}
-              >
-                {weightUnit.name}
-              </MenuItem>
-            ))}
-          </TextField>
-        }
+
+        <TextField
+          size="small"
+          select
+          label="Unit"
+          value={weightUnit}
+          onChange={(event) => setWeightUnit(event.target.value)}
+          sx={{ minWidth: 70, maxWidth: 150 }}
+        >
+          {units.weightUnits.map((unit) => (
+            <MenuItem key={`weightUnit-${unit.id}`} value={unit.id}>
+              {unit.name}
+            </MenuItem>
+          ))}
+        </TextField>
       </Box>
     </ListItem>
   );

@@ -3,14 +3,17 @@ import { AutocompleteExercise } from "../exercises/AutocompleteExercise";
 import { useState } from "react";
 import { Add } from "@mui/icons-material";
 import { Exercise } from "@prisma/client";
+import { createSetGroup } from "@/actions/createSetGroup";
 
 export const AddExerciseRow = ({ dayId }: { dayId: number }) => {
   const [exercise, setExercise] = useState<Exercise | null>(null);
+  const [numSets, setNumSets] = useState<string>("1");
 
-  const handleSubmit = async (formData: FormData) => {
+  const handleSubmit = async () => {
     if (!exercise) {
       return;
     }
+    await createSetGroup(dayId, exercise.id, parseInt(numSets, 10));
   };
 
   return (
@@ -29,7 +32,8 @@ export const AddExerciseRow = ({ dayId }: { dayId: number }) => {
         variant="outlined"
         type="number"
         label="Sets"
-        name="numSets"
+        value={numSets}
+        onChange={(event) => setNumSets(event.target.value)}
         slotProps={{
           htmlInput: { min: 1 },
         }}

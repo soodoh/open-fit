@@ -119,9 +119,6 @@ model WorkoutSetGroup {
   type         SetGroupType @default(NORMAL)
   order        Int
   comment      String?
-
-  @@unique([routineDayId, order])
-  @@index([routineDayId])
 }
 
 model WorkoutSet {
@@ -137,9 +134,6 @@ model WorkoutSet {
   weightUnit       WeightUnit      @relation(fields: [weightUnitId], references: [id])
   weightUnitId     Int
   order            Int
-
-  @@unique([setGroupId, order])
-  @@index([setGroupId])
 }
 
 enum ExerciseForce {

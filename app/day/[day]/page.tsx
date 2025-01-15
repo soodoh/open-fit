@@ -1,3 +1,4 @@
+import { getUnits } from "@/actions/getUnits";
 import { auth } from "@/auth";
 import { DayCard } from "@/components/routines/DayCard";
 import { prisma } from "@/lib/prisma";
@@ -34,6 +35,8 @@ export default async function Page({
     redirect("/routines");
   }
 
+  const units = await getUnits();
+
   return (
     <Container maxWidth="xl" sx={{ my: 3 }}>
       <Fab
@@ -46,7 +49,7 @@ export default async function Page({
         <ArrowBack />
         Routines
       </Fab>
-      <DayCard routineDay={routineDay} />
+      <DayCard routineDay={routineDay} units={units} />
     </Container>
   );
 }

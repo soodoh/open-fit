@@ -4,11 +4,12 @@ import { prisma } from "@/lib/prisma";
 import type { Exercise } from "@prisma/client";
 
 export async function searchExercise(searchTerm: string): Promise<Exercise[]> {
-  if (!searchTerm) {
+  const formattedSearchTerm = searchTerm.trim().split(/\s+/).join(" & ");
+  if (!formattedSearchTerm) {
     // TODO show most popular items if no searchTerm present?
     return [];
   }
-  const searchQuery = `${searchTerm}:*`;
+  const searchQuery = `${formattedSearchTerm}:*`;
 
   // TODO use this query whenever primaryMuscles is split into it's own table
   // const query = `
@@ -18,12 +19,12 @@ export async function searchExercise(searchTerm: string): Promise<Exercise[]> {
   // `;
 
   try {
-    const exercises = await prisma.$queryRaw`
+    const exercises = await prisma.$queryRaw<Exercise[]>`
     SELECT * FROM "Exercise"
     WHERE to_tsvector('english', "Exercise"."name" || ' ' || "Exercise"."primaryMuscles"::text)
     @@ to_tsquery('english', ${searchQuery});
     `;
-    return exercises as Exercise[];
+    return exercises;
   } catch (err) {
     console.error(err);
     return [];
