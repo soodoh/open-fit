@@ -24,7 +24,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { useState } from "react";
+import { useOptimistic, useState, useTransition } from "react";
 import { WorkoutSetRow } from "./WorkoutSetRow";
 import { DeleteSetGroupModal } from "./DeleteSetModal";
 import { EditSetCommentModal } from "./EditSetCommentModal";
@@ -38,9 +38,11 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import { reorderSets } from "@/actions/reorderSets";
+import { deleteSetGroup } from "@/actions/deleteSetGroup";
 import { SetGroupWithSets } from "@/types/routineDay";
 import { type Units } from "@/actions/getUnits";
 import type { SetWithUnits } from "@/types/routineDay";
+import { createSet } from "@/actions/createSet";
 
 export const WorkoutSetGroup = ({
   setGroup,
@@ -56,7 +58,11 @@ export const WorkoutSetGroup = ({
   const [edit, setEdit] = useState(false);
   const [editComment, setEditComment] = useState(false);
   const [deleteOpen, setDelete] = useState(false);
-  const [sets, optimisticUpdateSets] = useState<SetWithUnits[]>(setGroup.sets);
+  const [, startTransition] = useTransition();
+  const [sets, optimisticUpdateSets] = useOptimistic<
+    SetWithUnits[],
+    SetWithUnits[]
+  >(setGroup.sets, (_, newSets) => newSets);
 
   const exercise = sets[0]?.exercise;
 
@@ -65,9 +71,11 @@ export const WorkoutSetGroup = ({
   const keyboardSensor = useSensor(KeyboardSensor);
   const sensors = useSensors(mouseSensor, touchSensor, keyboardSensor);
 
-  const handleAdd = async () => {};
+  const handleAdd = async () => {
+    await createSet(setGroup.id, exercise.id);
+  };
 
-  const handleSort = async (event: DragEndEvent) => {
+  const handleSort = (event: DragEndEvent) => {
     const dragId = event.active.id;
     const overId = event.over?.id;
     if (!Number.isInteger(overId) || dragId === overId) {
@@ -77,8 +85,10 @@ export const WorkoutSetGroup = ({
     const oldIndex = sets.findIndex((set) => set.id === dragId);
     const newIndex = sets.findIndex((set) => set.id === overId);
     const newSets = arrayMove(sets, oldIndex, newIndex);
-    optimisticUpdateSets(newSets);
-    await reorderSets(newSets);
+    startTransition(async () => {
+      optimisticUpdateSets(newSets);
+      await reorderSets(newSets);
+    });
   };
 
   const EditActions =
@@ -132,7 +142,7 @@ export const WorkoutSetGroup = ({
             )}
           </ListItemAvatar>
           <ListItemText
-            primary={exercise.name}
+            primary={exercise?.name ?? "Unknown exercise"}
             secondary={`${sets.length} sets`}
           />
         </ListItemButton>

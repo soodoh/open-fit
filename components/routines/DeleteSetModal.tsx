@@ -8,7 +8,6 @@ import {
   DialogTitle,
 } from "@mui/material";
 import type { WorkoutSetGroup } from "@prisma/client";
-import { revalidatePath } from "next/cache";
 
 export const DeleteSetGroupModal = ({
   open,
@@ -37,7 +36,6 @@ export const DeleteSetGroupModal = ({
         <Button
           onClick={async () => {
             await deleteSetGroup(setGroup.id);
-            revalidatePath(`/day/${setGroup.routineDayId}`);
             onClose();
           }}
         >

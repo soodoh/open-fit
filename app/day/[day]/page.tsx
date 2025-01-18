@@ -23,8 +23,10 @@ export default async function Page({
     where: { id: dayId },
     include: {
       setGroups: {
+        orderBy: { order: "asc" },
         include: {
           sets: {
+            orderBy: { order: "asc" },
             include: { exercise: true, repetitionUnit: true, weightUnit: true },
           },
         },

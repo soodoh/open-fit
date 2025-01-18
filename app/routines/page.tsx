@@ -13,6 +13,7 @@ export default async function Routines() {
   }
 
   const routines = await prisma.routine.findMany({
+    orderBy: { updatedAt: "desc" },
     where: { userId: session.user.id },
     include: { routineDays: true },
   });

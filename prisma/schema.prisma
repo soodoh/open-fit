@@ -76,7 +76,7 @@ model VerificationToken {
 
 model Routine {
   id          Int          @id @default(autoincrement())
-  user        User         @relation(fields: [userId], references: [id])
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId      String
   name        String
   description String?
@@ -97,7 +97,7 @@ enum Weekday {
 
 model RoutineDay {
   id          Int               @id @default(autoincrement())
-  routine     Routine           @relation(fields: [routineId], references: [id])
+  routine     Routine           @relation(fields: [routineId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   routineId   Int
   weekdays    Weekday[]
   description String
@@ -113,7 +113,7 @@ enum SetGroupType {
 
 model WorkoutSetGroup {
   id           Int          @id @default(autoincrement())
-  routineDay   RoutineDay   @relation(fields: [routineDayId], references: [id])
+  routineDay   RoutineDay   @relation(fields: [routineDayId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   routineDayId Int
   sets         WorkoutSet[]
   type         SetGroupType @default(NORMAL)
@@ -123,7 +123,7 @@ model WorkoutSetGroup {
 
 model WorkoutSet {
   id               Int             @id @default(autoincrement())
-  setGroup         WorkoutSetGroup @relation(fields: [setGroupId], references: [id])
+  setGroup         WorkoutSetGroup @relation(fields: [setGroupId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   setGroupId       Int
   exercise         Exercise        @relation(fields: [exerciseId], references: [id])
   exerciseId       Int

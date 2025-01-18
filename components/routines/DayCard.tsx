@@ -26,7 +26,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { AddExerciseRow } from "./AddExerciseRow";
-import { useState } from "react";
+import { useOptimistic, useState, useTransition } from "react";
 import { EditDayModal } from "./EditDayModal";
 import { reorderSetGroups } from "@/actions/reorderSetGroups";
 import type { RoutineDayWithSets, SetGroupWithSets } from "@/types/routineDay";
@@ -40,9 +40,12 @@ export const DayCard = ({
   routineDay: RoutineDayWithSets;
   units: Units;
 }) => {
-  const [setGroups, optimisticUpdateSetGroups] = useState<SetGroupWithSets[]>(
-    routineDay.setGroups,
-  );
+  const [, startTransition] = useTransition();
+  const [setGroups, optimisticUpdateSetGroups] = useOptimistic<
+    SetGroupWithSets[],
+    SetGroupWithSets[]
+  >(routineDay.setGroups, (_, newSetGroups) => newSetGroups);
+
   const mouseSensor = useSensor(MouseSensor);
   const touchSensor = useSensor(TouchSensor);
   const keyboardSensor = useSensor(KeyboardSensor);
@@ -51,7 +54,7 @@ export const DayCard = ({
   const [isSortingActive, setSortingState] = useState(true);
   const [edit, setEdit] = useState(false);
 
-  const handleSort = async (event: DragEndEvent) => {
+  const handleSort = (event: DragEndEvent) => {
     const dragId = event.active.id;
     const overId = event.over?.id;
     if (!Number.isInteger(overId) || dragId === overId || !setGroups.length) {
@@ -60,9 +63,11 @@ export const DayCard = ({
     const oldIndex = setGroups.findIndex((set) => set.id === dragId);
     const newIndex = setGroups.findIndex((set) => set.id === overId);
     const newSetGroups = arrayMove(setGroups, oldIndex, newIndex);
-    optimisticUpdateSetGroups(newSetGroups);
-    await reorderSetGroups(newSetGroups);
-    setSortingState(true);
+    startTransition(async () => {
+      optimisticUpdateSetGroups(newSetGroups);
+      await reorderSetGroups(newSetGroups);
+      setSortingState(true);
+    });
   };
 
   return (

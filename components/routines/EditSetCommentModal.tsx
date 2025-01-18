@@ -1,3 +1,4 @@
+import { updateSetGroupComment } from "@/actions/updateSetGroupComment";
 import {
   Button,
   Dialog,
@@ -19,8 +20,6 @@ export const EditSetCommentModal = ({
   setGroup: WorkoutSetGroup;
 }) => {
   const [comment, setComment] = useState(setGroup.comment ?? "");
-
-  const updateSet = async () => {};
 
   return (
     <Dialog
@@ -44,8 +43,8 @@ export const EditSetCommentModal = ({
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
         <Button
-          onClick={() => {
-            updateSet();
+          onClick={async () => {
+            await updateSetGroupComment(setGroup.id, comment);
             onClose();
           }}
         >
