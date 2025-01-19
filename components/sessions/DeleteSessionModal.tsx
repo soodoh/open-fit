@@ -1,3 +1,4 @@
+import { deleteSession } from "@/actions/deleteSession";
 import {
   Button,
   Dialog,
@@ -6,10 +7,6 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
-import { useAuthFetcher } from "@/lib/fetcher";
-import { getSession, SESSIONS } from "@/lib/urls";
-import { useSWRConfig } from "swr";
-import { WorkoutSession } from "@/types/privateApi/workoutSession";
 
 export const DeleteSessionModal = ({
   open,
@@ -18,32 +15,8 @@ export const DeleteSessionModal = ({
 }: {
   open: boolean;
   onClose: () => void;
-  sessionId?: number;
+  sessionId: number;
 }) => {
-  const authFetcher = useAuthFetcher();
-  const { mutate } = useSWRConfig();
-
-  const deleteSession = async () => {
-    const deletePromise = authFetcher(getSession(sessionId), {
-      method: "DELETE",
-    });
-    mutate(SESSIONS, deletePromise, {
-      populateCache: (_, cachedSessions) => {
-        const newResults =
-          cachedSessions?.results?.filter(
-            (session: WorkoutSession) => session.id !== sessionId,
-          ) ?? [];
-        return {
-          ...cachedSessions,
-          count: newResults.length,
-          results: newResults,
-        };
-      },
-      revalidate: false,
-      rollbackOnError: true,
-    });
-  };
-
   return (
     <Dialog
       open={open}
@@ -60,8 +33,8 @@ export const DeleteSessionModal = ({
       <DialogActions>
         <Button onClick={onClose}>No</Button>
         <Button
-          onClick={() => {
-            deleteSession();
+          onClick={async () => {
+            await deleteSession(sessionId);
             onClose();
           }}
         >

@@ -29,7 +29,8 @@ import { AddExerciseRow } from "./AddExerciseRow";
 import { useOptimistic, useState, useTransition } from "react";
 import { EditDayModal } from "./EditDayModal";
 import { reorderSetGroups } from "@/actions/reorderSetGroups";
-import type { RoutineDayWithSets, SetGroupWithSets } from "@/types/routineDay";
+import type { RoutineDayWithSets } from "@/types/routineDay";
+import type { SetGroupWithSets } from "@/types/workoutSet";
 import type { Units } from "@/actions/getUnits";
 import { WorkoutSetGroup } from "./WorkoutSetGroup";
 

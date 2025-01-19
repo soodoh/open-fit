@@ -31,8 +31,9 @@ model User {
   defaultWeightUnit       WeightUnit     @relation(fields: [defaultWeightUnitId], references: [id])
   defaultWeightUnitId     Int            @default(1)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  WorkoutSession WorkoutSession[]
 }
 
 model Account {
@@ -112,11 +113,13 @@ enum SetGroupType {
 }
 
 model WorkoutSetGroup {
-  id           Int          @id @default(autoincrement())
-  routineDay   RoutineDay   @relation(fields: [routineDayId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  routineDayId Int
+  id           Int             @id @default(autoincrement())
+  routineDay   RoutineDay?     @relation(fields: [routineDayId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  routineDayId Int?
+  session      WorkoutSession? @relation(fields: [sessionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  sessionId    Int?
   sets         WorkoutSet[]
-  type         SetGroupType @default(NORMAL)
+  type         SetGroupType    @default(NORMAL)
   order        Int
   comment      String?
 }
@@ -134,6 +137,8 @@ model WorkoutSet {
   weightUnit       WeightUnit      @relation(fields: [weightUnitId], references: [id])
   weightUnitId     Int
   order            Int
+  restTime         Int             @default(0)
+  completed        Boolean         @default(false)
 }
 
 enum ExerciseForce {
@@ -225,4 +230,16 @@ model WeightUnit {
   name  String       @unique
   sets  WorkoutSet[]
   users User[]
+}
+
+model WorkoutSession {
+  id         Int               @id @default(autoincrement())
+  name       String
+  impression Int?
+  notes      String
+  startTime  DateTime          @default(now())
+  endTime    DateTime?
+  setGroups  WorkoutSetGroup[]
+  user       User              @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId     String
 }

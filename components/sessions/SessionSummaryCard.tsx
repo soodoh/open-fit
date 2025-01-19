@@ -1,7 +1,3 @@
-import { useAuthedSWR } from "@/lib/fetcher";
-import { useSessionDuration } from "@/lib/useSessionDuration";
-import { Workout } from "@/types/privateApi/workout";
-import { WorkoutSession } from "@/types/privateApi/workoutSession";
 import {
   Button,
   Card,
@@ -18,13 +14,20 @@ import {
 import moment from "moment";
 import Link from "next/link";
 import { EditSessionMenu } from "./EditSessionMenu";
-import { getSession, getWorkout } from "@/lib/urls";
+import { SessionWithSets } from "@/types/workoutSession";
 
-export const SessionSummaryCard = ({ sessionId }: { sessionId?: number }) => {
-  const { data: session } = useAuthedSWR<WorkoutSession>(getSession(sessionId));
-  const { data: workout } = useAuthedSWR<Workout>(getWorkout(session?.workout));
-
-  const durationString = useSessionDuration(sessionId);
+export const SessionSummaryCard = ({
+  session: { id, name, startTime, endTime, impression, notes },
+}: {
+  session: SessionWithSets;
+}) => {
+  const durationDate =
+    startTime && endTime
+      ? moment.duration(moment(endTime).diff(moment(startTime)))
+      : null;
+  const durationString = durationDate
+    ? `${durationDate.hours()} hours, ${durationDate.minutes()} mins`
+    : "Not entered";
 
   return (
     <Card
@@ -38,16 +41,16 @@ export const SessionSummaryCard = ({ sessionId }: { sessionId?: number }) => {
         title={
           <>
             <Typography variant="h6" gutterBottom sx={{ mr: 2 }}>
-              {workout?.name || "Unknown Routine"}
+              {name}
             </Typography>
             <Chip
               variant="outlined"
-              label={moment(session?.date).format("MM/DD/YYYY")}
+              label={moment(startTime).format("MM/DD/YYYY")}
             />
           </>
         }
         disableTypography
-        action={<EditSessionMenu sessionId={sessionId} />}
+        action={<EditSessionMenu sessionId={id} />}
       />
 
       <CardContent sx={{ py: 0, flexGrow: 1 }}>
@@ -60,28 +63,25 @@ export const SessionSummaryCard = ({ sessionId }: { sessionId?: number }) => {
             <ListItemText
               primary="General Impression"
               secondary={
-                <Rating
-                  size="small"
-                  max={3}
-                  value={
-                    session?.impression ? parseInt(session.impression) : null
-                  }
-                  readOnly
-                />
+                impression ? (
+                  <Rating size="small" max={3} value={impression} readOnly />
+                ) : (
+                  "Not rated"
+                )
               }
             />
           </ListItem>
 
-          {session?.notes && (
+          {notes && (
             <ListItem disableGutters>
-              <ListItemText primary="Notes" secondary={session.notes} />
+              <ListItemText primary="Notes" secondary={notes} />
             </ListItem>
           )}
         </List>
       </CardContent>
 
       <CardActions sx={{ alignSelf: "flex-end" }}>
-        <Button LinkComponent={Link} href={`/session/${sessionId}`}>
+        <Button LinkComponent={Link} href={`/session/${id}`}>
           View Session
         </Button>
       </CardActions>

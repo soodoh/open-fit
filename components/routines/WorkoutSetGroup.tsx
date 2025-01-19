@@ -38,10 +38,8 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import { reorderSets } from "@/actions/reorderSets";
-import { deleteSetGroup } from "@/actions/deleteSetGroup";
-import { SetGroupWithSets } from "@/types/routineDay";
 import { type Units } from "@/actions/getUnits";
-import type { SetWithUnits } from "@/types/routineDay";
+import type { SetGroupWithSets, SetWithUnits } from "@/types/workoutSet";
 import { createSet } from "@/actions/createSet";
 
 export const WorkoutSetGroup = ({
@@ -162,12 +160,7 @@ export const WorkoutSetGroup = ({
               strategy={verticalListSortingStrategy}
             >
               {sets.map((set) => (
-                <WorkoutSetRow
-                  key={`set-${set.id}`}
-                  routineDayId={setGroup.routineDayId}
-                  set={set}
-                  units={units}
-                />
+                <WorkoutSetRow key={`set-${set.id}`} set={set} units={units} />
               ))}
             </SortableContext>
           </DndContext>

@@ -1,7 +1,7 @@
 import { deleteSet } from "@/actions/deleteSet";
 import { editSet } from "@/actions/editSet";
 import type { Units } from "@/actions/getUnits";
-import type { SetWithUnits } from "@/types/routineDay";
+import type { SetWithUnits } from "@/types/workoutSet";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Check, Delete, DragHandle } from "@mui/icons-material";
@@ -18,11 +18,9 @@ import {
 import { useState } from "react";
 
 export const WorkoutSetRow = ({
-  routineDayId,
   set,
   units,
 }: {
-  routineDayId: number;
   set: SetWithUnits;
   units: Units;
 }) => {
@@ -65,7 +63,7 @@ export const WorkoutSetRow = ({
         ref={setNodeRef}
         sx={{ transform: CSS.Transform.toString(transform), transition }}
         secondaryAction={
-          <IconButton onClick={() => deleteSet(routineDayId, set.id)}>
+          <IconButton onClick={() => deleteSet(set.id)}>
             <Delete />
           </IconButton>
         }

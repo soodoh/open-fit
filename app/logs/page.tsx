@@ -1,35 +1,26 @@
-"use client";
-import { Box, Container, Fab, Typography } from "@mui/material";
-import { useAuthedSWR } from "@/lib/fetcher";
-import { Add } from "@mui/icons-material";
-import { PaginatedResponse } from "@/types/response";
-import { WorkoutSession } from "@/types/privateApi/workoutSession";
+import { Box, Container, Typography } from "@mui/material";
 import { SessionSummaryCard } from "@/components/sessions/SessionSummaryCard";
-import { EditSessionModal as NewSessionModal } from "@/components/sessions/EditSessionModal";
-import { SESSIONS } from "@/lib/urls";
-import { useState } from "react";
+import { CreateSessionButton } from "@/components/sessions/CreateSession";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
+import { prisma } from "@/lib/prisma";
 
-export default function Sessions() {
-  const { data: sessions } =
-    useAuthedSWR<PaginatedResponse<WorkoutSession>>(SESSIONS);
-  const sessionItems = sessions?.results ?? [];
+export default async function Sessions() {
+  const session = await auth();
+  if (!session?.user) {
+    redirect("/login");
+  }
 
-  const [open, setOpen] = useState(false);
+  const sessions = await prisma.workoutSession.findMany({
+    orderBy: { startTime: "desc" },
+    where: { userId: session.user.id },
+    include: { setGroups: { include: { sets: true } } },
+  });
 
   return (
     <>
-      <NewSessionModal open={open} onClose={() => setOpen(false)} />
-
       <Container maxWidth="xl" sx={{ my: 3 }}>
-        <Fab
-          color="primary"
-          variant="extended"
-          sx={{ mb: 2 }}
-          onClick={() => setOpen(true)}
-        >
-          <Add sx={{ mr: 1 }} />
-          Create Session
-        </Fab>
+        <CreateSessionButton />
 
         <Typography variant="h4" gutterBottom>
           In Progress
@@ -39,8 +30,8 @@ export default function Sessions() {
         </Typography>
 
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-          {sessionItems.map((session) => (
-            <SessionSummaryCard key={session.id} sessionId={session.id} />
+          {sessions.map((session) => (
+            <SessionSummaryCard key={session.id} session={session} />
           ))}
         </Box>
       </Container>
