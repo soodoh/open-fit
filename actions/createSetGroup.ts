@@ -2,6 +2,7 @@
 
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { SetGroupType, SetType } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 export async function createSetGroup(
@@ -30,12 +31,14 @@ export async function createSetGroup(
   const setGroup = await prisma.workoutSetGroup.create({
     data: {
       routineDayId,
+      type: SetGroupType.NORMAL,
       order: existingSetGroups.length,
     },
   });
   await prisma.workoutSet.createMany({
     data: Array.from({ length: numSets }, (_, index) => ({
       exerciseId,
+      type: SetType.NORMAL,
       order: index,
       setGroupId: setGroup.id,
       reps: 0,

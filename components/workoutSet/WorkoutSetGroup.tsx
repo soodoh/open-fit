@@ -23,7 +23,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { useOptimistic, useState, useTransition } from "react";
+import { useMemo, useOptimistic, useState, useTransition } from "react";
 import { WorkoutSetRow } from "./WorkoutSetRow";
 import {
   DndContext,
@@ -39,6 +39,7 @@ import { type Units } from "@/actions/getUnits";
 import type { SetGroupWithSets, SetWithUnits } from "@/types/workoutSet";
 import { createSet } from "@/actions/createSet";
 import { EditSetGroupMenu } from "./EditSetGroupMenu";
+import { SetType } from "@prisma/client";
 
 export const WorkoutSetGroup = ({
   setGroup,
@@ -59,6 +60,17 @@ export const WorkoutSetGroup = ({
   const [expanded, setExpanded] = useState(false);
 
   const exercise = sets[0]?.exercise;
+  const setsWithNumber: { set: SetWithUnits; setNum: number }[] =
+    useMemo(() => {
+      let setNum = 1;
+      return sets.reduce((acc, set) => {
+        acc.push({ set, setNum });
+        if (set.type === SetType.NORMAL) {
+          setNum += 1;
+        }
+        return acc;
+      }, []);
+    }, [sets]);
 
   const mouseSensor = useSensor(MouseSensor);
   const touchSensor = useSensor(TouchSensor);
@@ -139,9 +151,16 @@ export const WorkoutSetGroup = ({
               items={sets}
               strategy={verticalListSortingStrategy}
             >
-              {sets.map((set) => (
-                <WorkoutSetRow key={`set-${set.id}`} set={set} units={units} />
-              ))}
+              {setsWithNumber.map(({ set, setNum }) => {
+                return (
+                  <WorkoutSetRow
+                    key={`set-${set.id}`}
+                    set={set}
+                    setNum={setNum}
+                    units={units}
+                  />
+                );
+              })}
             </SortableContext>
           </DndContext>
 

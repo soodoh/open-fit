@@ -2,6 +2,7 @@
 
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { SetType } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 export async function createSet(setGroupId: number, exerciseId: number) {
@@ -36,6 +37,7 @@ export async function createSet(setGroupId: number, exerciseId: number) {
     data: {
       setGroupId,
       exerciseId,
+      type: SetType.NORMAL,
       weight: 0,
       weightUnitId: defaultWeightUnitId,
       reps: 0,
