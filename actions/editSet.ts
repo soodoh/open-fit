@@ -5,16 +5,15 @@ import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
 import type { WorkoutSet } from "@prisma/client";
 
+type EditSetParams = Pick<WorkoutSet, "id"> &
+  Partial<
+    Pick<WorkoutSet, "weight" | "reps" | "weightUnitId" | "repetitionUnitId">
+  >;
+
 export async function editSet({
   id,
-  weight,
-  reps,
-  weightUnitId,
-  repetitionUnitId,
-}: Pick<
-  WorkoutSet,
-  "id" | "weight" | "reps" | "weightUnitId" | "repetitionUnitId"
->): Promise<boolean> {
+  ...newSetData
+}: EditSetParams): Promise<boolean> {
   const session = await auth();
   if (!session?.user?.id) {
     throw new Error("Unauthorized");
@@ -24,10 +23,7 @@ export async function editSet({
     await prisma.workoutSet.update({
       where: { id },
       data: {
-        weight,
-        reps,
-        weightUnitId,
-        repetitionUnitId,
+        ...newSetData,
       },
     });
   } catch (error) {

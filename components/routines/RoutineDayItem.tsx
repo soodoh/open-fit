@@ -10,6 +10,7 @@ import { EditDayMenu } from "./EditDayMenu";
 import moment from "moment";
 import Link from "next/link";
 import type { RoutineDay } from "@prisma/client";
+import { MoreHoriz } from "@mui/icons-material";
 
 export const RoutineDayItem = ({ routineDay }: { routineDay: RoutineDay }) => {
   return (
@@ -17,7 +18,9 @@ export const RoutineDayItem = ({ routineDay }: { routineDay: RoutineDay }) => {
       <ListItem
         dense
         disablePadding
-        secondaryAction={<EditDayMenu routineDay={routineDay} />}
+        secondaryAction={
+          <EditDayMenu routineDay={routineDay} icon={<MoreHoriz />} />
+        }
       >
         <ListItemButton component={Link} href={`/day/${routineDay.id}`}>
           <ListItemText

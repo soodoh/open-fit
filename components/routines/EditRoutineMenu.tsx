@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { DeleteRoutineModal } from "./DeleteRoutineModal";
 import { EditRoutineModal } from "@/components/routines/EditRoutineModal";
-import { Add, Delete, Edit, MoreVert } from "@mui/icons-material";
+import { Add, Delete, Edit, Settings } from "@mui/icons-material";
 import {
   IconButton,
   ListItemIcon,
@@ -62,7 +62,7 @@ export const EditRoutineMenu = ({ routine }: { routine: Routine }) => {
           setAnchorEl(event.currentTarget);
         }}
       >
-        <MoreVert />
+        <Settings />
       </IconButton>
       <Menu
         id={`edit-workout-actions-${routine.id}-menu`}

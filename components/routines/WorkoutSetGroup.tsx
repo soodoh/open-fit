@@ -6,13 +6,12 @@ import {
   List,
   ListItem,
   ListItemAvatar,
-  ListItemButton,
+  ListItemIcon,
   ListItemText,
+  ListItemButton,
 } from "@mui/material";
 import {
   Add,
-  Comment,
-  Delete,
   DragHandle,
   Error,
   Image as ImageIcon,
@@ -26,8 +25,6 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { useOptimistic, useState, useTransition } from "react";
 import { WorkoutSetRow } from "./WorkoutSetRow";
-import { DeleteSetGroupModal } from "./DeleteSetModal";
-import { EditSetCommentModal } from "./EditSetCommentModal";
 import {
   DndContext,
   DragEndEvent,
@@ -41,26 +38,25 @@ import { reorderSets } from "@/actions/reorderSets";
 import { type Units } from "@/actions/getUnits";
 import type { SetGroupWithSets, SetWithUnits } from "@/types/workoutSet";
 import { createSet } from "@/actions/createSet";
+import { EditSetGroupMenu } from "./EditSetGroupMenu";
 
 export const WorkoutSetGroup = ({
   setGroup,
-  isSortingActive,
+  isReorderActive,
   units,
 }: {
   setGroup: SetGroupWithSets;
-  isSortingActive: boolean;
+  isReorderActive: boolean;
   units: Units;
 }) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: setGroup.id });
-  const [edit, setEdit] = useState(false);
-  const [editComment, setEditComment] = useState(false);
-  const [deleteOpen, setDelete] = useState(false);
   const [, startTransition] = useTransition();
   const [sets, optimisticUpdateSets] = useOptimistic<
     SetWithUnits[],
     SetWithUnits[]
   >(setGroup.sets, (_, newSets) => newSets);
+  const [expanded, setExpanded] = useState(false);
 
   const exercise = sets[0]?.exercise;
 
@@ -89,46 +85,29 @@ export const WorkoutSetGroup = ({
     });
   };
 
-  const EditActions =
-    edit && isSortingActive ? (
-      <IconButton
-        onClick={() => {
-          setDelete(true);
-          setEdit(false);
-        }}
-      >
-        <Delete />
-      </IconButton>
-    ) : (
-      <IconButton
-        sx={{ touchAction: "manipulation" }}
-        {...attributes}
-        {...listeners}
-      >
-        <DragHandle />
-      </IconButton>
-    );
-
   return (
     <>
-      <DeleteSetGroupModal
-        open={deleteOpen}
-        onClose={() => setDelete(false)}
-        setGroup={setGroup}
-      />
-      <EditSetCommentModal
-        open={editComment}
-        onClose={() => setEditComment(false)}
-        setGroup={setGroup}
-      />
-
       <ListItem
         disablePadding
         ref={setNodeRef}
         sx={{ transform: CSS.Transform.toString(transform), transition }}
-        secondaryAction={EditActions}
+        secondaryAction={
+          !isReorderActive && <EditSetGroupMenu setGroup={setGroup} />
+        }
       >
-        <ListItemButton onClick={() => setEdit(!edit)}>
+        <ListItemButton onClick={() => setExpanded(!expanded)}>
+          {isReorderActive && (
+            <ListItemIcon>
+              <IconButton
+                sx={{ touchAction: "manipulation" }}
+                {...attributes}
+                {...listeners}
+              >
+                <DragHandle />
+              </IconButton>
+            </ListItemIcon>
+          )}
+
           <ListItemAvatar>
             {exercise ? (
               <Avatar
@@ -139,6 +118,7 @@ export const WorkoutSetGroup = ({
               <Avatar>{exercise ? <ImageIcon /> : <Error />}</Avatar>
             )}
           </ListItemAvatar>
+
           <ListItemText
             primary={exercise?.name ?? "Unknown exercise"}
             secondary={`${sets.length} sets`}
@@ -146,7 +126,7 @@ export const WorkoutSetGroup = ({
         </ListItemButton>
       </ListItem>
 
-      <Collapse in={edit && isSortingActive} timeout="auto" unmountOnExit>
+      <Collapse in={!isReorderActive && expanded} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
           {setGroup.comment && (
             <ListItem dense sx={{ pl: 4 }}>
@@ -169,13 +149,6 @@ export const WorkoutSetGroup = ({
             <Fab size="medium" variant="extended" onClick={handleAdd}>
               <Add />
               New set
-            </Fab>
-            <Fab
-              size="medium"
-              variant="extended"
-              onClick={() => setEditComment(true)}
-            >
-              <Comment />
             </Fab>
           </ListItem>
         </List>

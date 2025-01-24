@@ -1,8 +1,5 @@
-"use client";
-
-import { type ReactNode, useEffect, useState } from "react";
-import { EditDayModal } from "./EditDayModal";
-import { Delete, Edit } from "@mui/icons-material";
+import { useEffect, useState } from "react";
+import { Comment, Delete, MoreHoriz, SquareFoot } from "@mui/icons-material";
 import {
   IconButton,
   ListItemIcon,
@@ -11,20 +8,19 @@ import {
   MenuItem,
   MenuList,
 } from "@mui/material";
-import { DeleteDayModal } from "./DeleteDayModal";
-import { RoutineDay } from "@prisma/client";
+import { SetGroupWithSets } from "@/types/workoutSet";
+import { EditSetCommentModal } from "./EditSetCommentModal";
+import { DeleteSetGroupModal } from "./DeleteSetGroupModal";
 
 enum Modal {
-  EDIT = "edit",
+  COMMENT = "comment",
   DELETE = "delete",
 }
 
-export const EditDayMenu = ({
-  routineDay,
-  icon,
+export const EditSetGroupMenu = ({
+  setGroup,
 }: {
-  routineDay: RoutineDay;
-  icon: ReactNode;
+  setGroup: SetGroupWithSets;
 }) => {
   const [modal, setModal] = useState<Modal | null>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -39,21 +35,20 @@ export const EditDayMenu = ({
 
   return (
     <>
-      <EditDayModal
-        open={modal === Modal.EDIT}
-        onClose={handleClose}
-        routineDay={routineDay}
-        routineId={routineDay.routineId}
-      />
-      <DeleteDayModal
+      <DeleteSetGroupModal
         open={modal === Modal.DELETE}
         onClose={handleClose}
-        dayId={routineDay.id}
+        setGroup={setGroup}
+      />
+      <EditSetCommentModal
+        open={modal === Modal.COMMENT}
+        onClose={handleClose}
+        setGroup={setGroup}
       />
 
       <Menu
-        id={`edit-day-actions-${routineDay.id}-menu`}
-        aria-labelledby={`edit-day-actions-${routineDay.id}`}
+        id={`edit-set-group-actions-${setGroup.id}-menu`}
+        aria-labelledby={`edit-set-group-actions-${setGroup.id}`}
         open={menuOpen}
         onClose={() => setAnchorEl(null)}
         anchorEl={anchorEl}
@@ -62,12 +57,20 @@ export const EditDayMenu = ({
         disableScrollLock
       >
         <MenuList dense disablePadding>
-          <MenuItem onClick={() => setModal(Modal.EDIT)}>
+          <MenuItem onClick={() => setModal(Modal.COMMENT)}>
             <ListItemIcon>
-              <Edit fontSize="small" />
+              <SquareFoot fontSize="small" />
             </ListItemIcon>
-            <ListItemText>Edit</ListItemText>
+            <ListItemText>Set rep/weight units</ListItemText>
           </MenuItem>
+
+          <MenuItem onClick={() => setModal(Modal.COMMENT)}>
+            <ListItemIcon>
+              <Comment fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>Comment</ListItemText>
+          </MenuItem>
+
           <MenuItem onClick={() => setModal(Modal.DELETE)}>
             <ListItemIcon>
               <Delete fontSize="small" />
@@ -78,10 +81,10 @@ export const EditDayMenu = ({
       </Menu>
 
       <IconButton
-        aria-label={`Edit actions for workout day ${routineDay.id}`}
-        id={`edit-day-actions-${routineDay.id}`}
+        aria-label={`Edit actions for set group ${setGroup.id}`}
+        id={`edit-set-group-actions-${setGroup.id}`}
         aria-controls={
-          menuOpen ? `edit-day-actions-${routineDay.id}-menu` : undefined
+          menuOpen ? `edit-set-group-actions-${setGroup.id}-menu` : undefined
         }
         aria-haspopup="true"
         aria-expanded={menuOpen ? "true" : undefined}
@@ -89,7 +92,7 @@ export const EditDayMenu = ({
           setAnchorEl(event.currentTarget);
         }}
       >
-        {icon}
+        <MoreHoriz />
       </IconButton>
     </>
   );

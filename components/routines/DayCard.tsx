@@ -6,7 +6,10 @@ import {
   CardContent,
   CardHeader,
   Chip,
+  FormControlLabel,
+  FormGroup,
   List,
+  Switch,
   Typography,
 } from "@mui/material";
 import { EditDayMenu } from "./EditDayMenu";
@@ -27,12 +30,12 @@ import {
 } from "@dnd-kit/sortable";
 import { AddExerciseRow } from "./AddExerciseRow";
 import { useOptimistic, useState, useTransition } from "react";
-import { EditDayModal } from "./EditDayModal";
 import { reorderSetGroups } from "@/actions/reorderSetGroups";
 import type { RoutineDayWithSets } from "@/types/routineDay";
 import type { SetGroupWithSets } from "@/types/workoutSet";
 import type { Units } from "@/actions/getUnits";
 import { WorkoutSetGroup } from "./WorkoutSetGroup";
+import { Settings } from "@mui/icons-material";
 
 export const DayCard = ({
   routineDay,
@@ -41,6 +44,7 @@ export const DayCard = ({
   routineDay: RoutineDayWithSets;
   units: Units;
 }) => {
+  const [isReorderActive, setReorderActive] = useState(false);
   const [, startTransition] = useTransition();
   const [setGroups, optimisticUpdateSetGroups] = useOptimistic<
     SetGroupWithSets[],
@@ -51,9 +55,6 @@ export const DayCard = ({
   const touchSensor = useSensor(TouchSensor);
   const keyboardSensor = useSensor(KeyboardSensor);
   const sensors = useSensors(mouseSensor, touchSensor, keyboardSensor);
-
-  const [isSortingActive, setSortingState] = useState(true);
-  const [edit, setEdit] = useState(false);
 
   const handleSort = (event: DragEndEvent) => {
     const dragId = event.active.id;
@@ -67,19 +68,11 @@ export const DayCard = ({
     startTransition(async () => {
       optimisticUpdateSetGroups(newSetGroups);
       await reorderSetGroups(newSetGroups);
-      setSortingState(true);
     });
   };
 
   return (
     <>
-      <EditDayModal
-        open={edit}
-        onClose={() => setEdit(false)}
-        routineDay={routineDay}
-        routineId={routineDay.routineId}
-      />
-
       <Card sx={{ pb: 2 }}>
         <CardHeader
           title={
@@ -97,22 +90,26 @@ export const DayCard = ({
               </Box>
             </>
           }
-          action={<EditDayMenu routineDay={routineDay} />}
+          action={<EditDayMenu routineDay={routineDay} icon={<Settings />} />}
         />
 
         <CardContent>
           <AddExerciseRow dayId={routineDay.id} />
+          <FormGroup>
+            <FormControlLabel
+              control={
+                <Switch
+                  value={isReorderActive}
+                  onChange={(event) => setReorderActive(event.target.checked)}
+                />
+              }
+              label="Reorder Sets"
+            />
+          </FormGroup>
         </CardContent>
 
         <List dense disablePadding>
-          <DndContext
-            id="set-groups"
-            onDragEnd={handleSort}
-            onDragStart={() => setSortingState(false)}
-            onDragCancel={() => setSortingState(true)}
-            onDragAbort={() => setSortingState(true)}
-            sensors={sensors}
-          >
+          <DndContext id="set-groups" onDragEnd={handleSort} sensors={sensors}>
             <SortableContext
               items={setGroups}
               strategy={verticalListSortingStrategy}
@@ -121,9 +118,9 @@ export const DayCard = ({
                 return (
                   <WorkoutSetGroup
                     key={`set-${setGroup.id}`}
+                    isReorderActive={isReorderActive}
                     setGroup={setGroup}
                     units={units}
-                    isSortingActive={isSortingActive}
                   />
                 );
               })}

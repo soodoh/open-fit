@@ -13,7 +13,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useState } from "react";
-import { TimePicker } from "@mui/x-date-pickers";
+import { TimePicker, DateTimePicker } from "@mui/x-date-pickers";
 import moment, { type Moment } from "moment";
 import { SessionWithSets } from "@/types/workoutSession";
 
@@ -95,7 +95,7 @@ export const EditSessionModal = ({
           // }}
         />
 
-        <TimePicker
+        <DateTimePicker
           label="Start Time"
           value={startTime}
           maxTime={endTime ?? undefined}
@@ -103,7 +103,7 @@ export const EditSessionModal = ({
             setStartTime(newTime);
           }}
         />
-        <TimePicker
+        <DateTimePicker
           label="End Time"
           value={endTime}
           minTime={startTime ?? undefined}

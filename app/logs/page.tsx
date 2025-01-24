@@ -23,9 +23,6 @@ export default async function Sessions() {
         <CreateSessionButton />
 
         <Typography variant="h4" gutterBottom>
-          In Progress
-        </Typography>
-        <Typography variant="h4" gutterBottom>
           Previous Workout Sessions
         </Typography>
 
