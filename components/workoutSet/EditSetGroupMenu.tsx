@@ -1,5 +1,12 @@
 import { useEffect, useState } from "react";
-import { Comment, Delete, MoreHoriz, SquareFoot } from "@mui/icons-material";
+import {
+  Comment,
+  Delete,
+  MoreHoriz,
+  Reorder,
+  SquareFoot,
+  Timer,
+} from "@mui/icons-material";
 import {
   IconButton,
   ListItemIcon,
@@ -19,8 +26,12 @@ enum Modal {
 
 export const EditSetGroupMenu = ({
   setGroup,
+  reorder,
+  onReorder,
 }: {
   setGroup: SetGroupWithSets;
+  reorder: boolean;
+  onReorder: () => void;
 }) => {
   const [modal, setModal] = useState<Modal | null>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -57,6 +68,27 @@ export const EditSetGroupMenu = ({
         disableScrollLock
       >
         <MenuList dense disablePadding>
+          <MenuItem
+            onClick={() => {
+              onReorder();
+              setAnchorEl(null);
+            }}
+          >
+            <ListItemIcon>
+              <Reorder fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>
+              {reorder ? "Hide Reorder" : "Show Reorder"}
+            </ListItemText>
+          </MenuItem>
+
+          <MenuItem onClick={() => setModal(Modal.COMMENT)}>
+            <ListItemIcon>
+              <Timer fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>Set rest timer</ListItemText>
+          </MenuItem>
+
           <MenuItem onClick={() => setModal(Modal.COMMENT)}>
             <ListItemIcon>
               <SquareFoot fontSize="small" />

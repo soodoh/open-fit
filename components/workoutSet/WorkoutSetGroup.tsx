@@ -58,6 +58,7 @@ export const WorkoutSetGroup = ({
     SetWithUnits[]
   >(setGroup.sets, (_, newSets) => newSets);
   const [expanded, setExpanded] = useState(false);
+  const [canReorderSets, setReorderSets] = useState(false);
 
   const exercise = sets[0]?.exercise;
   const setsWithNumber: { set: SetWithUnits; setNum: number }[] =
@@ -104,7 +105,13 @@ export const WorkoutSetGroup = ({
         ref={setNodeRef}
         sx={{ transform: CSS.Transform.toString(transform), transition }}
         secondaryAction={
-          !isReorderActive && <EditSetGroupMenu setGroup={setGroup} />
+          !isReorderActive && (
+            <EditSetGroupMenu
+              setGroup={setGroup}
+              reorder={canReorderSets}
+              onReorder={() => setReorderSets(!canReorderSets)}
+            />
+          )
         }
       >
         <ListItemButton onClick={() => setExpanded(!expanded)}>
@@ -158,6 +165,7 @@ export const WorkoutSetGroup = ({
                     set={set}
                     setNum={setNum}
                     units={units}
+                    reorder={canReorderSets}
                   />
                 );
               })}

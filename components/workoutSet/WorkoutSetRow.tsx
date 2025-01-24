@@ -1,16 +1,14 @@
-import { deleteSet } from "@/actions/deleteSet";
 import { editSet } from "@/actions/editSet";
 import type { Units } from "@/actions/getUnits";
 import type { SetWithUnits } from "@/types/workoutSet";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Delete, DragHandle } from "@mui/icons-material";
+import { Check, Delete, DragHandle, MoreVert } from "@mui/icons-material";
 import {
   Box,
   IconButton,
   InputAdornment,
   ListItem,
-  ListItemIcon,
   TextField,
 } from "@mui/material";
 import { SetTypeMenu } from "./SetTypeMenu";
@@ -20,10 +18,12 @@ import { WeightUnitMenu } from "./WeightUnitMenu";
 export const WorkoutSetRow = ({
   set,
   setNum,
+  reorder,
   units,
 }: {
   set: SetWithUnits;
   setNum: number;
+  reorder: boolean;
   units: Units;
 }) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
@@ -32,19 +32,18 @@ export const WorkoutSetRow = ({
   return (
     <ListItem
       dense
-      disablePadding
       ref={setNodeRef}
       sx={{ transform: CSS.Transform.toString(transform), transition }}
     >
-      <ListItemIcon>
+      {reorder && (
         <IconButton
-          sx={{ mx: 2, touchAction: "manipulation" }}
+          sx={{ touchAction: "manipulation" }}
           {...attributes}
           {...listeners}
         >
           <DragHandle />
         </IconButton>
-      </ListItemIcon>
+      )}
 
       <SetTypeMenu set={set} setNum={setNum} />
 
@@ -96,11 +95,15 @@ export const WorkoutSetRow = ({
         />
       </Box>
 
-      <ListItemIcon>
-        <IconButton onClick={() => deleteSet(set.id)}>
-          <Delete />
-        </IconButton>
-      </ListItemIcon>
+      <IconButton
+        onClick={() => editSet({ id: set.id, completed: !set.completed })}
+      >
+        <Check />
+      </IconButton>
+      {/* TODO add delete & setRestTimer */}
+      <IconButton>
+        <MoreVert />
+      </IconButton>
     </ListItem>
   );
 };

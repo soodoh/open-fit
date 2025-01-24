@@ -25,15 +25,16 @@ model User {
   role     Role
   password String
 
-  Routine                 Routine[]
+  routine Routine[]
+  session WorkoutSession[]
+
   defaultRepetitionUnit   RepetitionUnit @relation(fields: [defaultRepetitionUnitId], references: [id])
   defaultRepetitionUnitId Int            @default(1)
   defaultWeightUnit       WeightUnit     @relation(fields: [defaultWeightUnitId], references: [id])
   defaultWeightUnitId     Int            @default(1)
 
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  WorkoutSession WorkoutSession[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Account {
