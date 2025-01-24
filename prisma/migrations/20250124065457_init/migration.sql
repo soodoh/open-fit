@@ -5,7 +5,10 @@ CREATE TYPE "Role" AS ENUM ('USER', 'ADMIN');
 CREATE TYPE "Weekday" AS ENUM ('MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY');
 
 -- CreateEnum
-CREATE TYPE "SetGroupType" AS ENUM ('NORMAL', 'SUPERSET', 'DROPSET', 'MYO');
+CREATE TYPE "SetGroupType" AS ENUM ('NORMAL', 'SUPERSET');
+
+-- CreateEnum
+CREATE TYPE "SetType" AS ENUM ('NORMAL', 'WARMUP', 'DROPSET', 'FAILURE');
 
 -- CreateEnum
 CREATE TYPE "ExerciseForce" AS ENUM ('push', 'pull', 'static');
@@ -104,7 +107,8 @@ CREATE TABLE "RoutineDay" (
 -- CreateTable
 CREATE TABLE "WorkoutSetGroup" (
     "id" SERIAL NOT NULL,
-    "routineDayId" INTEGER NOT NULL,
+    "routineDayId" INTEGER,
+    "sessionId" INTEGER,
     "type" "SetGroupType" NOT NULL DEFAULT 'NORMAL',
     "order" INTEGER NOT NULL,
     "comment" TEXT,
@@ -115,6 +119,7 @@ CREATE TABLE "WorkoutSetGroup" (
 -- CreateTable
 CREATE TABLE "WorkoutSet" (
     "id" SERIAL NOT NULL,
+    "type" "SetType" NOT NULL DEFAULT 'NORMAL',
     "setGroupId" INTEGER NOT NULL,
     "exerciseId" INTEGER NOT NULL,
     "reps" INTEGER NOT NULL,
@@ -122,6 +127,8 @@ CREATE TABLE "WorkoutSet" (
     "weight" DOUBLE PRECISION NOT NULL DEFAULT 0,
     "weightUnitId" INTEGER NOT NULL,
     "order" INTEGER NOT NULL,
+    "restTime" INTEGER NOT NULL DEFAULT 0,
+    "completed" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "WorkoutSet_pkey" PRIMARY KEY ("id")
 );
@@ -159,23 +166,24 @@ CREATE TABLE "WeightUnit" (
     CONSTRAINT "WeightUnit_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "WorkoutSession" (
+    "id" SERIAL NOT NULL,
+    "name" TEXT NOT NULL,
+    "impression" INTEGER,
+    "notes" TEXT NOT NULL,
+    "startTime" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "endTime" TIMESTAMP(3),
+    "userId" TEXT NOT NULL,
+
+    CONSTRAINT "WorkoutSession_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Session_sessionToken_key" ON "Session"("sessionToken");
-
--- CreateIndex
-CREATE INDEX "WorkoutSetGroup_routineDayId_idx" ON "WorkoutSetGroup"("routineDayId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "WorkoutSetGroup_routineDayId_order_key" ON "WorkoutSetGroup"("routineDayId", "order");
-
--- CreateIndex
-CREATE INDEX "WorkoutSet_setGroupId_idx" ON "WorkoutSet"("setGroupId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "WorkoutSet_setGroupId_order_key" ON "WorkoutSet"("setGroupId", "order");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Exercise_name_key" ON "Exercise"("name");
@@ -199,16 +207,19 @@ ALTER TABLE "Account" ADD CONSTRAINT "Account_userId_fkey" FOREIGN KEY ("userId"
 ALTER TABLE "Session" ADD CONSTRAINT "Session_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Routine" ADD CONSTRAINT "Routine_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Routine" ADD CONSTRAINT "Routine_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "RoutineDay" ADD CONSTRAINT "RoutineDay_routineId_fkey" FOREIGN KEY ("routineId") REFERENCES "Routine"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "RoutineDay" ADD CONSTRAINT "RoutineDay_routineId_fkey" FOREIGN KEY ("routineId") REFERENCES "Routine"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "WorkoutSetGroup" ADD CONSTRAINT "WorkoutSetGroup_routineDayId_fkey" FOREIGN KEY ("routineDayId") REFERENCES "RoutineDay"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "WorkoutSetGroup" ADD CONSTRAINT "WorkoutSetGroup_routineDayId_fkey" FOREIGN KEY ("routineDayId") REFERENCES "RoutineDay"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "WorkoutSet" ADD CONSTRAINT "WorkoutSet_setGroupId_fkey" FOREIGN KEY ("setGroupId") REFERENCES "WorkoutSetGroup"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "WorkoutSetGroup" ADD CONSTRAINT "WorkoutSetGroup_sessionId_fkey" FOREIGN KEY ("sessionId") REFERENCES "WorkoutSession"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "WorkoutSet" ADD CONSTRAINT "WorkoutSet_setGroupId_fkey" FOREIGN KEY ("setGroupId") REFERENCES "WorkoutSetGroup"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "WorkoutSet" ADD CONSTRAINT "WorkoutSet_exerciseId_fkey" FOREIGN KEY ("exerciseId") REFERENCES "Exercise"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -218,3 +229,6 @@ ALTER TABLE "WorkoutSet" ADD CONSTRAINT "WorkoutSet_repetitionUnitId_fkey" FOREI
 
 -- AddForeignKey
 ALTER TABLE "WorkoutSet" ADD CONSTRAINT "WorkoutSet_weightUnitId_fkey" FOREIGN KEY ("weightUnitId") REFERENCES "WeightUnit"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "WorkoutSession" ADD CONSTRAINT "WorkoutSession_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

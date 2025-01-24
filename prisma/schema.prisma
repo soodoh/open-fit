@@ -108,8 +108,6 @@ model RoutineDay {
 enum SetGroupType {
   NORMAL
   SUPERSET
-  DROPSET
-  MYO
 }
 
 model WorkoutSetGroup {
@@ -124,8 +122,16 @@ model WorkoutSetGroup {
   comment      String?
 }
 
+enum SetType {
+  NORMAL
+  WARMUP
+  DROPSET
+  FAILURE
+}
+
 model WorkoutSet {
   id               Int             @id @default(autoincrement())
+  type             SetType         @default(NORMAL)
   setGroup         WorkoutSetGroup @relation(fields: [setGroupId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   setGroupId       Int
   exercise         Exercise        @relation(fields: [exerciseId], references: [id])

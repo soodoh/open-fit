@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { SetGroupWithSets } from "@/types/workoutSet";
 import { EditSetCommentModal } from "./EditSetCommentModal";
-import { DeleteSetGroupModal } from "./DeleteSetGroupModal";
+import { DeleteSetGroupModal } from "../routines/DeleteSetGroupModal";
 
 enum Modal {
   COMMENT = "comment",

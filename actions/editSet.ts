@@ -5,10 +5,7 @@ import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
 import type { WorkoutSet } from "@prisma/client";
 
-type EditSetParams = Pick<WorkoutSet, "id"> &
-  Partial<
-    Pick<WorkoutSet, "weight" | "reps" | "weightUnitId" | "repetitionUnitId">
-  >;
+type EditSetParams = Pick<WorkoutSet, "id"> & Partial<WorkoutSet>;
 
 export async function editSet({
   id,

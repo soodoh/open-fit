@@ -34,7 +34,7 @@ import { reorderSetGroups } from "@/actions/reorderSetGroups";
 import type { RoutineDayWithSets } from "@/types/routineDay";
 import type { SetGroupWithSets } from "@/types/workoutSet";
 import type { Units } from "@/actions/getUnits";
-import { WorkoutSetGroup } from "./WorkoutSetGroup";
+import { WorkoutSetGroup } from "../workoutSet/WorkoutSetGroup";
 import { Settings } from "@mui/icons-material";
 
 export const DayCard = ({

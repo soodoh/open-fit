@@ -17,7 +17,6 @@ async function main() {
   // Repetition Units
   for (const repetitionUnit of [
     "Repetitions",
-    "Until Failure",
     "Seconds",
     "Minutes",
     "Miles",
@@ -32,7 +31,7 @@ async function main() {
     });
   }
   // Weight Units
-  for (const weightUnit of ["lb", "kg", "Body Weight", "Plates"]) {
+  for (const weightUnit of ["lb", "kg", "Body Weight"]) {
     await prisma.weightUnit.upsert({
       where: { name: weightUnit },
       update: {},

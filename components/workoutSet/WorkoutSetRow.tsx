@@ -6,16 +6,19 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Delete, DragHandle, MoreVert } from "@mui/icons-material";
 import {
+  Avatar,
   Box,
   IconButton,
   InputAdornment,
   ListItem,
+  ListItemAvatar,
   ListItemIcon,
   Menu,
   MenuItem,
   TextField,
 } from "@mui/material";
 import { useState } from "react";
+import { SetType } from "@prisma/client";
 
 export const WorkoutSetRow = ({
   set,
@@ -30,6 +33,7 @@ export const WorkoutSetRow = ({
   const [weightUnitMenu, setWeightUnitMenu] = useState<null | HTMLElement>(
     null,
   );
+  const [setTypeMenu, setSetTypeMenu] = useState<null | HTMLElement>(null);
 
   return (
     <ListItem
@@ -47,6 +51,42 @@ export const WorkoutSetRow = ({
           <DragHandle />
         </IconButton>
       </ListItemIcon>
+
+      <ListItemAvatar
+        id={`${set.id}-set-type-menu-button`}
+        aria-controls={setTypeMenu ? `${set.id}-set-type-menu` : undefined}
+        aria-haspopup="true"
+        aria-expanded={setTypeMenu ? "true" : undefined}
+        onClick={(event) => setSetTypeMenu(event.currentTarget)}
+      >
+        <IconButton onClick={(event) => setSetTypeMenu(event.currentTarget)}>
+          <Avatar>{set.type?.[0] ?? set.order}</Avatar>
+        </IconButton>
+      </ListItemAvatar>
+      <Menu
+        id={`${set.id}-set-type-menu`}
+        anchorEl={setTypeMenu}
+        open={!!setTypeMenu}
+        onClose={() => setSetTypeMenu(null)}
+        MenuListProps={{
+          "aria-labelledby": `${set.id}-set-type-menu-button`,
+        }}
+      >
+        {Object.values(SetType).map((setType) => (
+          <MenuItem
+            key={`set-type-${set.id}-${setType}`}
+            onClick={async () => {
+              await editSet({
+                id: set.id,
+                type: setType,
+              });
+              setSetTypeMenu(null);
+            }}
+          >
+            {setType}
+          </MenuItem>
+        ))}
+      </Menu>
 
       <Box sx={{ display: "flex", gap: 2, my: 1 }}>
         <TextField
