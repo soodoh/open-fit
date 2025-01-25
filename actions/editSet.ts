@@ -17,17 +17,20 @@ export async function editSet({
   }
 
   try {
-    await prisma.workoutSet.update({
+    const newSet = await prisma.workoutSet.update({
       where: { id },
       data: {
         ...newSetData,
       },
     });
+    const parentSetGroup = await prisma.workoutSetGroup.findUnique({
+      where: { id: newSet.setGroupId },
+    });
+    revalidatePath(`/day/${parentSetGroup?.routineDayId}`);
   } catch (error) {
     console.error(error);
     return false;
   }
 
-  revalidatePath("/routines");
   return true;
 }

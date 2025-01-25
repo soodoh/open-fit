@@ -51,14 +51,14 @@ export const SetTypeMenu = ({
   const [setTypeMenu, setSetTypeMenu] = useState<null | HTMLElement>(null);
   return (
     <>
-      <ListItemAvatar
-        id={`${set.id}-set-type-menu-button`}
-        aria-controls={setTypeMenu ? `${set.id}-set-type-menu` : undefined}
-        aria-haspopup="true"
-        aria-expanded={setTypeMenu ? "true" : undefined}
-        onClick={(event) => setSetTypeMenu(event.currentTarget)}
-      >
-        <IconButton onClick={(event) => setSetTypeMenu(event.currentTarget)}>
+      <ListItemAvatar>
+        <IconButton
+          id={`${set.id}-set-type-menu-button`}
+          aria-controls={setTypeMenu ? `${set.id}-set-type-menu` : undefined}
+          aria-haspopup="true"
+          aria-expanded={setTypeMenu ? "true" : undefined}
+          onClick={(event) => setSetTypeMenu(event.currentTarget)}
+        >
           {setTypeIcons[set.type] ?? (
             <Avatar sx={{ width: 32, height: 32 }}>{setNum}</Avatar>
           )}

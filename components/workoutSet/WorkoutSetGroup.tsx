@@ -36,7 +36,11 @@ import {
 } from "@dnd-kit/core";
 import { reorderSets } from "@/actions/reorderSets";
 import { type Units } from "@/actions/getUnits";
-import type { SetGroupWithSets, SetWithUnits } from "@/types/workoutSet";
+import type {
+  SetGroupWithSets,
+  SetWithNumber,
+  SetWithUnits,
+} from "@/types/workoutSet";
 import { createSet } from "@/actions/createSet";
 import { EditSetGroupMenu } from "./EditSetGroupMenu";
 import { SetType } from "@prisma/client";
@@ -61,17 +65,16 @@ export const WorkoutSetGroup = ({
   const [canReorderSets, setReorderSets] = useState(false);
 
   const exercise = sets[0]?.exercise;
-  const setsWithNumber: { set: SetWithUnits; setNum: number }[] =
-    useMemo(() => {
-      let setNum = 1;
-      return sets.reduce((acc, set) => {
-        acc.push({ set, setNum });
-        if (set.type === SetType.NORMAL) {
-          setNum += 1;
-        }
-        return acc;
-      }, []);
-    }, [sets]);
+  const setsWithNumber = useMemo(() => {
+    let setNum = 1;
+    return sets.reduce((acc, set) => {
+      acc.push({ set, setNum });
+      if (set.type === SetType.NORMAL) {
+        setNum += 1;
+      }
+      return acc;
+    }, [] as SetWithNumber[]);
+  }, [sets]);
 
   const mouseSensor = useSensor(MouseSensor);
   const touchSensor = useSensor(TouchSensor);
@@ -110,6 +113,7 @@ export const WorkoutSetGroup = ({
               setGroup={setGroup}
               reorder={canReorderSets}
               onReorder={() => setReorderSets(!canReorderSets)}
+              units={units}
             />
           )
         }

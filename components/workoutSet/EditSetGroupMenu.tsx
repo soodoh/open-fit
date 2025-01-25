@@ -1,12 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  Comment,
-  Delete,
-  MoreHoriz,
-  Reorder,
-  SquareFoot,
-  Timer,
-} from "@mui/icons-material";
+import { Comment, Delete, Edit, MoreHoriz, Reorder } from "@mui/icons-material";
 import {
   IconButton,
   ListItemIcon,
@@ -18,8 +11,11 @@ import {
 import { SetGroupWithSets } from "@/types/workoutSet";
 import { EditSetCommentModal } from "./EditSetCommentModal";
 import { DeleteSetGroupModal } from "../routines/DeleteSetGroupModal";
+import { BulkEditSetModal } from "./BulkEditSetModal";
+import { Units } from "@/actions/getUnits";
 
 enum Modal {
+  BULK_EDIT = "bulkEdit",
   COMMENT = "comment",
   DELETE = "delete",
 }
@@ -28,10 +24,12 @@ export const EditSetGroupMenu = ({
   setGroup,
   reorder,
   onReorder,
+  units,
 }: {
   setGroup: SetGroupWithSets;
   reorder: boolean;
   onReorder: () => void;
+  units: Units;
 }) => {
   const [modal, setModal] = useState<Modal | null>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -55,6 +53,12 @@ export const EditSetGroupMenu = ({
         open={modal === Modal.COMMENT}
         onClose={handleClose}
         setGroup={setGroup}
+      />
+      <BulkEditSetModal
+        open={modal === Modal.BULK_EDIT}
+        onClose={handleClose}
+        setGroup={setGroup}
+        units={units}
       />
 
       <Menu
@@ -82,18 +86,11 @@ export const EditSetGroupMenu = ({
             </ListItemText>
           </MenuItem>
 
-          <MenuItem onClick={() => setModal(Modal.COMMENT)}>
+          <MenuItem onClick={() => setModal(Modal.BULK_EDIT)}>
             <ListItemIcon>
-              <Timer fontSize="small" />
+              <Edit fontSize="small" />
             </ListItemIcon>
-            <ListItemText>Set rest timer</ListItemText>
-          </MenuItem>
-
-          <MenuItem onClick={() => setModal(Modal.COMMENT)}>
-            <ListItemIcon>
-              <SquareFoot fontSize="small" />
-            </ListItemIcon>
-            <ListItemText>Set rep/weight units</ListItemText>
+            <ListItemText>Bulk edit</ListItemText>
           </MenuItem>
 
           <MenuItem onClick={() => setModal(Modal.COMMENT)}>

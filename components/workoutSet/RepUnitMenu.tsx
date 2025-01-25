@@ -1,15 +1,16 @@
-import { editSet } from "@/actions/editSet";
 import type { Units } from "@/actions/getUnits";
-import type { SetWithUnits } from "@/types/workoutSet";
-import { MoreVert } from "@mui/icons-material";
+import { ArrowDropDown } from "@mui/icons-material";
 import { IconButton, Menu, MenuItem } from "@mui/material";
+import type { RepetitionUnit } from "@prisma/client";
 import { useState } from "react";
 
 export const RepUnitMenu = ({
-  set,
+  id,
+  onChange,
   units,
 }: {
-  set: SetWithUnits;
+  id: string | number;
+  onChange: (repUnit: RepetitionUnit) => void;
   units: Units;
 }) => {
   const [repUnitMenu, setRepUnitMenu] = useState<null | HTMLElement>(null);
@@ -18,31 +19,28 @@ export const RepUnitMenu = ({
       <IconButton
         size="medium"
         edge="end"
-        id={`${set.id}-rep-unit-menu-button`}
-        aria-controls={repUnitMenu ? `${set.id}-rep-unit-menu` : undefined}
+        id={`${id}-rep-unit-menu-button`}
+        aria-controls={repUnitMenu ? `${id}-rep-unit-menu` : undefined}
         aria-haspopup="true"
         aria-expanded={repUnitMenu ? "true" : undefined}
         onClick={(event) => setRepUnitMenu(event.currentTarget)}
       >
-        <MoreVert fontSize="small" />
+        <ArrowDropDown fontSize="small" />
       </IconButton>
       <Menu
-        id={`${set.id}-rep-unit-menu`}
+        id={`${id}-rep-unit-menu`}
         anchorEl={repUnitMenu}
         open={!!repUnitMenu}
         onClose={() => setRepUnitMenu(null)}
         MenuListProps={{
-          "aria-labelledby": `${set.id}-rep-unit-menu-button`,
+          "aria-labelledby": `${id}-rep-unit-menu-button`,
         }}
       >
         {units.repetitionUnits.map((unit) => (
           <MenuItem
-            key={`rep-unit-${set.id}-${unit.id}`}
-            onClick={async () => {
-              await editSet({
-                id: set.id,
-                repetitionUnitId: unit.id,
-              });
+            key={`rep-unit-${id}-${unit.id}`}
+            onClick={() => {
+              onChange(unit);
               setRepUnitMenu(null);
             }}
           >
@@ -53,4 +51,3 @@ export const RepUnitMenu = ({
     </>
   );
 };
-

@@ -3,8 +3,9 @@ import type { Units } from "@/actions/getUnits";
 import type { SetWithUnits } from "@/types/workoutSet";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Check, Delete, DragHandle, MoreVert } from "@mui/icons-material";
+import { Check, DragHandle, MoreVert } from "@mui/icons-material";
 import {
+  Avatar,
   Box,
   IconButton,
   InputAdornment,
@@ -14,6 +15,7 @@ import {
 import { SetTypeMenu } from "./SetTypeMenu";
 import { RepUnitMenu } from "./RepUnitMenu";
 import { WeightUnitMenu } from "./WeightUnitMenu";
+import { green, grey } from "@mui/material/colors";
 
 export const WorkoutSetRow = ({
   set,
@@ -35,7 +37,7 @@ export const WorkoutSetRow = ({
       ref={setNodeRef}
       sx={{ transform: CSS.Transform.toString(transform), transition }}
     >
-      {reorder && (
+      {reorder ? (
         <IconButton
           sx={{ touchAction: "manipulation" }}
           {...attributes}
@@ -43,12 +45,18 @@ export const WorkoutSetRow = ({
         >
           <DragHandle />
         </IconButton>
+      ) : (
+        // TODO add delete & setRestTimer
+        <IconButton>
+          <MoreVert fontSize="small" />
+        </IconButton>
       )}
 
       <SetTypeMenu set={set} setNum={setNum} />
 
-      <Box sx={{ display: "flex", gap: 2, my: 1 }}>
+      <Box sx={{ display: "flex", gap: 1, my: 1 }}>
         <TextField
+          key={`reps-${set.id}-${set.reps}`}
           size="small"
           variant="outlined"
           type="string"
@@ -57,7 +65,13 @@ export const WorkoutSetRow = ({
             input: {
               endAdornment: (
                 <InputAdornment position="end">
-                  <RepUnitMenu set={set} units={units} />
+                  <RepUnitMenu
+                    id={set.id}
+                    units={units}
+                    onChange={(repUnit) => {
+                      editSet({ id: set.id, repetitionUnitId: repUnit.id });
+                    }}
+                  />
                 </InputAdornment>
               ),
             },
@@ -72,6 +86,7 @@ export const WorkoutSetRow = ({
         />
 
         <TextField
+          key={`weight-${set.id}-${set.weight}`}
           size="small"
           variant="outlined"
           type="string"
@@ -80,7 +95,13 @@ export const WorkoutSetRow = ({
             input: {
               endAdornment: (
                 <InputAdornment position="end">
-                  <WeightUnitMenu set={set} units={units} />
+                  <WeightUnitMenu
+                    id={set.id}
+                    units={units}
+                    onChange={(weightUnit) => {
+                      editSet({ id: set.id, weightUnitId: weightUnit.id });
+                    }}
+                  />
                 </InputAdornment>
               ),
             },
@@ -93,17 +114,20 @@ export const WorkoutSetRow = ({
             });
           }}
         />
+        <IconButton
+          onClick={() => editSet({ id: set.id, completed: !set.completed })}
+        >
+          <Avatar
+            sx={{
+              bgcolor: set.completed ? green[500] : grey[400],
+              width: 32,
+              height: 32,
+            }}
+          >
+            <Check />
+          </Avatar>
+        </IconButton>
       </Box>
-
-      <IconButton
-        onClick={() => editSet({ id: set.id, completed: !set.completed })}
-      >
-        <Check />
-      </IconButton>
-      {/* TODO add delete & setRestTimer */}
-      <IconButton>
-        <MoreVert />
-      </IconButton>
     </ListItem>
   );
 };

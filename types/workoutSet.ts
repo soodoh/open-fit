@@ -14,3 +14,5 @@ export type SetGroupWithSets =
   Prisma.WorkoutSetGroupGetPayload<SetGroupInclude>;
 
 export type SetWithUnits = Prisma.WorkoutSetGetPayload<SetInclude>;
+
+export type SetWithNumber = { set: SetWithUnits; setNum: number };
