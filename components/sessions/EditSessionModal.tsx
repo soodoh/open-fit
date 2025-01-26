@@ -6,16 +6,21 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  // ListItem,
-  // ListItemText,
+  ListItem,
+  ListItemText,
   Rating,
   TextField,
   Typography,
 } from "@mui/material";
 import { useState } from "react";
-import { TimePicker, DateTimePicker } from "@mui/x-date-pickers";
+import { DateTimePicker } from "@mui/x-date-pickers";
 import moment, { type Moment } from "moment";
 import { SessionWithSets } from "@/types/workoutSession";
+import useSWR from "swr";
+import {
+  RoutineDayWithRoutine,
+  searchTemplates,
+} from "@/actions/searchTemplates";
 
 export const EditSessionModal = ({
   session,
@@ -36,6 +41,12 @@ export const EditSessionModal = ({
   const [endTime, setEndTime] = useState<Moment | null>(
     session?.endTime ? moment(session.endTime) : null,
   );
+  const [workoutTemplate, setWorkoutTemplate] =
+    useState<RoutineDayWithRoutine | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const { data: options, isLoading } = useSWR(searchTerm, searchTemplates, {
+    keepPreviousData: true,
+  });
 
   return (
     <Dialog
@@ -67,32 +78,39 @@ export const EditSessionModal = ({
         <Autocomplete
           sx={{ mt: 2 }}
           fullWidth
-          options={[]}
+          value={workoutTemplate ?? null}
+          inputValue={searchTerm}
+          options={options ?? []}
           autoHighlight
-          // value={workoutValue}
-          // isOptionEqualToValue={(option, value) => option?.id === value?.id}
-          // onChange={(_, newValue) => {
-          //   if (newValue?.id) {
-          //     setWorkout(newValue.id);
-          //   }
-          // }}
+          isOptionEqualToValue={(option, value) => option?.id === value?.id}
+          getOptionLabel={(option) => option?.description ?? "Unknown"}
+          getOptionKey={(option) => `template-${option?.id}`}
+          filterOptions={(option) => option}
+          loading={isLoading}
           noOptionsText="No workouts found"
-          // getOptionKey={(option) => `workout-opt-${option?.id}`}
-          // getOptionLabel={(option) => option?.name || "Loading"}
+          onChange={(_, selectedTemplate) => {
+            setWorkoutTemplate(selectedTemplate);
+          }}
+          onInputChange={(_, newInputValue: string) => {
+            setSearchTerm(newInputValue);
+          }}
           renderInput={(params) => (
             <TextField
               {...params}
-              label="Choose a routine as a template for this session"
-              placeholder="Choose a routine"
+              label="Start from template"
+              placeholder="Empty workout"
             />
           )}
-          // renderOption={({ key, ...optionProps }, option) => {
-          //   return (
-          //     <ListItem key={key} {...optionProps}>
-          //       <ListItemText primary={option?.name} />
-          //     </ListItem>
-          //   );
-          // }}
+          renderOption={({ key, ...optionProps }, option) => {
+            return (
+              <ListItem key={key} {...optionProps}>
+                <ListItemText
+                  primary={option?.description}
+                  secondary={option?.routine?.name}
+                />
+              </ListItem>
+            );
+          }}
         />
 
         <DateTimePicker
@@ -116,7 +134,7 @@ export const EditSessionModal = ({
           <Typography component="legend">General Impression</Typography>
           <Rating
             size="medium"
-            max={3}
+            max={5}
             value={impression}
             onChange={(_, newValue) => {
               if (newValue) {
