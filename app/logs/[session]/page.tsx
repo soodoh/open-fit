@@ -22,8 +22,10 @@ export default async function Page({
     where: { id: sessionId },
     include: {
       setGroups: {
+        orderBy: { order: "asc" },
         include: {
           sets: {
+            orderBy: { order: "asc" },
             include: { exercise: true, repetitionUnit: true, weightUnit: true },
           },
         },

@@ -46,10 +46,12 @@ import { EditSetGroupMenu } from "./EditSetGroupMenu";
 import { SetType } from "@prisma/client";
 
 export const WorkoutSetGroup = ({
+  active,
   setGroup,
   isReorderActive,
   units,
 }: {
+  active: boolean;
   setGroup: SetGroupWithSets;
   isReorderActive: boolean;
   units: Units;
@@ -61,7 +63,9 @@ export const WorkoutSetGroup = ({
     SetWithUnits[],
     SetWithUnits[]
   >(setGroup.sets, (_, newSets) => newSets);
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(
+    active && sets.some((set) => !set.completed),
+  );
   const [canReorderSets, setReorderSets] = useState(false);
 
   const exercise = sets[0]?.exercise;

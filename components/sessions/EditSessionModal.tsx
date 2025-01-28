@@ -47,9 +47,13 @@ export const EditSessionModal = ({
   const [workoutTemplate, setWorkoutTemplate] =
     useState<RoutineDayWithRoutine | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const { data: options, isLoading } = useSWR(searchTerm, searchTemplates, {
-    keepPreviousData: true,
-  });
+  const { data: options, isLoading } = useSWR(
+    { searchTerm },
+    ({ searchTerm }) => searchTemplates(searchTerm),
+    {
+      keepPreviousData: true,
+    },
+  );
 
   return (
     <Dialog
@@ -70,6 +74,7 @@ export const EditSessionModal = ({
             return;
           }
           const sessionData = {
+            templateId: workoutTemplate?.id,
             name,
             startTime: startTime?.toDate(),
             endTime: endTime?.toDate(),
@@ -91,46 +96,44 @@ export const EditSessionModal = ({
 
       <DialogContent>
         <Box sx={{ mt: 1, display: "flex", flexDirection: "column", gap: 2 }}>
-          {!session && (
-            <Autocomplete
-              sx={{ mt: 2 }}
-              fullWidth
-              value={workoutTemplate ?? null}
-              inputValue={searchTerm}
-              options={options ?? []}
-              autoHighlight
-              isOptionEqualToValue={(option, value) => option?.id === value?.id}
-              getOptionLabel={(option) => option?.description ?? "Unknown"}
-              getOptionKey={(option) => `template-${option?.id}`}
-              filterOptions={(option) => option}
-              loading={isLoading}
-              noOptionsText="No workouts found"
-              onChange={(_, selectedTemplate) => {
-                setWorkoutTemplate(selectedTemplate);
-                setName(selectedTemplate?.description ?? "");
-              }}
-              onInputChange={(_, newInputValue: string) => {
-                setSearchTerm(newInputValue);
-              }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Start from template"
-                  placeholder="Empty workout"
-                />
-              )}
-              renderOption={({ key, ...optionProps }, option) => {
-                return (
-                  <ListItem key={key} {...optionProps}>
-                    <ListItemText
-                      primary={option?.description}
-                      secondary={option?.routine?.name}
-                    />
-                  </ListItem>
-                );
-              }}
-            />
-          )}
+          <Autocomplete
+            sx={{ mt: 2 }}
+            fullWidth
+            value={workoutTemplate ?? null}
+            inputValue={searchTerm}
+            options={options ?? []}
+            autoHighlight
+            isOptionEqualToValue={(option, value) => option?.id === value?.id}
+            getOptionLabel={(option) => option?.description ?? "Unknown"}
+            getOptionKey={(option) => `template-${option?.id}`}
+            filterOptions={(option) => option}
+            loading={isLoading}
+            noOptionsText="No workouts found"
+            onChange={(_, selectedTemplate) => {
+              setWorkoutTemplate(selectedTemplate);
+              setName(selectedTemplate?.description ?? "");
+            }}
+            onInputChange={(_, newInputValue: string) => {
+              setSearchTerm(newInputValue);
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Use Template"
+                placeholder="Empty workout"
+              />
+            )}
+            renderOption={({ key, ...optionProps }, option) => {
+              return (
+                <ListItem key={key} {...optionProps}>
+                  <ListItemText
+                    primary={option?.description}
+                    secondary={option?.routine?.name}
+                  />
+                </ListItem>
+              );
+            }}
+          />
 
           <TextField
             variant="outlined"

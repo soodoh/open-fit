@@ -20,10 +20,12 @@ import { WorkoutSetGroup } from "./WorkoutSetGroup";
 import { Units } from "@/actions/getUnits";
 
 export const WorkoutList = ({
+  active = false,
   reorder,
   setGroups,
   units,
 }: {
+  active?: boolean;
   reorder: boolean;
   setGroups: SetGroupWithSets[];
   units: Units;
@@ -68,6 +70,7 @@ export const WorkoutList = ({
           {optimisticSetGroups.map((setGroup) => {
             return (
               <WorkoutSetGroup
+                active={active}
                 key={`set-${setGroup.id}`}
                 isReorderActive={reorder}
                 setGroup={setGroup}

@@ -8,33 +8,15 @@ import {
   Chip,
   FormControlLabel,
   FormGroup,
-  List,
   Switch,
   Typography,
 } from "@mui/material";
 import { EditDayMenu } from "./EditDayMenu";
 import moment from "moment";
-import {
-  DndContext,
-  DragEndEvent,
-  KeyboardSensor,
-  MouseSensor,
-  TouchSensor,
-  useSensor,
-  useSensors,
-} from "@dnd-kit/core";
-import {
-  arrayMove,
-  SortableContext,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
 import { AddExerciseRow } from "./AddExerciseRow";
-import { useOptimistic, useState, useTransition } from "react";
-import { reorderSetGroups } from "@/actions/reorderSetGroups";
+import { useState } from "react";
 import type { RoutineDayWithSets } from "@/types/routineDay";
-import type { SetGroupWithSets } from "@/types/workoutSet";
 import type { Units } from "@/actions/getUnits";
-import { WorkoutSetGroup } from "../workoutSet/WorkoutSetGroup";
 import { Settings } from "@mui/icons-material";
 import { WorkoutList } from "../workoutSet/WorkoutList";
 

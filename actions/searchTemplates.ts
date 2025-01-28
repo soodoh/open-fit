@@ -13,7 +13,12 @@ export async function searchTemplates(
   const formattedSearchTerm = searchTerm.trim().split(/\s+/).join(" & ");
   if (!formattedSearchTerm) {
     // TODO show most popular items if no searchTerm present?
-    return [];
+    const firstTemplates = await prisma.routineDay.findMany({
+      // orderBy: { createdAt: "desc" },
+      // limit: 10,
+      include: { routine: true },
+    });
+    return firstTemplates;
   }
   const searchQuery = `${formattedSearchTerm}:*`;
 

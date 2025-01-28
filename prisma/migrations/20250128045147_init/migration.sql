@@ -100,6 +100,8 @@ CREATE TABLE "RoutineDay" (
     "routineId" INTEGER NOT NULL,
     "weekdays" "Weekday"[],
     "description" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "RoutineDay_pkey" PRIMARY KEY ("id")
 );
@@ -174,6 +176,7 @@ CREATE TABLE "WorkoutSession" (
     "notes" TEXT NOT NULL,
     "startTime" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "endTime" TIMESTAMP(3),
+    "templateId" INTEGER,
     "userId" TEXT NOT NULL,
 
     CONSTRAINT "WorkoutSession_pkey" PRIMARY KEY ("id")
@@ -229,6 +232,9 @@ ALTER TABLE "WorkoutSet" ADD CONSTRAINT "WorkoutSet_repetitionUnitId_fkey" FOREI
 
 -- AddForeignKey
 ALTER TABLE "WorkoutSet" ADD CONSTRAINT "WorkoutSet_weightUnitId_fkey" FOREIGN KEY ("weightUnitId") REFERENCES "WeightUnit"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "WorkoutSession" ADD CONSTRAINT "WorkoutSession_templateId_fkey" FOREIGN KEY ("templateId") REFERENCES "RoutineDay"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "WorkoutSession" ADD CONSTRAINT "WorkoutSession_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

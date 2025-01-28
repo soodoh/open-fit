@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  List,
   Card,
   CardContent,
   CardHeader,
@@ -18,7 +17,6 @@ import moment from "moment";
 import { useState } from "react";
 import { EditSessionMenu } from "./EditSessionMenu";
 import type { SessionWithSets } from "@/types/workoutSession";
-import { WorkoutSetGroup } from "../workoutSet/WorkoutSetGroup";
 import { Units } from "@/actions/getUnits";
 import { WorkoutList } from "../workoutSet/WorkoutList";
 
@@ -96,6 +94,7 @@ export const SessionPage = ({
       </CardContent>
 
       <WorkoutList
+        active
         reorder={isReorderActive}
         setGroups={session.setGroups}
         units={units}

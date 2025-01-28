@@ -27,13 +27,11 @@ export const BulkEditSetModal = ({
   units: Units;
   setGroup: SetGroupWithSets;
 }) => {
-  const [reps, setReps] = useState<string>(`${setGroup.sets[0].reps}` || "");
+  const [reps, setReps] = useState<string>("");
   const [repUnit, setRepUnit] = useState<RepetitionUnit>(
     setGroup.sets[0].repetitionUnit,
   );
-  const [weight, setWeight] = useState<string>(
-    `${setGroup.sets[0].weight}` || "",
-  );
+  const [weight, setWeight] = useState<string>("");
   const [weightUnit, setWeightUnit] = useState<WeightUnit>(
     setGroup.sets[0].weightUnit,
   );
@@ -55,6 +53,7 @@ export const BulkEditSetModal = ({
             type="string"
             label={repUnit.name}
             value={reps}
+            placeholder={`${setGroup.sets[0].reps}`}
             onChange={(event) => setReps(event.target.value)}
             slotProps={{
               input: {
@@ -77,6 +76,7 @@ export const BulkEditSetModal = ({
             type="string"
             label={weightUnit.name}
             value={weight}
+            placeholder={`${setGroup.sets[0].weight}`}
             onChange={(event) => setWeight(event.target.value)}
             slotProps={{
               input: {
@@ -99,8 +99,9 @@ export const BulkEditSetModal = ({
         <Button
           onClick={async () => {
             await bulkEditSets(setGroup.id, {
-              reps: parseInt(reps, 10) || 0,
-              weight: parseInt(weight, 10) || 0,
+              // If empty string, leave unchanged (undefined)
+              reps: reps ? parseInt(reps, 10) : undefined,
+              weight: weight ? parseInt(weight, 10) : undefined,
               repetitionUnitId: repUnit.id,
               weightUnitId: weightUnit.id,
             });

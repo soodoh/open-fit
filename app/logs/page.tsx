@@ -16,7 +16,6 @@ export default async function Sessions() {
     where: { userId: session.user.id },
     include: { setGroups: { include: { sets: true } } },
   });
-  console.log(sessions);
 
   return (
     <>

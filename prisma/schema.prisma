@@ -98,12 +98,15 @@ enum Weekday {
 }
 
 model RoutineDay {
-  id          Int               @id @default(autoincrement())
-  routine     Routine           @relation(fields: [routineId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  routineId   Int
-  weekdays    Weekday[]
-  description String
-  setGroups   WorkoutSetGroup[]
+  id             Int               @id @default(autoincrement())
+  routine        Routine           @relation(fields: [routineId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  routineId      Int
+  weekdays       Weekday[]
+  description    String
+  setGroups      WorkoutSetGroup[]
+  WorkoutSession WorkoutSession[]
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
 }
 
 enum SetGroupType {
@@ -247,6 +250,8 @@ model WorkoutSession {
   startTime  DateTime          @default(now())
   endTime    DateTime?
   setGroups  WorkoutSetGroup[]
+  template   RoutineDay?       @relation(fields: [templateId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  templateId Int?
   user       User              @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId     String
 }
