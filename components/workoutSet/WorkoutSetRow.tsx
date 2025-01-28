@@ -61,6 +61,7 @@ export const WorkoutSetRow = ({
           variant="outlined"
           type="string"
           label={set.repetitionUnit.name}
+          disabled={set.completed}
           slotProps={{
             input: {
               endAdornment: (
@@ -91,6 +92,7 @@ export const WorkoutSetRow = ({
           variant="outlined"
           type="string"
           label={set.weightUnit.name}
+          disabled={set.completed}
           slotProps={{
             input: {
               endAdornment: (

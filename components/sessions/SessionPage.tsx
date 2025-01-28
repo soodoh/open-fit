@@ -1,10 +1,5 @@
 "use client";
-import { useAuthedSWR } from "@/lib/fetcher";
-import { useSessionDuration } from "@/lib/useSessionDuration";
-import { Workout } from "@/types/privateApi/workout";
-import { WorkoutLog } from "@/types/privateApi/workoutLog";
-import { WorkoutSession } from "@/types/privateApi/workoutSession";
-import { PaginatedResponse } from "@/types/response";
+
 import {
   List,
   Card,
@@ -15,32 +10,33 @@ import {
   Typography,
   Grid2 as Grid,
   Divider,
+  FormGroup,
+  FormControlLabel,
+  Switch,
 } from "@mui/material";
 import moment from "moment";
-import { useMemo } from "react";
-import { SessionLogItem } from "./SessionLogItem";
+import { useState } from "react";
 import { EditSessionMenu } from "./EditSessionMenu";
-import { getSession, getWorkout, getWorkoutLogs } from "@/lib/urls";
-import { AddLogRow } from "./AddLogRow";
+import type { SessionWithSets } from "@/types/workoutSession";
+import { WorkoutSetGroup } from "../workoutSet/WorkoutSetGroup";
+import { Units } from "@/actions/getUnits";
+import { WorkoutList } from "../workoutSet/WorkoutList";
 
-export const SessionPage = ({ sessionId }: { sessionId: number }) => {
-  const { data: session } = useAuthedSWR<WorkoutSession>(getSession(sessionId));
-  const { data: workout } = useAuthedSWR<Workout>(getWorkout(session?.workout));
-  const { data: workoutLogs } = useAuthedSWR<PaginatedResponse<WorkoutLog>>(
-    getWorkoutLogs(session?.date),
-  );
-  const exerciseLogGroups = useMemo(() => {
-    const exerciseMap = new Map();
-    for (const log of workoutLogs?.results ?? []) {
-      if (!exerciseMap.has(log.exercise_base)) {
-        exerciseMap.set(log.exercise_base, []);
-      }
-      exerciseMap.get(log.exercise_base).push(log);
-    }
-    return Array.from(exerciseMap.entries());
-  }, [workoutLogs]);
-
-  const durationString = useSessionDuration(sessionId);
+export const SessionPage = ({
+  session,
+  units,
+}: {
+  session: SessionWithSets;
+  units: Units;
+}) => {
+  const [isReorderActive, setReorderActive] = useState(false);
+  const durationDate =
+    session.startTime && session.endTime
+      ? moment.duration(moment(session.endTime).diff(moment(session.startTime)))
+      : null;
+  const durationString = durationDate
+    ? `${durationDate.hours()} hours, ${durationDate.minutes()} mins`
+    : "Not entered";
 
   return (
     <Card>
@@ -48,15 +44,15 @@ export const SessionPage = ({ sessionId }: { sessionId: number }) => {
         title={
           <>
             <Typography variant="h4" gutterBottom>
-              {workout?.name || "Unknown Routine"}
+              {session.name}
             </Typography>
             <Chip
               variant="outlined"
-              label={moment(session?.date).format("MM/DD/YYYY")}
+              label={moment(session.startTime).format("MM/DD/YYYY")}
             />
           </>
         }
-        action={<EditSessionMenu sessionId={sessionId} />}
+        action={<EditSessionMenu session={session} />}
         disableTypography
       />
 
@@ -72,15 +68,10 @@ export const SessionPage = ({ sessionId }: { sessionId: number }) => {
             <Typography variant="subtitle1" component="legend">
               General Impression
             </Typography>
-            <Rating
-              size="large"
-              max={3}
-              value={session?.impression ? parseInt(session.impression) : null}
-              readOnly
-            />
+            <Rating size="large" max={5} value={session.impression} readOnly />
           </Grid>
 
-          {session?.notes && (
+          {session.notes && (
             <Grid size={{ xs: 12, sm: 4 }}>
               <Typography variant="subtitle1">Notes</Typography>
               <Typography variant="subtitle2">{session.notes}</Typography>
@@ -91,19 +82,24 @@ export const SessionPage = ({ sessionId }: { sessionId: number }) => {
       <Divider />
 
       <CardContent>
-        <AddLogRow sessionId={sessionId} />
+        <FormGroup>
+          <FormControlLabel
+            control={
+              <Switch
+                value={isReorderActive}
+                onChange={(event) => setReorderActive(event.target.checked)}
+              />
+            }
+            label="Reorder Sets"
+          />
+        </FormGroup>
       </CardContent>
 
-      <List disablePadding>
-        {exerciseLogGroups.map(([exerciseBaseId, logs]) => (
-          <SessionLogItem
-            key={`exercise-${exerciseBaseId}`}
-            exerciseBaseId={exerciseBaseId}
-            sessionId={sessionId}
-            logs={logs}
-          />
-        ))}
-      </List>
+      <WorkoutList
+        reorder={isReorderActive}
+        setGroups={session.setGroups}
+        units={units}
+      />
     </Card>
   );
 };

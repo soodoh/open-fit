@@ -17,13 +17,13 @@ import { EditSessionMenu } from "./EditSessionMenu";
 import { SessionWithSets } from "@/types/workoutSession";
 
 export const SessionSummaryCard = ({
-  session: { id, name, startTime, endTime, impression, notes },
+  session,
 }: {
   session: SessionWithSets;
 }) => {
   const durationDate =
-    startTime && endTime
-      ? moment.duration(moment(endTime).diff(moment(startTime)))
+    session.startTime && session.endTime
+      ? moment.duration(moment(session.endTime).diff(moment(session.startTime)))
       : null;
   const durationString = durationDate
     ? `${durationDate.hours()} hours, ${durationDate.minutes()} mins`
@@ -41,16 +41,16 @@ export const SessionSummaryCard = ({
         title={
           <>
             <Typography variant="h6" gutterBottom sx={{ mr: 2 }}>
-              {name}
+              {session.name}
             </Typography>
             <Chip
               variant="outlined"
-              label={moment(startTime).format("MM/DD/YYYY")}
+              label={moment(session.startTime).format("MM/DD/YYYY")}
             />
           </>
         }
         disableTypography
-        action={<EditSessionMenu sessionId={id} />}
+        action={<EditSessionMenu session={session} />}
       />
 
       <CardContent sx={{ py: 0, flexGrow: 1 }}>
@@ -63,8 +63,13 @@ export const SessionSummaryCard = ({
             <ListItemText
               primary="General Impression"
               secondary={
-                impression ? (
-                  <Rating size="small" max={3} value={impression} readOnly />
+                session.impression ? (
+                  <Rating
+                    size="small"
+                    max={5}
+                    value={session.impression}
+                    readOnly
+                  />
                 ) : (
                   "Not rated"
                 )
@@ -72,16 +77,16 @@ export const SessionSummaryCard = ({
             />
           </ListItem>
 
-          {notes && (
+          {session.notes && (
             <ListItem disableGutters>
-              <ListItemText primary="Notes" secondary={notes} />
+              <ListItemText primary="Notes" secondary={session.notes} />
             </ListItem>
           )}
         </List>
       </CardContent>
 
       <CardActions sx={{ alignSelf: "flex-end" }}>
-        <Button LinkComponent={Link} href={`/session/${id}`}>
+        <Button LinkComponent={Link} href={`/logs/${session.id}`}>
           View Session
         </Button>
       </CardActions>

@@ -36,6 +36,7 @@ import type { SetGroupWithSets } from "@/types/workoutSet";
 import type { Units } from "@/actions/getUnits";
 import { WorkoutSetGroup } from "../workoutSet/WorkoutSetGroup";
 import { Settings } from "@mui/icons-material";
+import { WorkoutList } from "../workoutSet/WorkoutList";
 
 export const DayCard = ({
   routineDay,
@@ -45,31 +46,6 @@ export const DayCard = ({
   units: Units;
 }) => {
   const [isReorderActive, setReorderActive] = useState(false);
-  const [, startTransition] = useTransition();
-  const [setGroups, optimisticUpdateSetGroups] = useOptimistic<
-    SetGroupWithSets[],
-    SetGroupWithSets[]
-  >(routineDay.setGroups, (_, newSetGroups) => newSetGroups);
-
-  const mouseSensor = useSensor(MouseSensor);
-  const touchSensor = useSensor(TouchSensor);
-  const keyboardSensor = useSensor(KeyboardSensor);
-  const sensors = useSensors(mouseSensor, touchSensor, keyboardSensor);
-
-  const handleSort = (event: DragEndEvent) => {
-    const dragId = event.active.id;
-    const overId = event.over?.id;
-    if (!Number.isInteger(overId) || dragId === overId || !setGroups.length) {
-      return;
-    }
-    const oldIndex = setGroups.findIndex((set) => set.id === dragId);
-    const newIndex = setGroups.findIndex((set) => set.id === overId);
-    const newSetGroups = arrayMove(setGroups, oldIndex, newIndex);
-    startTransition(async () => {
-      optimisticUpdateSetGroups(newSetGroups);
-      await reorderSetGroups(newSetGroups);
-    });
-  };
 
   return (
     <>
@@ -108,25 +84,11 @@ export const DayCard = ({
           </FormGroup>
         </CardContent>
 
-        <List dense disablePadding>
-          <DndContext id="set-groups" onDragEnd={handleSort} sensors={sensors}>
-            <SortableContext
-              items={setGroups}
-              strategy={verticalListSortingStrategy}
-            >
-              {setGroups.map((setGroup) => {
-                return (
-                  <WorkoutSetGroup
-                    key={`set-${setGroup.id}`}
-                    isReorderActive={isReorderActive}
-                    setGroup={setGroup}
-                    units={units}
-                  />
-                );
-              })}
-            </SortableContext>
-          </DndContext>
-        </List>
+        <WorkoutList
+          reorder={isReorderActive}
+          setGroups={routineDay.setGroups}
+          units={units}
+        />
       </Card>
     </>
   );

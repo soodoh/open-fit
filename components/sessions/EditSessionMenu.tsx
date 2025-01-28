@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Delete, Edit, MoreVert } from "@mui/icons-material";
+import { Delete, Edit, Settings } from "@mui/icons-material";
 import {
   IconButton,
   ListItemIcon,
@@ -11,13 +11,14 @@ import {
 } from "@mui/material";
 import { EditSessionModal } from "./EditSessionModal";
 import { DeleteSessionModal } from "./DeleteSessionModal";
+import type { SessionWithSets } from "@/types/workoutSession";
 
 enum Modal {
   EDIT = "edit",
   DELETE = "delete",
 }
 
-export const EditSessionMenu = ({ sessionId }: { sessionId?: number }) => {
+export const EditSessionMenu = ({ session }: { session: SessionWithSets }) => {
   const [modal, setModal] = useState<Modal | null>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const menuOpen = Boolean(anchorEl);
@@ -34,18 +35,18 @@ export const EditSessionMenu = ({ sessionId }: { sessionId?: number }) => {
       <DeleteSessionModal
         open={modal === Modal.DELETE}
         onClose={handleClose}
-        sessionId={sessionId}
+        sessionId={session.id}
       />
 
       <EditSessionModal
         open={modal === Modal.EDIT}
         onClose={handleClose}
-        sessionId={sessionId}
+        session={session}
       />
 
       <Menu
-        id={`edit-session-actions-${sessionId}-menu`}
-        aria-labelledby={`edit-day-actions-${sessionId}`}
+        id={`edit-session-actions-${session.id}-menu`}
+        aria-labelledby={`edit-day-actions-${session.id}`}
         open={menuOpen}
         onClose={() => setAnchorEl(null)}
         anchorEl={anchorEl}
@@ -70,10 +71,10 @@ export const EditSessionMenu = ({ sessionId }: { sessionId?: number }) => {
       </Menu>
 
       <IconButton
-        aria-label={`Edit actions for workout session ${sessionId}`}
-        id={`edit-day-actions-${sessionId}`}
+        aria-label={`Edit actions for workout session ${session.id}`}
+        id={`edit-day-actions-${session.id}`}
         aria-controls={
-          menuOpen ? `edit-day-actions-${sessionId}-menu` : undefined
+          menuOpen ? `edit-day-actions-${session.id}-menu` : undefined
         }
         aria-haspopup="true"
         aria-expanded={menuOpen ? "true" : undefined}
@@ -81,7 +82,7 @@ export const EditSessionMenu = ({ sessionId }: { sessionId?: number }) => {
           setAnchorEl(event.currentTarget);
         }}
       >
-        <MoreVert />
+        <Settings />
       </IconButton>
     </>
   );

@@ -21,6 +21,8 @@ import {
   RoutineDayWithRoutine,
   searchTemplates,
 } from "@/actions/searchTemplates";
+import { createSession } from "@/actions/createSession";
+import { editSession } from "@/actions/editSession";
 
 export const EditSessionModal = ({
   session,
@@ -31,6 +33,7 @@ export const EditSessionModal = ({
   session?: SessionWithSets;
   onClose: () => void;
 }) => {
+  const [name, setName] = useState<string>(session?.name ?? "");
   const [notes, setNotes] = useState<string>(session?.notes ?? "");
   const [impression, setImpression] = useState<number | null>(
     session?.impression ?? null,
@@ -66,6 +69,18 @@ export const EditSessionModal = ({
           if (!isStartValid || !isEndValid || !isDurationValid) {
             return;
           }
+          const sessionData = {
+            name,
+            startTime: startTime?.toDate(),
+            endTime: endTime?.toDate(),
+            notes,
+            impression,
+          };
+          if (!session) {
+            createSession(sessionData, workoutTemplate?.id);
+          } else {
+            editSession(session.id, sessionData);
+          }
           onClose();
         },
       }}
@@ -74,83 +89,95 @@ export const EditSessionModal = ({
         {session ? "Edit Workout Session" : "Create Workout Session"}
       </DialogTitle>
 
-      <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-        <Autocomplete
-          sx={{ mt: 2 }}
-          fullWidth
-          value={workoutTemplate ?? null}
-          inputValue={searchTerm}
-          options={options ?? []}
-          autoHighlight
-          isOptionEqualToValue={(option, value) => option?.id === value?.id}
-          getOptionLabel={(option) => option?.description ?? "Unknown"}
-          getOptionKey={(option) => `template-${option?.id}`}
-          filterOptions={(option) => option}
-          loading={isLoading}
-          noOptionsText="No workouts found"
-          onChange={(_, selectedTemplate) => {
-            setWorkoutTemplate(selectedTemplate);
-          }}
-          onInputChange={(_, newInputValue: string) => {
-            setSearchTerm(newInputValue);
-          }}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="Start from template"
-              placeholder="Empty workout"
+      <DialogContent>
+        <Box sx={{ mt: 1, display: "flex", flexDirection: "column", gap: 2 }}>
+          {!session && (
+            <Autocomplete
+              sx={{ mt: 2 }}
+              fullWidth
+              value={workoutTemplate ?? null}
+              inputValue={searchTerm}
+              options={options ?? []}
+              autoHighlight
+              isOptionEqualToValue={(option, value) => option?.id === value?.id}
+              getOptionLabel={(option) => option?.description ?? "Unknown"}
+              getOptionKey={(option) => `template-${option?.id}`}
+              filterOptions={(option) => option}
+              loading={isLoading}
+              noOptionsText="No workouts found"
+              onChange={(_, selectedTemplate) => {
+                setWorkoutTemplate(selectedTemplate);
+                setName(selectedTemplate?.description ?? "");
+              }}
+              onInputChange={(_, newInputValue: string) => {
+                setSearchTerm(newInputValue);
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Start from template"
+                  placeholder="Empty workout"
+                />
+              )}
+              renderOption={({ key, ...optionProps }, option) => {
+                return (
+                  <ListItem key={key} {...optionProps}>
+                    <ListItemText
+                      primary={option?.description}
+                      secondary={option?.routine?.name}
+                    />
+                  </ListItem>
+                );
+              }}
             />
           )}
-          renderOption={({ key, ...optionProps }, option) => {
-            return (
-              <ListItem key={key} {...optionProps}>
-                <ListItemText
-                  primary={option?.description}
-                  secondary={option?.routine?.name}
-                />
-              </ListItem>
-            );
-          }}
-        />
 
-        <DateTimePicker
-          label="Start Time"
-          value={startTime}
-          maxTime={endTime ?? undefined}
-          onChange={(newTime) => {
-            setStartTime(newTime);
-          }}
-        />
-        <DateTimePicker
-          label="End Time"
-          value={endTime}
-          minTime={startTime ?? undefined}
-          onChange={(newTime) => {
-            setEndTime(newTime);
-          }}
-        />
+          <TextField
+            variant="outlined"
+            label="Name"
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+          />
 
-        <Box>
-          <Typography component="legend">General Impression</Typography>
-          <Rating
-            size="medium"
-            max={5}
-            value={impression}
-            onChange={(_, newValue) => {
-              if (newValue) {
-                setImpression(newValue);
-              }
+          <DateTimePicker
+            label="Start Time"
+            value={startTime}
+            maxTime={endTime ?? undefined}
+            onChange={(newTime) => {
+              setStartTime(newTime);
             }}
           />
-        </Box>
+          <DateTimePicker
+            label="End Time"
+            value={endTime}
+            minTime={startTime ?? undefined}
+            onChange={(newTime) => {
+              setEndTime(newTime);
+            }}
+          />
 
-        <TextField
-          multiline
-          rows={4}
-          label="Notes"
-          value={notes}
-          onChange={(event) => setNotes(event.target.value)}
-        />
+          <Box>
+            <Typography component="legend">General Impression</Typography>
+            <Rating
+              size="medium"
+              max={5}
+              value={impression}
+              onChange={(_, newValue) => {
+                if (newValue) {
+                  setImpression(newValue);
+                }
+              }}
+            />
+          </Box>
+
+          <TextField
+            multiline
+            rows={4}
+            label="Notes"
+            value={notes}
+            onChange={(event) => setNotes(event.target.value)}
+          />
+        </Box>
       </DialogContent>
 
       <DialogActions>

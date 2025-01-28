@@ -1,4 +1,6 @@
+import { getUnits } from "@/actions/getUnits";
 import { SessionPage } from "@/components/sessions/SessionPage";
+import { prisma } from "@/lib/prisma";
 import { ArrowBack } from "@mui/icons-material";
 import { Container, Fab } from "@mui/material";
 import Link from "next/link";
@@ -13,7 +15,24 @@ export default async function Page({
   const sessionId = parseInt(sessionParam, 10);
 
   if (Number.isNaN(sessionId)) {
-    redirect("/session");
+    redirect("/logs");
+  }
+
+  const session = await prisma.workoutSession.findUnique({
+    where: { id: sessionId },
+    include: {
+      setGroups: {
+        include: {
+          sets: {
+            include: { exercise: true, repetitionUnit: true, weightUnit: true },
+          },
+        },
+      },
+    },
+  });
+  const units = await getUnits();
+  if (!session) {
+    redirect("/logs");
   }
 
   return (
@@ -23,13 +42,13 @@ export default async function Page({
         color="primary"
         sx={{ gap: 1, mb: 2 }}
         LinkComponent={Link}
-        href="/session"
+        href="/logs"
       >
         <ArrowBack />
-        Sessions
+        Workout Logs
       </Fab>
 
-      <SessionPage sessionId={sessionId} />
+      <SessionPage session={session} units={units} />
     </Container>
   );
 }
