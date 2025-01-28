@@ -18,11 +18,13 @@ import { WeightUnitMenu } from "./WeightUnitMenu";
 import { green, grey } from "@mui/material/colors";
 
 export const WorkoutSetRow = ({
+  active,
   set,
   setNum,
   reorder,
   units,
 }: {
+  active: boolean;
   set: SetWithUnits;
   setNum: number;
   reorder: boolean;
@@ -37,20 +39,21 @@ export const WorkoutSetRow = ({
       ref={setNodeRef}
       sx={{ transform: CSS.Transform.toString(transform), transition }}
     >
-      {reorder ? (
-        <IconButton
-          sx={{ touchAction: "manipulation" }}
-          {...attributes}
-          {...listeners}
-        >
-          <DragHandle />
-        </IconButton>
-      ) : (
+      {
+        !active || reorder ? (
+          <IconButton
+            sx={{ touchAction: "manipulation" }}
+            {...attributes}
+            {...listeners}
+          >
+            <DragHandle />
+          </IconButton>
+        ) : null
         // TODO add delete & setRestTimer
-        <IconButton>
-          <MoreVert fontSize="small" />
-        </IconButton>
-      )}
+        // <IconButton>
+        //   <MoreVert fontSize="small" />
+        // </IconButton>
+      }
 
       <SetTypeMenu set={set} setNum={setNum} />
 
@@ -116,19 +119,21 @@ export const WorkoutSetRow = ({
             });
           }}
         />
-        <IconButton
-          onClick={() => editSet({ id: set.id, completed: !set.completed })}
-        >
-          <Avatar
-            sx={{
-              bgcolor: set.completed ? green[500] : grey[400],
-              width: 32,
-              height: 32,
-            }}
+        {active && (
+          <IconButton
+            onClick={() => editSet({ id: set.id, completed: !set.completed })}
           >
-            <Check />
-          </Avatar>
-        </IconButton>
+            <Avatar
+              sx={{
+                bgcolor: set.completed ? green[500] : grey[400],
+                width: 32,
+                height: 32,
+              }}
+            >
+              <Check />
+            </Avatar>
+          </IconButton>
+        )}
       </Box>
     </ListItem>
   );

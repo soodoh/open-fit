@@ -23,7 +23,13 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { useMemo, useOptimistic, useState, useTransition } from "react";
+import {
+  useEffect,
+  useMemo,
+  useOptimistic,
+  useState,
+  useTransition,
+} from "react";
 import { WorkoutSetRow } from "./WorkoutSetRow";
 import {
   DndContext,
@@ -67,6 +73,12 @@ export const WorkoutSetGroup = ({
     active && sets.some((set) => !set.completed),
   );
   const [canReorderSets, setReorderSets] = useState(false);
+
+  useEffect(() => {
+    if (sets.every((set) => set.completed)) {
+      setExpanded(false);
+    }
+  }, [sets]);
 
   const exercise = sets[0]?.exercise;
   const setsWithNumber = useMemo(() => {
@@ -170,6 +182,7 @@ export const WorkoutSetGroup = ({
                 return (
                   <WorkoutSetRow
                     key={`set-${set.id}`}
+                    active={active}
                     set={set}
                     setNum={setNum}
                     units={units}
