@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { Delete, Edit, Settings } from "@mui/icons-material";
 import {
@@ -11,14 +12,18 @@ import {
 } from "@mui/material";
 import { EditSessionModal } from "./EditSessionModal";
 import { DeleteSessionModal } from "./DeleteSessionModal";
-import type { SessionWithSets } from "@/types/workoutSession";
+import type { SessionWithRelations } from "@/types/workoutSession";
 
 enum Modal {
   EDIT = "edit",
   DELETE = "delete",
 }
 
-export const EditSessionMenu = ({ session }: { session: SessionWithSets }) => {
+export const EditSessionMenu = ({
+  session,
+}: {
+  session: SessionWithRelations;
+}) => {
   const [modal, setModal] = useState<Modal | null>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const menuOpen = Boolean(anchorEl);

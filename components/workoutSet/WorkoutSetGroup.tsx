@@ -43,9 +43,9 @@ import {
 import { reorderSets } from "@/actions/reorderSets";
 import { type Units } from "@/actions/getUnits";
 import type {
-  SetGroupWithSets,
+  SetGroupWithRelations,
   SetWithNumber,
-  SetWithUnits,
+  SetWithRelations,
 } from "@/types/workoutSet";
 import { createSet } from "@/actions/createSet";
 import { EditSetGroupMenu } from "./EditSetGroupMenu";
@@ -58,7 +58,7 @@ export const WorkoutSetGroup = ({
   units,
 }: {
   active: boolean;
-  setGroup: SetGroupWithSets;
+  setGroup: SetGroupWithRelations;
   isReorderActive: boolean;
   units: Units;
 }) => {
@@ -66,8 +66,8 @@ export const WorkoutSetGroup = ({
     useSortable({ id: setGroup.id });
   const [, startTransition] = useTransition();
   const [sets, optimisticUpdateSets] = useOptimistic<
-    SetWithUnits[],
-    SetWithUnits[]
+    SetWithRelations[],
+    SetWithRelations[]
   >(setGroup.sets, (_, newSets) => newSets);
   const [expanded, setExpanded] = useState(
     active && sets.some((set) => !set.completed),

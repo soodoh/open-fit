@@ -10,9 +10,9 @@ export type SetGroupInclude = {
   };
 };
 
-export type SetGroupWithSets =
+export type SetGroupWithRelations =
   Prisma.WorkoutSetGroupGetPayload<SetGroupInclude>;
 
-export type SetWithUnits = Prisma.WorkoutSetGetPayload<SetInclude>;
+export type SetWithRelations = Prisma.WorkoutSetGetPayload<SetInclude>;
 
-export type SetWithNumber = { set: SetWithUnits; setNum: number };
+export type SetWithNumber = { set: SetWithRelations; setNum: number };

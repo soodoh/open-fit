@@ -1,5 +1,5 @@
 import { editSet } from "@/actions/editSet";
-import { SetWithUnits } from "@/types/workoutSet";
+import { SetWithRelations } from "@/types/workoutSet";
 import {
   Avatar,
   IconButton,
@@ -45,7 +45,7 @@ export const SetTypeMenu = ({
   set,
   setNum,
 }: {
-  set: SetWithUnits;
+  set: SetWithRelations;
   setNum: number;
 }) => {
   const [setTypeMenu, setSetTypeMenu] = useState<null | HTMLElement>(null);

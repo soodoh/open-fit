@@ -8,7 +8,7 @@ import {
   MenuItem,
   MenuList,
 } from "@mui/material";
-import { SetGroupWithSets } from "@/types/workoutSet";
+import { SetGroupWithRelations } from "@/types/workoutSet";
 import { EditSetCommentModal } from "./EditSetCommentModal";
 import { DeleteSetGroupModal } from "../routines/DeleteSetGroupModal";
 import { BulkEditSetModal } from "./BulkEditSetModal";
@@ -26,7 +26,7 @@ export const EditSetGroupMenu = ({
   onReorder,
   units,
 }: {
-  setGroup: SetGroupWithSets;
+  setGroup: SetGroupWithRelations;
   reorder: boolean;
   onReorder: () => void;
   units: Units;

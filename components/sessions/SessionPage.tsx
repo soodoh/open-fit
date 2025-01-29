@@ -1,10 +1,6 @@
 "use client";
 
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  Chip,
   Rating,
   Typography,
   Grid2 as Grid,
@@ -12,11 +8,11 @@ import {
   FormGroup,
   FormControlLabel,
   Switch,
+  Container,
 } from "@mui/material";
 import moment from "moment";
 import { useState } from "react";
-import { EditSessionMenu } from "./EditSessionMenu";
-import type { SessionWithSets } from "@/types/workoutSession";
+import type { SessionWithRelations } from "@/types/workoutSession";
 import { Units } from "@/actions/getUnits";
 import { WorkoutList } from "../workoutSet/WorkoutList";
 
@@ -24,10 +20,11 @@ export const SessionPage = ({
   session,
   units,
 }: {
-  session: SessionWithSets;
+  session: SessionWithRelations;
   units: Units;
 }) => {
   const [isReorderActive, setReorderActive] = useState(false);
+
   const durationDate =
     session.startTime && session.endTime
       ? moment.duration(moment(session.endTime).diff(moment(session.startTime)))
@@ -37,26 +34,9 @@ export const SessionPage = ({
     : "Not entered";
 
   return (
-    <Card>
-      <CardHeader
-        title={
-          <>
-            <Typography variant="h4" gutterBottom>
-              {session.name}
-            </Typography>
-            <Chip
-              variant="outlined"
-              label={moment(session.startTime).format("MM/DD/YYYY")}
-            />
-          </>
-        }
-        action={<EditSessionMenu session={session} />}
-        disableTypography
-      />
-
-      <Divider />
-      <CardContent>
-        <Grid container spacing={2}>
+    <>
+      <Container maxWidth="xl">
+        <Grid sx={{ my: 2 }} container spacing={2}>
           <Grid size={{ xs: 12, sm: 4 }}>
             <Typography variant="subtitle1">Duration</Typography>
             <Typography variant="subtitle2">{durationString}</Typography>
@@ -75,30 +55,30 @@ export const SessionPage = ({
               <Typography variant="subtitle2">{session.notes}</Typography>
             </Grid>
           )}
-        </Grid>
-      </CardContent>
-      <Divider />
 
-      <CardContent>
-        <FormGroup>
-          <FormControlLabel
-            control={
-              <Switch
-                value={isReorderActive}
-                onChange={(event) => setReorderActive(event.target.checked)}
+          <Grid size={{ xs: 12 }}>
+            <FormGroup>
+              <FormControlLabel
+                control={
+                  <Switch
+                    value={isReorderActive}
+                    onChange={(event) => setReorderActive(event.target.checked)}
+                  />
+                }
+                label="Reorder Sets"
               />
-            }
-            label="Reorder Sets"
-          />
-        </FormGroup>
-      </CardContent>
+            </FormGroup>
+          </Grid>
+        </Grid>
+      </Container>
 
+      <Divider />
       <WorkoutList
         active
         reorder={isReorderActive}
         setGroups={session.setGroups}
         units={units}
       />
-    </Card>
+    </>
   );
 };

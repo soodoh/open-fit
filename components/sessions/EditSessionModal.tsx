@@ -15,7 +15,7 @@ import {
 import { useState } from "react";
 import { DateTimePicker } from "@mui/x-date-pickers";
 import moment, { type Moment } from "moment";
-import { SessionWithSets } from "@/types/workoutSession";
+import { SessionWithRelations } from "@/types/workoutSession";
 import useSWR from "swr";
 import {
   RoutineDayWithRoutine,
@@ -30,7 +30,7 @@ export const EditSessionModal = ({
   onClose,
 }: {
   open: boolean;
-  session?: SessionWithSets;
+  session?: SessionWithRelations;
   onClose: () => void;
 }) => {
   const [name, setName] = useState<string>(session?.name ?? "");
@@ -45,13 +45,14 @@ export const EditSessionModal = ({
     session?.endTime ? moment(session.endTime) : null,
   );
   const [workoutTemplate, setWorkoutTemplate] =
-    useState<RoutineDayWithRoutine | null>(null);
+    useState<RoutineDayWithRoutine | null>(session?.template ?? null);
   const [searchTerm, setSearchTerm] = useState("");
   const { data: options, isLoading } = useSWR(
     { searchTerm },
     ({ searchTerm }) => searchTemplates(searchTerm),
     {
       keepPreviousData: true,
+      fallbackData: session?.template ? [session.template] : [],
     },
   );
 
@@ -101,7 +102,7 @@ export const EditSessionModal = ({
             fullWidth
             value={workoutTemplate ?? null}
             inputValue={searchTerm}
-            options={options ?? []}
+            options={options}
             autoHighlight
             isOptionEqualToValue={(option, value) => option?.id === value?.id}
             getOptionLabel={(option) => option?.description ?? "Unknown"}
@@ -111,7 +112,9 @@ export const EditSessionModal = ({
             noOptionsText="No workouts found"
             onChange={(_, selectedTemplate) => {
               setWorkoutTemplate(selectedTemplate);
-              setName(selectedTemplate?.description ?? "");
+              if (selectedTemplate?.description) {
+                setName(selectedTemplate.description);
+              }
             }}
             onInputChange={(_, newInputValue: string) => {
               setSearchTerm(newInputValue);

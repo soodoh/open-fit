@@ -1,6 +1,6 @@
 import { editSet } from "@/actions/editSet";
 import type { Units } from "@/actions/getUnits";
-import type { SetWithUnits } from "@/types/workoutSet";
+import type { SetWithRelations } from "@/types/workoutSet";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Check, DragHandle, MoreVert } from "@mui/icons-material";
@@ -25,7 +25,7 @@ export const WorkoutSetRow = ({
   units,
 }: {
   active: boolean;
-  set: SetWithUnits;
+  set: SetWithRelations;
   setNum: number;
   reorder: boolean;
   units: Units;
@@ -39,21 +39,20 @@ export const WorkoutSetRow = ({
       ref={setNodeRef}
       sx={{ transform: CSS.Transform.toString(transform), transition }}
     >
-      {
-        !active || reorder ? (
-          <IconButton
-            sx={{ touchAction: "manipulation" }}
-            {...attributes}
-            {...listeners}
-          >
-            <DragHandle />
-          </IconButton>
-        ) : null
+      {reorder ? (
+        <IconButton
+          sx={{ touchAction: "manipulation" }}
+          {...attributes}
+          {...listeners}
+        >
+          <DragHandle />
+        </IconButton>
+      ) : (
         // TODO add delete & setRestTimer
-        // <IconButton>
-        //   <MoreVert fontSize="small" />
-        // </IconButton>
-      }
+        <IconButton>
+          <MoreVert fontSize="small" />
+        </IconButton>
+      )}
 
       <SetTypeMenu set={set} setNum={setNum} />
 

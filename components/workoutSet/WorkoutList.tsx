@@ -1,5 +1,5 @@
 import { reorderSetGroups } from "@/actions/reorderSetGroups";
-import { SetGroupWithSets } from "@/types/workoutSet";
+import { SetGroupWithRelations } from "@/types/workoutSet";
 import {
   DndContext,
   type DragEndEvent,
@@ -27,13 +27,13 @@ export const WorkoutList = ({
 }: {
   active?: boolean;
   reorder: boolean;
-  setGroups: SetGroupWithSets[];
+  setGroups: SetGroupWithRelations[];
   units: Units;
 }) => {
   const [, startTransition] = useTransition();
   const [optimisticSetGroups, optimisticUpdateSetGroups] = useOptimistic<
-    SetGroupWithSets[],
-    SetGroupWithSets[]
+    SetGroupWithRelations[],
+    SetGroupWithRelations[]
   >(setGroups, (_, newSetGroups) => newSetGroups);
 
   const mouseSensor = useSensor(MouseSensor);

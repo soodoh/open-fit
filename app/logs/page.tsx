@@ -14,7 +14,18 @@ export default async function Sessions() {
   const sessions = await prisma.workoutSession.findMany({
     orderBy: { startTime: "desc" },
     where: { userId: session.user.id },
-    include: { setGroups: { include: { sets: true } } },
+    include: {
+      template: { include: { routine: true } },
+      setGroups: {
+        orderBy: { order: "asc" },
+        include: {
+          sets: {
+            orderBy: { order: "asc" },
+            include: { exercise: true, repetitionUnit: true, weightUnit: true },
+          },
+        },
+      },
+    },
   });
 
   return (

@@ -14,12 +14,12 @@ import {
 import moment from "moment";
 import Link from "next/link";
 import { EditSessionMenu } from "./EditSessionMenu";
-import { SessionWithSets } from "@/types/workoutSession";
+import { SessionWithRelations } from "@/types/workoutSession";
 
 export const SessionSummaryCard = ({
   session,
 }: {
-  session: SessionWithSets;
+  session: SessionWithRelations;
 }) => {
   const durationDate =
     session.startTime && session.endTime

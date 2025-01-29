@@ -1,5 +1,5 @@
 import type { Units } from "@/actions/getUnits";
-import type { SetGroupWithSets } from "@/types/workoutSet";
+import type { SetGroupWithRelations } from "@/types/workoutSet";
 import {
   Box,
   Button,
@@ -25,7 +25,7 @@ export const BulkEditSetModal = ({
   open: boolean;
   onClose: () => void;
   units: Units;
-  setGroup: SetGroupWithSets;
+  setGroup: SetGroupWithRelations;
 }) => {
   const [reps, setReps] = useState<string>("");
   const [repUnit, setRepUnit] = useState<RepetitionUnit>(
