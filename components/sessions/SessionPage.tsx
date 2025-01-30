@@ -10,7 +10,7 @@ import {
   Switch,
   Container,
 } from "@mui/material";
-import moment from "moment";
+import dayjs from "dayjs";
 import { useState } from "react";
 import type { SessionWithRelations } from "@/types/workoutSession";
 import { Units } from "@/actions/getUnits";
@@ -27,7 +27,7 @@ export const SessionPage = ({
 
   const durationDate =
     session.startTime && session.endTime
-      ? moment.duration(moment(session.endTime).diff(moment(session.startTime)))
+      ? dayjs.duration(dayjs(session.endTime).diff(dayjs(session.startTime)))
       : null;
   const durationString = durationDate
     ? `${durationDate.hours()} hours, ${durationDate.minutes()} mins`

@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { DateTimePicker } from "@mui/x-date-pickers";
-import moment, { type Moment } from "moment";
+import dayjs, { type Dayjs } from "dayjs";
 import { SessionWithRelations } from "@/types/workoutSession";
 import useSWR from "swr";
 import {
@@ -38,11 +38,11 @@ export const EditSessionModal = ({
   const [impression, setImpression] = useState<number | null>(
     session?.impression ?? null,
   );
-  const [startTime, setStartTime] = useState<Moment | null>(
-    session?.startTime ? moment(session.startTime) : moment(),
+  const [startTime, setStartTime] = useState<Dayjs | null>(
+    session?.startTime ? dayjs(session.startTime) : dayjs(),
   );
-  const [endTime, setEndTime] = useState<Moment | null>(
-    session?.endTime ? moment(session.endTime) : null,
+  const [endTime, setEndTime] = useState<Dayjs | null>(
+    session?.endTime ? dayjs(session.endTime) : null,
   );
   const [workoutTemplate, setWorkoutTemplate] =
     useState<RoutineDayWithRoutine | null>(session?.template ?? null);
@@ -70,7 +70,7 @@ export const EditSessionModal = ({
           const isEndValid = endTime === null || endTime.isValid();
           // Prevent negative durations (if both are valid dates)
           const isDurationValid =
-            !startTime || !endTime || startTime.isSameOrBefore(endTime);
+            !startTime || !endTime || startTime.isBefore(endTime);
           if (!isStartValid || !isEndValid || !isDurationValid) {
             return;
           }

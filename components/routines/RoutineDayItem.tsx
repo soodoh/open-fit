@@ -7,7 +7,7 @@ import {
   ListItemText,
 } from "@mui/material";
 import { EditDayMenu } from "./EditDayMenu";
-import moment from "moment";
+import dayjs from "dayjs";
 import Link from "next/link";
 import type { RoutineDay } from "@prisma/client";
 import { MoreHoriz } from "@mui/icons-material";
@@ -39,7 +39,7 @@ export const RoutineDayItem = ({ routineDay }: { routineDay: RoutineDay }) => {
                   <Chip
                     key={`${routineDay.id}-${weekday}`}
                     component="span"
-                    label={moment().day(weekday).format("ddd")}
+                    label={dayjs().day(weekday).format("ddd")}
                   />
                 ))}
               </Box>

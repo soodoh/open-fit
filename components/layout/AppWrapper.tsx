@@ -1,10 +1,13 @@
 "use client";
+
 import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
 import { type ReactNode } from "react";
 import { Header } from "./Header";
 import { Roboto } from "next/font/google";
 import { LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
 
 const roboto = Roboto({
   weight: ["300", "400", "500", "700"],
@@ -12,6 +15,8 @@ const roboto = Roboto({
   display: "swap",
   variable: "--font-roboto",
 });
+
+dayjs.extend(duration);
 
 export const AppWrapper = ({ children }: Readonly<{ children: ReactNode }>) => {
   const theme = createTheme({
@@ -39,7 +44,7 @@ export const AppWrapper = ({ children }: Readonly<{ children: ReactNode }>) => {
 
   return (
     <ThemeProvider theme={theme}>
-      <LocalizationProvider dateAdapter={AdapterMoment}>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
         <CssBaseline />
         <Header />
         {children}

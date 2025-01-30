@@ -4,17 +4,16 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
-import type { Weekday } from "@prisma/client";
 
 const DaySchema = z.object({
   description: z.string().min(1, { message: "A description is required." }),
-  weekdays: z.array(z.string()),
+  weekdays: z.array(z.number().min(1).max(7)),
 });
 
 export type DayActionState = {
   data: {
     description: string;
-    weekdays: Weekday[];
+    weekdays: number[];
   };
   errors?: {
     description?: string[];
@@ -24,7 +23,7 @@ export type DayActionState = {
 export async function editDay(
   description: string,
   routineId: number,
-  weekdays: Weekday[],
+  weekdays: number[],
   routineDayId?: number,
 ): Promise<DayActionState> {
   const session = await auth();

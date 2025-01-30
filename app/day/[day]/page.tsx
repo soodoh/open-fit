@@ -5,7 +5,7 @@ import { EditDayMenu } from "@/components/routines/EditDayMenu";
 import { prisma } from "@/lib/prisma";
 import { ArrowBack, Settings } from "@mui/icons-material";
 import { Box, Chip, Container, Fab, Typography } from "@mui/material";
-import moment from "moment";
+import dayjs from "dayjs";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -72,7 +72,7 @@ export default async function Page({
           {routineDay.weekdays.map((weekday) => (
             <Chip
               key={`day-${routineDay.id}-weekday-${weekday}`}
-              label={moment(weekday, "dddd").format("dddd")}
+              label={dayjs().day(weekday).format("dddd")}
             />
           ))}
         </Box>

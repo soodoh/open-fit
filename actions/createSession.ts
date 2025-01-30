@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
 import { WorkoutSession } from "@prisma/client";
-import moment from "moment";
+import dayjs from "dayjs";
 
 export async function createSession(
   newSessionData: Partial<WorkoutSession>,
@@ -22,7 +22,7 @@ export async function createSession(
         userId: session.user.id,
         name: newSessionData.name ?? "",
         notes: newSessionData.notes ?? "",
-        startTime: newSessionData.startTime ?? moment().toISOString(),
+        startTime: newSessionData.startTime ?? dayjs().toISOString(),
       },
     });
     revalidatePath("/logs");

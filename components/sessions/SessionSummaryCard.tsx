@@ -11,7 +11,7 @@ import {
   Rating,
   Typography,
 } from "@mui/material";
-import moment from "moment";
+import dayjs from "dayjs";
 import Link from "next/link";
 import { EditSessionMenu } from "./EditSessionMenu";
 import { SessionWithRelations } from "@/types/workoutSession";
@@ -23,7 +23,7 @@ export const SessionSummaryCard = ({
 }) => {
   const durationDate =
     session.startTime && session.endTime
-      ? moment.duration(moment(session.endTime).diff(moment(session.startTime)))
+      ? dayjs.duration(dayjs(session.endTime).diff(dayjs(session.startTime)))
       : null;
   const durationString = durationDate
     ? `${durationDate.hours()} hours, ${durationDate.minutes()} mins`
@@ -45,7 +45,7 @@ export const SessionSummaryCard = ({
             </Typography>
             <Chip
               variant="outlined"
-              label={moment(session.startTime).format("MM/DD/YYYY")}
+              label={dayjs(session.startTime).format("MM/DD/YYYY")}
             />
           </>
         }

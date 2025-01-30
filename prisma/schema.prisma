@@ -87,21 +87,11 @@ model Routine {
   routineDays RoutineDay[]
 }
 
-enum Weekday {
-  MONDAY
-  TUESDAY
-  WEDNESDAY
-  THURSDAY
-  FRIDAY
-  SATURDAY
-  SUNDAY
-}
-
 model RoutineDay {
   id             Int               @id @default(autoincrement())
   routine        Routine           @relation(fields: [routineId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   routineId      Int
-  weekdays       Weekday[]
+  weekdays       Int[]
   description    String
   setGroups      WorkoutSetGroup[]
   WorkoutSession WorkoutSession[]

@@ -1,4 +1,4 @@
-import moment from "moment";
+import dayjs from "dayjs";
 import { Typography, Card, CardHeader, List, Divider } from "@mui/material";
 import { EditRoutineMenu } from "./EditRoutineMenu";
 import type { Prisma } from "@prisma/client";
@@ -20,7 +20,7 @@ export async function RoutineCard({
               <Typography variant="subtitle2">{routine.description}</Typography>
             )}
             <Typography variant="caption" gutterBottom>
-              {`Last Updated: ${moment(routine.updatedAt).format("MM/DD/YYYY")}`}
+              {`Last Updated: ${dayjs(routine.updatedAt).format("MM/DD/YYYY")}`}
             </Typography>
           </>
         }

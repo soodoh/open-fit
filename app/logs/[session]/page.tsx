@@ -4,7 +4,7 @@ import { SessionPage } from "@/components/sessions/SessionPage";
 import { prisma } from "@/lib/prisma";
 import { ArrowBack } from "@mui/icons-material";
 import { Box, Chip, Container, Fab, Typography } from "@mui/material";
-import moment from "moment";
+import dayjs from "dayjs";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -61,7 +61,7 @@ export default async function Page({
         <Chip
           sx={{ mt: 1, mb: 2 }}
           variant="outlined"
-          label={moment(session.startTime).format("MM/DD/YYYY")}
+          label={dayjs(session.startTime).format("MM/DD/YYYY")}
         />
       </Container>
 

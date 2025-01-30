@@ -15,8 +15,8 @@ import {
   TextField,
 } from "@mui/material";
 import { useState } from "react";
-import moment from "moment";
-import { type RoutineDay, Weekday } from "@prisma/client";
+import dayjs from "dayjs";
+import { type RoutineDay } from "@prisma/client";
 import { editDay } from "@/actions/editDay";
 
 export const EditDayModal = ({
@@ -30,17 +30,13 @@ export const EditDayModal = ({
   routineId: number;
   routineDay?: RoutineDay;
 }) => {
-  const [selectedWeekdays, setWeekdays] = useState<Weekday[]>(
+  const [selectedWeekdays, setWeekdays] = useState<number[]>(
     routineDay?.weekdays ?? [],
   );
 
-  const handleWeekdayChange = (event: SelectChangeEvent<Weekday[]>) => {
-    const newWeekdays = event.target.value as Weekday[];
-    setWeekdays(
-      newWeekdays.sort((a, b) =>
-        moment(a, "dddd").isBefore(moment(b, "dddd")) ? -1 : 1,
-      ),
-    );
+  const handleWeekdayChange = (event: SelectChangeEvent<number[]>) => {
+    const newWeekdays = event.target.value as number[];
+    setWeekdays(newWeekdays.sort((a, b) => a - b));
   };
 
   const action = async (formData: FormData) => {
@@ -96,18 +92,18 @@ export const EditDayModal = ({
                 {selected.map((value) => (
                   <Chip
                     key={`weekday-${value}`}
-                    label={moment(value, "dddd").format("dddd")}
+                    label={dayjs().day(value).format("dddd")}
                   />
                 ))}
               </Box>
             )}
           >
-            {Object.values(Weekday).map((weekday) => (
+            {Array.from({ length: 7 }, (_, i) => i + 1).map((weekday) => (
               <MenuItem
                 key={`${routineDay?.id ?? "new"}-${weekday}`}
                 value={weekday}
               >
-                {moment(weekday, "dddd").format("dddd")}
+                {dayjs().day(weekday).format("dddd")}
               </MenuItem>
             ))}
           </Select>

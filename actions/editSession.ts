@@ -4,7 +4,6 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
 import { WorkoutSession } from "@prisma/client";
-import moment from "moment";
 
 export async function editSession(
   sessionId: number,
