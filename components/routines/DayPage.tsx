@@ -7,7 +7,7 @@ import type { RoutineDayWithRelations } from "@/types/routineDay";
 import type { Units } from "@/actions/getUnits";
 import { WorkoutList } from "../workoutSet/WorkoutList";
 
-export const DayCard = ({
+export const DayPage = ({
   routineDay,
   units,
 }: {
@@ -18,7 +18,7 @@ export const DayCard = ({
 
   return (
     <>
-      <Container maxWidth="xl">
+      <Container maxWidth="lg">
         <AddExerciseRow dayId={routineDay.id} />
         <FormGroup>
           <FormControlLabel
@@ -33,11 +33,13 @@ export const DayCard = ({
         </FormGroup>
       </Container>
 
-      <WorkoutList
-        reorder={isReorderActive}
-        setGroups={routineDay.setGroups}
-        units={units}
-      />
+      <Container disableGutters maxWidth="lg">
+        <WorkoutList
+          reorder={isReorderActive}
+          setGroups={routineDay.setGroups}
+          units={units}
+        />
+      </Container>
     </>
   );
 };

@@ -2,7 +2,7 @@
 
 import { EditSessionModal as NewSessionModal } from "@/components/sessions/EditSessionModal";
 import { Add } from "@mui/icons-material";
-import { Fab } from "@mui/material";
+import { Button, Fab } from "@mui/material";
 import { useState } from "react";
 
 export const CreateSessionButton = () => {
@@ -12,15 +12,13 @@ export const CreateSessionButton = () => {
     <>
       <NewSessionModal open={open} onClose={() => setOpen(false)} />
 
-      <Fab
-        color="primary"
-        variant="extended"
-        sx={{ mb: 2 }}
+      <Button
+        variant="contained"
+        startIcon={<Add />}
         onClick={() => setOpen(true)}
       >
-        <Add sx={{ mr: 1 }} />
-        Create Session
-      </Fab>
+        Create
+      </Button>
     </>
   );
 };

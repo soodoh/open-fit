@@ -3,7 +3,7 @@ import { EditSessionMenu } from "@/components/sessions/EditSessionMenu";
 import { SessionPage } from "@/components/sessions/SessionPage";
 import { prisma } from "@/lib/prisma";
 import { ArrowBack } from "@mui/icons-material";
-import { Box, Chip, Container, Fab, Typography } from "@mui/material";
+import { Box, Button, Chip, Container, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -42,27 +42,34 @@ export default async function Page({
 
   return (
     <>
-      <Container maxWidth="xl" sx={{ mt: 3 }}>
-        <Fab
-          variant="extended"
-          color="primary"
-          sx={{ gap: 1, mb: 2 }}
-          LinkComponent={Link}
-          href="/logs"
+      <Container maxWidth="lg">
+        <Box
+          sx={{
+            my: 3,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
         >
-          <ArrowBack />
-          Workout Logs
-        </Fab>
+          <Chip
+            variant="outlined"
+            label={dayjs(session.startTime).format("MM/DD/YYYY")}
+          />
+
+          <Button
+            variant="contained"
+            startIcon={<ArrowBack />}
+            LinkComponent={Link}
+            href="/logs"
+          >
+            Logs
+          </Button>
+        </Box>
 
         <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
           <Typography variant="h4">{session.name}</Typography>
           <EditSessionMenu session={session} />
         </Box>
-        <Chip
-          sx={{ mt: 1, mb: 2 }}
-          variant="outlined"
-          label={dayjs(session.startTime).format("MM/DD/YYYY")}
-        />
       </Container>
 
       <SessionPage session={session} units={units} />

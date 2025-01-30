@@ -1,10 +1,10 @@
 import { getUnits } from "@/actions/getUnits";
 import { auth } from "@/auth";
-import { DayCard } from "@/components/routines/DayCard";
+import { DayPage } from "@/components/routines/DayPage";
 import { EditDayMenu } from "@/components/routines/EditDayMenu";
 import { prisma } from "@/lib/prisma";
 import { ArrowBack, Settings } from "@mui/icons-material";
-import { Box, Chip, Container, Fab, Typography } from "@mui/material";
+import { Box, Button, Chip, Container, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -44,41 +44,45 @@ export default async function Page({
 
   return (
     <>
-      <Container maxWidth="xl" sx={{ my: 3 }}>
-        <Fab
-          variant="extended"
-          color="primary"
-          sx={{ gap: 1, mb: 2 }}
-          LinkComponent={Link}
-          href="/routines"
-        >
-          <ArrowBack />
-          Routines
-        </Fab>
+      <Container
+        maxWidth="lg"
+        sx={{ mt: 3, display: "flex", justifyContent: "space-between" }}
+      >
         <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
           <Typography variant="h5" gutterBottom>
             {routineDay.description}
           </Typography>
           <EditDayMenu routineDay={routineDay} icon={<Settings />} />
         </Box>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            flexWrap: "wrap",
-            gap: 0.5,
-          }}
+        <Button
+          variant="contained"
+          startIcon={<ArrowBack />}
+          LinkComponent={Link}
+          href="/routines"
         >
-          {routineDay.weekdays.map((weekday) => (
-            <Chip
-              key={`day-${routineDay.id}-weekday-${weekday}`}
-              label={dayjs().day(weekday).format("dddd")}
-            />
-          ))}
-        </Box>
+          Routines
+        </Button>
       </Container>
 
-      <DayCard routineDay={routineDay} units={units} />
+      <Container
+        maxWidth="lg"
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: 0.5,
+          my: 1,
+        }}
+      >
+        {routineDay.weekdays.map((weekday) => (
+          <Chip
+            key={`day-${routineDay.id}-weekday-${weekday}`}
+            label={dayjs().day(weekday).format("dddd")}
+          />
+        ))}
+      </Container>
+
+      <DayPage routineDay={routineDay} units={units} />
     </>
   );
 }

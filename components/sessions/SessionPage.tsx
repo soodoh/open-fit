@@ -35,7 +35,7 @@ export const SessionPage = ({
 
   return (
     <>
-      <Container maxWidth="xl">
+      <Container maxWidth="lg">
         <Grid sx={{ my: 2 }} container spacing={2}>
           <Grid size={{ xs: 12, sm: 4 }}>
             <Typography variant="subtitle1">Duration</Typography>
@@ -72,13 +72,15 @@ export const SessionPage = ({
         </Grid>
       </Container>
 
-      <Divider />
-      <WorkoutList
-        active
-        reorder={isReorderActive}
-        setGroups={session.setGroups}
-        units={units}
-      />
+      <Container disableGutters maxWidth="lg">
+        <Divider />
+        <WorkoutList
+          active
+          reorder={isReorderActive}
+          setGroups={session.setGroups}
+          units={units}
+        />
+      </Container>
     </>
   );
 };

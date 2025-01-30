@@ -29,20 +29,17 @@ export default async function Sessions() {
   });
 
   return (
-    <>
-      <Container maxWidth="xl" sx={{ my: 3 }}>
+    <Container maxWidth="xl">
+      <Box sx={{ my: 3, display: "flex", justifyContent: "space-between" }}>
+        <Typography variant="h4">Workout Logs</Typography>
         <CreateSessionButton />
+      </Box>
 
-        <Typography variant="h4" gutterBottom>
-          Previous Workout Sessions
-        </Typography>
-
-        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-          {sessions.map((session) => (
-            <SessionSummaryCard key={session.id} session={session} />
-          ))}
-        </Box>
-      </Container>
-    </>
+      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
+        {sessions.map((session) => (
+          <SessionSummaryCard key={session.id} session={session} />
+        ))}
+      </Box>
+    </Container>
   );
 }

@@ -21,7 +21,7 @@ export default async function Routines() {
   return (
     <Container maxWidth="xl" sx={{ my: 3 }}>
       <Box sx={{ display: "flex", justifyContent: "space-between", mb: 3 }}>
-        <Typography variant="h4">Workout Routines</Typography>
+        <Typography variant="h4">Routines</Typography>
         <CreateRoutine />
       </Box>
 
