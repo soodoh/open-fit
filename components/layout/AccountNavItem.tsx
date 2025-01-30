@@ -53,7 +53,7 @@ export const AccountNavItem = () => {
           </ListItemIcon>
           <ListItemText>Profile</ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => signOut({ redirectTo: "/login" })}>
+        <MenuItem onClick={() => signOut({ redirectTo: "/signin" })}>
           <ListItemIcon>
             <Logout />
           </ListItemIcon>

@@ -8,7 +8,7 @@ import { prisma } from "@/lib/prisma";
 export default async function Sessions() {
   const session = await auth();
   if (!session?.user) {
-    redirect("/login");
+    redirect("/signin");
   }
 
   const sessions = await prisma.workoutSession.findMany({

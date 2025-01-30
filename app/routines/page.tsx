@@ -9,7 +9,7 @@ import { prisma } from "@/lib/prisma";
 export default async function Routines() {
   const session = await auth();
   if (!session?.user) {
-    redirect("/login");
+    redirect("/signin");
   }
 
   const routines = await prisma.routine.findMany({
