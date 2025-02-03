@@ -4967,6 +4967,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-timer-hook@npm:^3.0.8":
+  version: 3.0.8
+  resolution: "react-timer-hook@npm:3.0.8"
+  peerDependencies:
+    react: ">=16.8.0"
+  checksum: 10c0/3ee67def88bbe5d848ac02c9a795e49bc2bd248357e6119b26ad5ee1d98d66e5be21431d33e0e457da8bf2919c7cc5a3438f792e4fb5e44e8b80664f309af93e
+  languageName: node
+  linkType: hard
+
 "react-transition-group@npm:^4.4.5":
   version: 4.4.5
   resolution: "react-transition-group@npm:4.4.5"
@@ -6097,6 +6106,7 @@ __metadata:
     prisma: "npm:^6.2.1"
     react: "npm:19.0.0"
     react-dom: "npm:19.0.0"
+    react-timer-hook: "npm:^3.0.8"
     swr: "npm:^2.3.0"
     tsx: "npm:^4.19.2"
     typescript: "npm:^5.7.3"

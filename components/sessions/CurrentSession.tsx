@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  Rating,
   Typography,
   Grid2 as Grid,
   Divider,
@@ -15,6 +14,7 @@ import type { SessionWithRelations } from "@/types/workoutSession";
 import { Units } from "@/actions/getUnits";
 import { WorkoutList } from "../workoutSet/WorkoutList";
 import { CurrentDuration } from "./CurrentDuration";
+import { RestTimer } from "./RestTimer";
 
 export const CurrentSession = ({
   session,
@@ -30,6 +30,7 @@ export const CurrentSession = ({
       <Container maxWidth="lg">
         <Grid sx={{ my: 2 }} container spacing={2}>
           <CurrentDuration startTime={session.startTime} />
+          <RestTimer />
 
           {session.notes && (
             <Grid size={{ xs: 12, sm: 4 }}>

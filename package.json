@@ -29,6 +29,7 @@
     "next-auth": "^5.0.0-beta.25",
     "react": "19.0.0",
     "react-dom": "19.0.0",
+    "react-timer-hook": "^3.0.8",
     "swr": "^2.3.0",
     "zod": "^3.24.1"
   },
