@@ -16,8 +16,11 @@ export default async function Page() {
   //   redirect("/logs");
   // }
 
-  const session = await prisma.workoutSession.findFirst({
-    // where: { id: sessionId },
+  const currentSession = await prisma.workoutSession.findFirst({
+    where: {
+      startTime: { gte: dayjs().subtract(1, "day").toDate() },
+      endTime: null,
+    },
     include: {
       template: { include: { routine: true } },
       setGroups: {
@@ -32,8 +35,12 @@ export default async function Page() {
     },
   });
   const units = await getUnits();
-  if (!session) {
-    redirect("/logs");
+  if (!currentSession) {
+    return (
+      <Container maxWidth="lg">
+        <Typography variant="h4">No active session</Typography>
+      </Container>
+    );
   }
 
   return (
@@ -49,7 +56,7 @@ export default async function Page() {
         >
           <Chip
             variant="outlined"
-            label={dayjs(session.startTime).format("MM/DD/YYYY")}
+            label={dayjs(currentSession.startTime).format("MM/DD/YYYY")}
           />
 
           <Button
@@ -63,12 +70,12 @@ export default async function Page() {
         </Box>
 
         <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
-          <Typography variant="h4">{session.name}</Typography>
-          <EditSessionMenu session={session} />
+          <Typography variant="h4">{currentSession.name}</Typography>
+          <EditSessionMenu session={currentSession} />
         </Box>
       </Container>
 
-      <CurrentSession session={session} units={units} />
+      <CurrentSession session={currentSession} units={units} />
     </>
   );
 }
