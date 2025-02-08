@@ -50,14 +50,15 @@ import type {
 import { createSet } from "@/actions/createSet";
 import { EditSetGroupMenu } from "./EditSetGroupMenu";
 import { SetType } from "@prisma/client";
+import { ListView } from "@/types/constants";
 
 export const WorkoutSetGroup = ({
-  active,
+  view,
   setGroup,
   isReorderActive,
   units,
 }: {
-  active: boolean;
+  view: ListView;
   setGroup: SetGroupWithRelations;
   isReorderActive: boolean;
   units: Units;
@@ -70,7 +71,7 @@ export const WorkoutSetGroup = ({
     SetWithRelations[]
   >(setGroup.sets, (_, newSets) => newSets);
   const [expanded, setExpanded] = useState(
-    active && sets.some((set) => !set.completed),
+    view === ListView.CurrentSession && sets.some((set) => !set.completed),
   );
   const [canReorderSets, setReorderSets] = useState(false);
 
@@ -126,6 +127,7 @@ export const WorkoutSetGroup = ({
         secondaryAction={
           !isReorderActive && (
             <EditSetGroupMenu
+              view={view}
               setGroup={setGroup}
               reorder={canReorderSets}
               onReorder={() => setReorderSets(!canReorderSets)}
@@ -182,7 +184,7 @@ export const WorkoutSetGroup = ({
                 return (
                   <WorkoutSetRow
                     key={`set-${set.id}`}
-                    active={active}
+                    view={view}
                     set={set}
                     setNum={setNum}
                     units={units}

@@ -15,6 +15,7 @@ import { Units } from "@/actions/getUnits";
 import { WorkoutList } from "../workoutSet/WorkoutList";
 import { CurrentDuration } from "./CurrentDuration";
 import { RestTimer } from "./RestTimer";
+import { ListView } from "@/types/constants";
 
 export const CurrentSession = ({
   session,
@@ -58,7 +59,7 @@ export const CurrentSession = ({
       <Container disableGutters maxWidth="lg">
         <Divider />
         <WorkoutList
-          active
+          view={ListView.CurrentSession}
           reorder={isReorderActive}
           setGroups={session.setGroups}
           units={units}

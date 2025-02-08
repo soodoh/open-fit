@@ -1,40 +1,16 @@
+import { getCurrentSession } from "@/actions/getCurrentSession";
 import { getUnits } from "@/actions/getUnits";
 import { CurrentSession } from "@/components/sessions/CurrentSession";
 import { EditSessionMenu } from "@/components/sessions/EditSessionMenu";
-import { prisma } from "@/lib/prisma";
 import { ArrowBack } from "@mui/icons-material";
 import { Box, Button, Chip, Container, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
 export default async function Page() {
-  // const { session: sessionParam } = await params;
-  // const sessionId = parseInt(sessionParam, 10);
-
-  // if (Number.isNaN(sessionId)) {
-  //   redirect("/logs");
-  // }
-
-  const currentSession = await prisma.workoutSession.findFirst({
-    where: {
-      startTime: { gte: dayjs().subtract(1, "day").toDate() },
-      endTime: null,
-    },
-    include: {
-      template: { include: { routine: true } },
-      setGroups: {
-        orderBy: { order: "asc" },
-        include: {
-          sets: {
-            orderBy: { order: "asc" },
-            include: { exercise: true, repetitionUnit: true, weightUnit: true },
-          },
-        },
-      },
-    },
-  });
+  const currentSession = await getCurrentSession();
   const units = await getUnits();
+
   if (!currentSession) {
     return (
       <Container maxWidth="lg">

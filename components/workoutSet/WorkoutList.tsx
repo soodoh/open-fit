@@ -18,14 +18,15 @@ import { List } from "@mui/material";
 import { useOptimistic, useTransition } from "react";
 import { WorkoutSetGroup } from "./WorkoutSetGroup";
 import { Units } from "@/actions/getUnits";
+import { ListView } from "@/types/constants";
 
 export const WorkoutList = ({
-  active = false,
+  view = ListView.EditTemplate,
   reorder,
   setGroups,
   units,
 }: {
-  active?: boolean;
+  view: ListView;
   reorder: boolean;
   setGroups: SetGroupWithRelations[];
   units: Units;
@@ -70,7 +71,7 @@ export const WorkoutList = ({
           {optimisticSetGroups.map((setGroup) => {
             return (
               <WorkoutSetGroup
-                active={active}
+                view={view}
                 key={`set-${setGroup.id}`}
                 isReorderActive={reorder}
                 setGroup={setGroup}

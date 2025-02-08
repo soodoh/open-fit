@@ -15,6 +15,7 @@ import { useState } from "react";
 import type { SessionWithRelations } from "@/types/workoutSession";
 import { Units } from "@/actions/getUnits";
 import { WorkoutList } from "../workoutSet/WorkoutList";
+import { ListView } from "@/types/constants";
 
 export const SessionPage = ({
   session,
@@ -75,7 +76,7 @@ export const SessionPage = ({
       <Container disableGutters maxWidth="lg">
         <Divider />
         <WorkoutList
-          active
+          view={ListView.EditSession}
           reorder={isReorderActive}
           setGroups={session.setGroups}
           units={units}

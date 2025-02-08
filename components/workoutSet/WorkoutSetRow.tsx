@@ -16,15 +16,16 @@ import { SetTypeMenu } from "./SetTypeMenu";
 import { RepUnitMenu } from "./RepUnitMenu";
 import { WeightUnitMenu } from "./WeightUnitMenu";
 import { green, grey } from "@mui/material/colors";
+import { ListView } from "@/types/constants";
 
 export const WorkoutSetRow = ({
-  active,
+  view,
   set,
   setNum,
   reorder,
   units,
 }: {
-  active: boolean;
+  view: ListView;
   set: SetWithRelations;
   setNum: number;
   reorder: boolean;
@@ -32,6 +33,7 @@ export const WorkoutSetRow = ({
 }) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: set.id });
+  const isRowDisabled = set.completed && view === ListView.CurrentSession;
 
   return (
     <ListItem
@@ -39,7 +41,7 @@ export const WorkoutSetRow = ({
       ref={setNodeRef}
       sx={{ transform: CSS.Transform.toString(transform), transition }}
     >
-      {reorder ? (
+      {(reorder || view !== ListView.CurrentSession) && (
         <IconButton
           sx={{ touchAction: "manipulation" }}
           {...attributes}
@@ -47,7 +49,9 @@ export const WorkoutSetRow = ({
         >
           <DragHandle />
         </IconButton>
-      ) : (
+      )}
+
+      {(!reorder || view !== ListView.CurrentSession) && (
         // TODO add delete & setRestTimer
         <IconButton>
           <MoreVert fontSize="small" />
@@ -63,7 +67,7 @@ export const WorkoutSetRow = ({
           variant="outlined"
           type="string"
           label={set.repetitionUnit.name}
-          disabled={set.completed}
+          disabled={isRowDisabled}
           slotProps={{
             input: {
               endAdornment: (
@@ -94,7 +98,7 @@ export const WorkoutSetRow = ({
           variant="outlined"
           type="string"
           label={set.weightUnit.name}
-          disabled={set.completed}
+          disabled={isRowDisabled}
           slotProps={{
             input: {
               endAdornment: (
@@ -118,7 +122,7 @@ export const WorkoutSetRow = ({
             });
           }}
         />
-        {active && (
+        {view === ListView.CurrentSession && (
           <IconButton
             onClick={() => editSet({ id: set.id, completed: !set.completed })}
           >

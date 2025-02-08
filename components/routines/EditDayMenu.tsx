@@ -2,7 +2,7 @@
 
 import { type ReactNode, useEffect, useState } from "react";
 import { EditDayModal } from "./EditDayModal";
-import { Delete, Edit } from "@mui/icons-material";
+import { Delete, Edit, PlayArrow } from "@mui/icons-material";
 import {
   IconButton,
   ListItemIcon,
@@ -12,7 +12,7 @@ import {
   MenuList,
 } from "@mui/material";
 import { DeleteDayModal } from "./DeleteDayModal";
-import { RoutineDay } from "@prisma/client";
+import type { RoutineDay } from "@prisma/client";
 
 enum Modal {
   EDIT = "edit",
@@ -62,12 +62,20 @@ export const EditDayMenu = ({
         disableScrollLock
       >
         <MenuList dense disablePadding>
+          <MenuItem onClick={() => {}}>
+            <ListItemIcon>
+              <PlayArrow fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>Start</ListItemText>
+          </MenuItem>
+
           <MenuItem onClick={() => setModal(Modal.EDIT)}>
             <ListItemIcon>
               <Edit fontSize="small" />
             </ListItemIcon>
             <ListItemText>Edit</ListItemText>
           </MenuItem>
+
           <MenuItem onClick={() => setModal(Modal.DELETE)}>
             <ListItemIcon>
               <Delete fontSize="small" />

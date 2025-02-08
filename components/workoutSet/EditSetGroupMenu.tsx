@@ -13,6 +13,7 @@ import { EditSetCommentModal } from "./EditSetCommentModal";
 import { DeleteSetGroupModal } from "../routines/DeleteSetGroupModal";
 import { BulkEditSetModal } from "./BulkEditSetModal";
 import { Units } from "@/actions/getUnits";
+import { ListView } from "@/types/constants";
 
 enum Modal {
   BULK_EDIT = "bulkEdit",
@@ -21,11 +22,13 @@ enum Modal {
 }
 
 export const EditSetGroupMenu = ({
+  view,
   setGroup,
   reorder,
   onReorder,
   units,
 }: {
+  view: ListView;
   setGroup: SetGroupWithRelations;
   reorder: boolean;
   onReorder: () => void;
@@ -72,19 +75,21 @@ export const EditSetGroupMenu = ({
         disableScrollLock
       >
         <MenuList dense disablePadding>
-          <MenuItem
-            onClick={() => {
-              onReorder();
-              setAnchorEl(null);
-            }}
-          >
-            <ListItemIcon>
-              <Reorder fontSize="small" />
-            </ListItemIcon>
-            <ListItemText>
-              {reorder ? "Hide Reorder" : "Show Reorder"}
-            </ListItemText>
-          </MenuItem>
+          {view === ListView.CurrentSession && (
+            <MenuItem
+              onClick={() => {
+                onReorder();
+                setAnchorEl(null);
+              }}
+            >
+              <ListItemIcon>
+                <Reorder fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>
+                {reorder ? "Hide Reorder" : "Show Reorder"}
+              </ListItemText>
+            </MenuItem>
+          )}
 
           <MenuItem onClick={() => setModal(Modal.BULK_EDIT)}>
             <ListItemIcon>
