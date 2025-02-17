@@ -39,6 +39,16 @@ export const AppWrapper = ({ children }: Readonly<{ children: ReactNode }>) => {
           },
         },
       },
+      MuiLink: {
+        styleOverrides: {
+          root: {
+            textDecoration: "none",
+            "&:hover": {
+              textDecoration: "underline",
+            },
+          },
+        },
+      },
     },
   });
 
