@@ -1,13 +1,10 @@
 import {
-  Autocomplete,
   Box,
   Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  ListItem,
-  ListItemText,
   Rating,
   TextField,
   Typography,
@@ -16,13 +13,10 @@ import { useState } from "react";
 import { DateTimePicker } from "@mui/x-date-pickers";
 import dayjs, { type Dayjs } from "dayjs";
 import { SessionWithRelations } from "@/types/workoutSession";
-import useSWR from "swr";
-import {
-  RoutineDayWithRoutine,
-  searchTemplates,
-} from "@/actions/searchTemplates";
+import { RoutineDayWithRoutine } from "@/actions/searchTemplates";
 import { createSession } from "@/actions/createSession";
 import { editSession } from "@/actions/editSession";
+import { SelectTemplate } from "./SelectTemplate";
 
 export const EditSessionModal = ({
   session,
@@ -46,15 +40,6 @@ export const EditSessionModal = ({
   );
   const [workoutTemplate, setWorkoutTemplate] =
     useState<RoutineDayWithRoutine | null>(session?.template ?? null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const { data: options, isLoading } = useSWR(
-    { searchTerm },
-    ({ searchTerm }) => searchTemplates(searchTerm),
-    {
-      keepPreviousData: true,
-      fallbackData: session?.template ? [session.template] : [],
-    },
-  );
 
   return (
     <Dialog
@@ -97,44 +82,15 @@ export const EditSessionModal = ({
 
       <DialogContent>
         <Box sx={{ mt: 1, display: "flex", flexDirection: "column", gap: 2 }}>
-          <Autocomplete
-            sx={{ mt: 2 }}
-            fullWidth
-            value={workoutTemplate ?? null}
-            inputValue={searchTerm}
-            options={options}
-            autoHighlight
-            isOptionEqualToValue={(option, value) => option?.id === value?.id}
-            getOptionLabel={(option) => option?.description ?? "Unknown"}
-            getOptionKey={(option) => `template-${option?.id}`}
-            filterOptions={(option) => option}
-            loading={isLoading}
-            noOptionsText="No workouts found"
-            onChange={(_, selectedTemplate) => {
+          <SelectTemplate
+            disabled={!!session}
+            label={session ? "Created with template" : "Start with template"}
+            value={session?.template ?? null}
+            onChange={(selectedTemplate) => {
               setWorkoutTemplate(selectedTemplate);
               if (selectedTemplate?.description) {
                 setName(selectedTemplate.description);
               }
-            }}
-            onInputChange={(_, newInputValue: string) => {
-              setSearchTerm(newInputValue);
-            }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Use Template"
-                placeholder="Empty workout"
-              />
-            )}
-            renderOption={({ key, ...optionProps }, option) => {
-              return (
-                <ListItem key={key} {...optionProps}>
-                  <ListItemText
-                    primary={option?.description}
-                    secondary={option?.routine?.name}
-                  />
-                </ListItem>
-              );
             }}
           />
 
