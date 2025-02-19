@@ -20,7 +20,7 @@ export const DayPage = ({
   return (
     <>
       <Container maxWidth="lg">
-        <AddExerciseRow dayId={routineDay.id} />
+        <AddExerciseRow sessionOrDayId={routineDay.id} type="routineDay" />
         <FormGroup>
           <FormControlLabel
             control={

@@ -16,6 +16,7 @@ import { WorkoutList } from "../workoutSet/WorkoutList";
 import { CurrentDuration } from "./CurrentDuration";
 import { RestTimer } from "./RestTimer";
 import { ListView } from "@/types/constants";
+import { AddExerciseRow } from "../routines/AddExerciseRow";
 
 export const CurrentSession = ({
   session,
@@ -57,6 +58,7 @@ export const CurrentSession = ({
       </Container>
 
       <Container disableGutters maxWidth="lg">
+        <AddExerciseRow sessionOrDayId={session?.id} type="session" />
         <Divider />
         <WorkoutList
           view={ListView.CurrentSession}

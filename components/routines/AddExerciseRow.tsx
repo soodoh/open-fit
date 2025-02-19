@@ -5,7 +5,13 @@ import { Add } from "@mui/icons-material";
 import { Exercise } from "@prisma/client";
 import { createSetGroup } from "@/actions/createSetGroup";
 
-export const AddExerciseRow = ({ dayId }: { dayId: number }) => {
+export const AddExerciseRow = ({
+  sessionOrDayId,
+  type,
+}: {
+  sessionOrDayId: number;
+  type: "session" | "routineDay";
+}) => {
   const [exercise, setExercise] = useState<Exercise | null>(null);
   const [numSets, setNumSets] = useState<string>("1");
 
@@ -13,7 +19,12 @@ export const AddExerciseRow = ({ dayId }: { dayId: number }) => {
     if (!exercise) {
       return;
     }
-    await createSetGroup(dayId, exercise.id, parseInt(numSets, 10));
+    await createSetGroup({
+      sessionOrDayId,
+      type,
+      exerciseId: exercise.id,
+      numSets: parseInt(numSets, 10),
+    });
   };
 
   return (
