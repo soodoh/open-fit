@@ -134,7 +134,7 @@ export const RestTimer = () => {
         </DialogActions>
       </Dialog>
 
-      <Box sx={{ position: "relative" }}>
+      <Box sx={{ position: "relative", margin: "6px" }}>
         <Fab size="small" color="default" onClick={() => setOpen(!open)}>
           <Timer />
           <CircularProgress

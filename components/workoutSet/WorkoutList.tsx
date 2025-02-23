@@ -14,28 +14,41 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { List } from "@mui/material";
-import { useOptimistic, useTransition } from "react";
+import {
+  Container,
+  Divider,
+  FormControlLabel,
+  FormGroup,
+  List,
+  Switch,
+  Grid2 as Grid,
+  Box,
+} from "@mui/material";
+import { useOptimistic, useState, useTransition } from "react";
 import { WorkoutSetGroup } from "./WorkoutSetGroup";
 import { Units } from "@/actions/getUnits";
 import { ListView } from "@/types/constants";
+import { AddExerciseRow } from "../routines/AddExerciseRow";
+import { CurrentDuration } from "../sessions/CurrentDuration";
+import { RestTimer } from "../sessions/RestTimer";
 
 export const WorkoutList = ({
   view = ListView.EditTemplate,
-  reorder,
   setGroups,
   units,
+  sessionOrDayId,
 }: {
   view: ListView;
-  reorder: boolean;
   setGroups: SetGroupWithRelations[];
   units: Units;
+  sessionOrDayId: number;
 }) => {
   const [, startTransition] = useTransition();
   const [optimisticSetGroups, optimisticUpdateSetGroups] = useOptimistic<
     SetGroupWithRelations[],
     SetGroupWithRelations[]
   >(setGroups, (_, newSetGroups) => newSetGroups);
+  const [isReorderActive, setReorderActive] = useState(false);
 
   const mouseSensor = useSensor(MouseSensor);
   const touchSensor = useSensor(TouchSensor);
@@ -62,25 +75,52 @@ export const WorkoutList = ({
   };
 
   return (
-    <List dense disablePadding>
-      <DndContext id="set-groups" onDragEnd={handleSort} sensors={sensors}>
-        <SortableContext
-          items={optimisticSetGroups}
-          strategy={verticalListSortingStrategy}
-        >
-          {optimisticSetGroups.map((setGroup) => {
-            return (
-              <WorkoutSetGroup
-                view={view}
-                key={`set-${setGroup.id}`}
-                isReorderActive={reorder}
-                setGroup={setGroup}
-                units={units}
-              />
-            );
-          })}
-        </SortableContext>
-      </DndContext>
-    </List>
+    <>
+      <Container maxWidth="lg">
+        <AddExerciseRow
+          sessionOrDayId={sessionOrDayId}
+          type={view === ListView.EditTemplate ? "routineDay" : "session"}
+        />
+
+        <Box sx={{ my: 2, display: "flex", alignItems: "center" }}>
+          <FormGroup>
+            <FormControlLabel
+              control={
+                <Switch
+                  value={isReorderActive}
+                  onChange={(event) => setReorderActive(event.target.checked)}
+                />
+              }
+              label="Reorder Sets"
+            />
+          </FormGroup>
+
+          {view === ListView.CurrentSession && <RestTimer />}
+        </Box>
+      </Container>
+
+      <Divider sx={{ my: 2 }} />
+
+      <List dense disablePadding>
+        <DndContext id="set-groups" onDragEnd={handleSort} sensors={sensors}>
+          <SortableContext
+            items={optimisticSetGroups}
+            strategy={verticalListSortingStrategy}
+          >
+            {optimisticSetGroups.map((setGroup) => {
+              return (
+                <WorkoutSetGroup
+                  view={view}
+                  key={`set-${setGroup.id}`}
+                  isReorderActive={isReorderActive}
+                  setGroup={setGroup}
+                  units={units}
+                />
+              );
+            })}
+          </SortableContext>
+        </DndContext>
+      </List>
+    </>
   );
 };

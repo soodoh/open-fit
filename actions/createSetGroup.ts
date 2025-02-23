@@ -61,5 +61,10 @@ export async function createSetGroup({
       weightUnitId: user.defaultWeightUnitId,
     })),
   });
-  revalidatePath(`/day/${routineDayId}`);
+  if (type === "routineDay") {
+    revalidatePath(`/day/${sessionOrDayId}`);
+  } else {
+    revalidatePath(`/logs/${sessionOrDayId}`);
+    revalidatePath(`/logs/current`);
+  }
 }

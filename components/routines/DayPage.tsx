@@ -1,8 +1,6 @@
 "use client";
 
-import { Container, FormControlLabel, FormGroup, Switch } from "@mui/material";
-import { AddExerciseRow } from "./AddExerciseRow";
-import { useState } from "react";
+import { Container } from "@mui/material";
 import type { RoutineDayWithRelations } from "@/types/routineDay";
 import type { Units } from "@/actions/getUnits";
 import { WorkoutList } from "../workoutSet/WorkoutList";
@@ -15,33 +13,14 @@ export const DayPage = ({
   routineDay: RoutineDayWithRelations;
   units: Units;
 }) => {
-  const [isReorderActive, setReorderActive] = useState(false);
-
   return (
-    <>
-      <Container maxWidth="lg">
-        <AddExerciseRow sessionOrDayId={routineDay.id} type="routineDay" />
-        <FormGroup>
-          <FormControlLabel
-            control={
-              <Switch
-                value={isReorderActive}
-                onChange={(event) => setReorderActive(event.target.checked)}
-              />
-            }
-            label="Reorder Sets"
-          />
-        </FormGroup>
-      </Container>
-
-      <Container disableGutters maxWidth="lg">
-        <WorkoutList
-          view={ListView.EditTemplate}
-          reorder={isReorderActive}
-          setGroups={routineDay.setGroups}
-          units={units}
-        />
-      </Container>
-    </>
+    <Container disableGutters maxWidth="lg">
+      <WorkoutList
+        view={ListView.EditTemplate}
+        sessionOrDayId={routineDay.id}
+        setGroups={routineDay.setGroups}
+        units={units}
+      />
+    </Container>
   );
 };

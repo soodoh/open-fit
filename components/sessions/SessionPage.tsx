@@ -1,17 +1,7 @@
 "use client";
 
-import {
-  Rating,
-  Typography,
-  Grid2 as Grid,
-  Divider,
-  FormGroup,
-  FormControlLabel,
-  Switch,
-  Container,
-} from "@mui/material";
+import { Rating, Typography, Grid2 as Grid, Container } from "@mui/material";
 import dayjs from "dayjs";
-import { useState } from "react";
 import type { SessionWithRelations } from "@/types/workoutSession";
 import { Units } from "@/actions/getUnits";
 import { WorkoutList } from "../workoutSet/WorkoutList";
@@ -24,8 +14,6 @@ export const SessionPage = ({
   session: SessionWithRelations;
   units: Units;
 }) => {
-  const [isReorderActive, setReorderActive] = useState(false);
-
   const durationDate =
     session.startTime && session.endTime
       ? dayjs.duration(dayjs(session.endTime).diff(dayjs(session.startTime)))
@@ -56,28 +44,13 @@ export const SessionPage = ({
               <Typography variant="subtitle2">{session.notes}</Typography>
             </Grid>
           )}
-
-          <Grid size={{ xs: 12 }}>
-            <FormGroup>
-              <FormControlLabel
-                control={
-                  <Switch
-                    value={isReorderActive}
-                    onChange={(event) => setReorderActive(event.target.checked)}
-                  />
-                }
-                label="Reorder Sets"
-              />
-            </FormGroup>
-          </Grid>
         </Grid>
       </Container>
 
       <Container disableGutters maxWidth="lg">
-        <Divider />
         <WorkoutList
           view={ListView.EditSession}
-          reorder={isReorderActive}
+          sessionOrDayId={session.id}
           setGroups={session.setGroups}
           units={units}
         />
