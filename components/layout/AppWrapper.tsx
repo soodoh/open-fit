@@ -30,6 +30,9 @@ export const AppWrapper = ({ children }: Readonly<{ children: ReactNode }>) => {
           root: {
             textTransform: "none",
           },
+          outlined: {
+            borderColor: "var(--mui-palette-primary-main)",
+          },
         },
       },
       MuiFab: {

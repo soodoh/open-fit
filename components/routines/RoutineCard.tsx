@@ -1,13 +1,15 @@
 import dayjs from "dayjs";
 import { Typography, Card, CardHeader, List, Divider } from "@mui/material";
 import { EditRoutineMenu } from "./EditRoutineMenu";
-import type { Prisma } from "@prisma/client";
+import type { Prisma, WorkoutSession } from "@prisma/client";
 import { RoutineDayItem } from "./RoutineDayItem";
 
 export async function RoutineCard({
   routine,
+  currentSession,
 }: {
   routine: Prisma.RoutineGetPayload<{ include: { routineDays: true } }>;
+  currentSession: WorkoutSession | null;
 }) {
   return (
     <Card sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
@@ -33,6 +35,7 @@ export async function RoutineCard({
             <RoutineDayItem
               key={`day-${routineDay.id}`}
               routineDay={routineDay}
+              currentSession={currentSession}
             />
           );
         })}

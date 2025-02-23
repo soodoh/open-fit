@@ -5,6 +5,8 @@ import { RoutineCard } from "@/components/routines/RoutineCard";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { getCurrentSession } from "@/actions/getCurrentSession";
+import { ResumeSessionButton } from "@/components/sessions/ResumeSessionButton";
 
 export default async function Routines() {
   const session = await auth();
@@ -17,6 +19,7 @@ export default async function Routines() {
     where: { userId: session.user.id },
     include: { routineDays: true },
   });
+  const currentSession = await getCurrentSession();
 
   return (
     <Container maxWidth="xl" sx={{ my: 3 }}>
@@ -26,9 +29,14 @@ export default async function Routines() {
       </Box>
 
       <Grid container spacing={2}>
+        {currentSession && (
+          <Grid size={{ xs: 12 }}>
+            <ResumeSessionButton />
+          </Grid>
+        )}
         {routines?.map((routine) => (
           <Grid key={`routine-${routine.id}`} size={{ xs: 12, sm: 6, md: 4 }}>
-            <RoutineCard routine={routine} />
+            <RoutineCard routine={routine} currentSession={currentSession} />
           </Grid>
         ))}
       </Grid>

@@ -4,6 +4,8 @@ import { CreateSessionButton } from "@/components/sessions/CreateSession";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { getCurrentSession } from "@/actions/getCurrentSession";
+import { ResumeSessionButton } from "@/components/sessions/ResumeSessionButton";
 
 export default async function Sessions() {
   const session = await auth();
@@ -27,6 +29,7 @@ export default async function Sessions() {
       },
     },
   });
+  const currentSession = await getCurrentSession();
 
   return (
     <Container maxWidth="xl">
@@ -34,6 +37,12 @@ export default async function Sessions() {
         <Typography variant="h4">Workout Logs</Typography>
         <CreateSessionButton />
       </Box>
+
+      {currentSession && (
+        <Box sx={{ my: 3 }}>
+          <ResumeSessionButton />
+        </Box>
+      )}
 
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
         {sessions.map((session) => (

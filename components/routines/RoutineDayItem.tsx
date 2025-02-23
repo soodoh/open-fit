@@ -9,17 +9,27 @@ import {
 import { EditDayMenu } from "./EditDayMenu";
 import dayjs from "dayjs";
 import Link from "next/link";
-import type { RoutineDay } from "@prisma/client";
+import type { RoutineDay, WorkoutSession } from "@prisma/client";
 import { MoreHoriz } from "@mui/icons-material";
 
-export const RoutineDayItem = ({ routineDay }: { routineDay: RoutineDay }) => {
+export const RoutineDayItem = ({
+  routineDay,
+  currentSession,
+}: {
+  routineDay: RoutineDay;
+  currentSession: WorkoutSession | null;
+}) => {
   return (
     <>
       <ListItem
         dense
         disablePadding
         secondaryAction={
-          <EditDayMenu routineDay={routineDay} icon={<MoreHoriz />} />
+          <EditDayMenu
+            routineDay={routineDay}
+            currentSession={currentSession}
+            icon={<MoreHoriz />}
+          />
         }
       >
         <ListItemButton component={Link} href={`/day/${routineDay.id}`}>

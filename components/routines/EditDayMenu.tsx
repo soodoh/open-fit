@@ -12,7 +12,7 @@ import {
   MenuList,
 } from "@mui/material";
 import { DeleteDayModal } from "./DeleteDayModal";
-import type { RoutineDay } from "@prisma/client";
+import type { RoutineDay, WorkoutSession } from "@prisma/client";
 
 enum Modal {
   EDIT = "edit",
@@ -21,9 +21,11 @@ enum Modal {
 
 export const EditDayMenu = ({
   routineDay,
+  currentSession,
   icon,
 }: {
   routineDay: RoutineDay;
+  currentSession: WorkoutSession | null;
   icon: ReactNode;
 }) => {
   const [modal, setModal] = useState<Modal | null>(null);
@@ -62,7 +64,7 @@ export const EditDayMenu = ({
         disableScrollLock
       >
         <MenuList dense disablePadding>
-          <MenuItem onClick={() => {}}>
+          <MenuItem onClick={() => {}} disabled={!!currentSession}>
             <ListItemIcon>
               <PlayArrow fontSize="small" />
             </ListItemIcon>

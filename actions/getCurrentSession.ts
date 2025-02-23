@@ -13,7 +13,7 @@ export async function getCurrentSession() {
   const currentSession = await prisma.workoutSession.findFirst({
     where: {
       userId: session.user.id,
-      startTime: { gte: dayjs().subtract(1, "day").toDate() },
+      // startTime: { gte: dayjs().subtract(1, "day").toDate() },
       endTime: null,
     },
     include: {
