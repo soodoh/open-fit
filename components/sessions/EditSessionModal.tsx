@@ -68,7 +68,7 @@ export const EditSessionModal = ({
             impression,
           };
           if (!session) {
-            createSession(sessionData, workoutTemplate?.id);
+            createSession(sessionData);
           } else {
             editSession(session.id, sessionData);
           }

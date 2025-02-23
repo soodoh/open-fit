@@ -8,7 +8,6 @@ import dayjs from "dayjs";
 
 export async function createSession(
   newSessionData: Partial<WorkoutSession>,
-  routineDayId?: number,
 ): Promise<boolean> {
   const session = await auth();
   if (!session?.user?.id) {
@@ -16,24 +15,25 @@ export async function createSession(
   }
 
   try {
+    const routineDay = newSessionData.templateId
+      ? await prisma.routineDay.findUnique({
+          where: { id: newSessionData.templateId },
+          include: { setGroups: { include: { sets: true } } },
+        })
+      : null;
     const workoutSession = await prisma.workoutSession.create({
       data: {
         ...newSessionData,
         userId: session.user.id,
-        name: newSessionData.name ?? "",
         notes: newSessionData.notes ?? "",
         startTime: newSessionData.startTime ?? dayjs().toISOString(),
+        name: newSessionData.name ?? routineDay?.description ?? "",
+        templateId: newSessionData.templateId,
       },
     });
     revalidatePath("/logs");
 
-    if (!routineDayId) {
-      return true;
-    }
-    const routineDay = await prisma.routineDay.findUnique({
-      where: { id: routineDayId },
-      include: { setGroups: { include: { sets: true } } },
-    });
+    // Clone sets from routineDay template (if templateId was passed)
     if (!routineDay) {
       return true;
     }

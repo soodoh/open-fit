@@ -13,6 +13,8 @@ import {
 } from "@mui/material";
 import { DeleteDayModal } from "./DeleteDayModal";
 import type { RoutineDay, WorkoutSession } from "@prisma/client";
+import { createSession } from "@/actions/createSession";
+import { redirect } from "next/navigation";
 
 enum Modal {
   EDIT = "edit",
@@ -64,7 +66,13 @@ export const EditDayMenu = ({
         disableScrollLock
       >
         <MenuList dense disablePadding>
-          <MenuItem onClick={() => {}} disabled={!!currentSession}>
+          <MenuItem
+            onClick={async () => {
+              await createSession({ templateId: routineDay.id });
+              redirect("/logs/current");
+            }}
+            disabled={!!currentSession}
+          >
             <ListItemIcon>
               <PlayArrow fontSize="small" />
             </ListItemIcon>
