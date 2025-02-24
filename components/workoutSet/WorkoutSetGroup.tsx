@@ -9,6 +9,7 @@ import {
   ListItemIcon,
   ListItemText,
   ListItemButton,
+  Typography,
 } from "@mui/material";
 import {
   Add,
@@ -161,7 +162,17 @@ export const WorkoutSetGroup = ({
           </ListItemAvatar>
 
           <ListItemText
-            primary={exercise?.name ?? "Unknown exercise"}
+            primary={
+              <Typography
+                sx={
+                  setGroup.sets.every((set) => set.completed)
+                    ? { textDecoration: "line-through" }
+                    : {}
+                }
+              >
+                {exercise?.name ?? "Unknown exercise"}
+              </Typography>
+            }
             secondary={`${sets.length} sets`}
           />
         </ListItemButton>
