@@ -21,7 +21,6 @@ import {
   FormGroup,
   List,
   Switch,
-  Grid2 as Grid,
   Box,
 } from "@mui/material";
 import { useOptimistic, useState, useTransition } from "react";
@@ -29,8 +28,9 @@ import { WorkoutSetGroup } from "./WorkoutSetGroup";
 import { Units } from "@/actions/getUnits";
 import { ListView } from "@/types/constants";
 import { AddExerciseRow } from "../routines/AddExerciseRow";
-import { CurrentDuration } from "../sessions/CurrentDuration";
 import { RestTimer } from "../sessions/RestTimer";
+import { useTimer } from "react-timer-hook";
+import dayjs from "dayjs";
 
 export const WorkoutList = ({
   view = ListView.EditTemplate,
@@ -49,6 +49,19 @@ export const WorkoutList = ({
     SetGroupWithRelations[]
   >(setGroups, (_, newSetGroups) => newSetGroups);
   const [isReorderActive, setReorderActive] = useState(false);
+  const [isTimerOpen, setTimerOpen] = useState(false);
+  const [totalSeconds, setTotalSeconds] = useState<number>(90);
+  const expiryTimestamp = dayjs().add(totalSeconds, "seconds").toDate();
+  const timer = useTimer({
+    expiryTimestamp,
+    autoStart: false,
+  });
+
+  const startRestTimer = (seconds: number) => {
+    setTotalSeconds(seconds);
+    timer.restart(dayjs().add(seconds, "seconds").toDate(), true);
+    setTimerOpen(true);
+  };
 
   const mouseSensor = useSensor(MouseSensor);
   const touchSensor = useSensor(TouchSensor);
@@ -95,7 +108,15 @@ export const WorkoutList = ({
             />
           </FormGroup>
 
-          {view === ListView.CurrentSession && <RestTimer />}
+          {view === ListView.CurrentSession && (
+            <RestTimer
+              open={isTimerOpen}
+              setOpen={setTimerOpen}
+              totalSeconds={totalSeconds}
+              setTotalSeconds={setTotalSeconds}
+              timer={timer}
+            />
+          )}
         </Box>
       </Container>
 
@@ -115,6 +136,7 @@ export const WorkoutList = ({
                   isReorderActive={isReorderActive}
                   setGroup={setGroup}
                   units={units}
+                  startRestTimer={startRestTimer}
                 />
               );
             })}

@@ -15,6 +15,8 @@ import { useState } from "react";
 import type { RepetitionUnit, WeightUnit } from "@prisma/client";
 import { RepUnitMenu } from "./RepUnitMenu";
 import { WeightUnitMenu } from "./WeightUnitMenu";
+import { DateTimeField } from "@mui/x-date-pickers";
+import dayjs, { Dayjs } from "dayjs";
 
 export const BulkEditSetModal = ({
   open,
@@ -28,6 +30,7 @@ export const BulkEditSetModal = ({
   setGroup: SetGroupWithRelations;
 }) => {
   const [reps, setReps] = useState<string>("");
+  const [restTime, setRestTime] = useState<Dayjs>(dayjs().minute(0).second(0));
   const [repUnit, setRepUnit] = useState<RepetitionUnit>(
     setGroup.sets[0].repetitionUnit,
   );
@@ -92,18 +95,33 @@ export const BulkEditSetModal = ({
               },
             }}
           />
+
+          <DateTimeField
+            label="Rest Timer"
+            format="mm:ss"
+            value={restTime}
+            onChange={(newTime) => {
+              if (newTime) {
+                setRestTime(newTime);
+              }
+            }}
+          />
         </Box>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
         <Button
           onClick={async () => {
+            const totalSeconds =
+              (restTime?.get("minutes") ?? 0) * 60 +
+              (restTime?.get("seconds") ?? 0);
             await bulkEditSets(setGroup.id, {
               // If empty string, leave unchanged (undefined)
               reps: reps ? parseInt(reps, 10) : undefined,
               weight: weight ? parseInt(weight, 10) : undefined,
               repetitionUnitId: repUnit.id,
               weightUnitId: weightUnit.id,
+              restTime: totalSeconds,
             });
             onClose();
           }}

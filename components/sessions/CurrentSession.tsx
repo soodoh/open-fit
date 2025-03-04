@@ -5,7 +5,6 @@ import type { SessionWithRelations } from "@/types/workoutSession";
 import { Units } from "@/actions/getUnits";
 import { WorkoutList } from "../workoutSet/WorkoutList";
 import { CurrentDuration } from "./CurrentDuration";
-import { RestTimer } from "./RestTimer";
 import { ListView } from "@/types/constants";
 
 export const CurrentSession = ({

@@ -58,11 +58,13 @@ export const WorkoutSetGroup = ({
   setGroup,
   isReorderActive,
   units,
+  startRestTimer,
 }: {
   view: ListView;
   setGroup: SetGroupWithRelations;
   isReorderActive: boolean;
   units: Units;
+  startRestTimer: (seconds: number) => void;
 }) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: setGroup.id });
@@ -200,6 +202,7 @@ export const WorkoutSetGroup = ({
                     setNum={setNum}
                     units={units}
                     reorder={canReorderSets}
+                    startRestTimer={startRestTimer}
                   />
                 );
               })}

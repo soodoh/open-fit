@@ -28,7 +28,13 @@ export async function bulkEditSets(
         ...newSetData,
       },
     });
-    revalidatePath(`/day/${parentSetGroup?.routineDayId}`);
+    if (parentSetGroup?.routineDayId) {
+      revalidatePath(`/day/${parentSetGroup.routineDayId}`);
+    }
+    if (parentSetGroup?.sessionId) {
+      revalidatePath(`/logs/${parentSetGroup.sessionId}`);
+      revalidatePath("/logs/current");
+    }
   } catch (error) {
     console.error(error);
     return false;

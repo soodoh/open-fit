@@ -24,12 +24,14 @@ export const WorkoutSetRow = ({
   setNum,
   reorder,
   units,
+  startRestTimer,
 }: {
   view: ListView;
   set: SetWithRelations;
   setNum: number;
   reorder: boolean;
   units: Units;
+  startRestTimer: (seconds: number) => void;
 }) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: set.id });
@@ -124,7 +126,12 @@ export const WorkoutSetRow = ({
         />
         {view === ListView.CurrentSession && (
           <IconButton
-            onClick={() => editSet({ id: set.id, completed: !set.completed })}
+            onClick={async () => {
+              editSet({ id: set.id, completed: !set.completed });
+              if (set.restTime && !set.completed) {
+                startRestTimer(set.restTime);
+              }
+            }}
           >
             <Avatar
               sx={{

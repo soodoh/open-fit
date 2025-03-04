@@ -1,5 +1,3 @@
-"use client";
-
 import { Pause, PlayArrow, Timer, Timer10 } from "@mui/icons-material";
 import {
   Box,
@@ -14,23 +12,28 @@ import {
 } from "@mui/material";
 import { green, grey } from "@mui/material/colors";
 import dayjs from "dayjs";
-import { useState } from "react";
-import { useTimer } from "react-timer-hook";
+import type { TimerResult } from "react-timer-hook";
 
-export const RestTimer = () => {
-  const [totalSeconds, setTotalSeconds] = useState<number>(90);
-  const [open, setOpen] = useState(false);
-  const expiryTimestamp = dayjs().add(totalSeconds, "seconds").toDate();
+export const RestTimer = ({
+  open,
+  setOpen,
+  totalSeconds,
+  setTotalSeconds,
+  timer,
+}: {
+  open: boolean;
+  setOpen: (isOpen: boolean) => void;
+  totalSeconds: number;
+  setTotalSeconds: (seconds: number) => void;
+  timer: TimerResult;
+}) => {
   const {
     isRunning,
     totalSeconds: remainingSeconds,
     start,
     pause,
     restart,
-  } = useTimer({
-    expiryTimestamp,
-    autoStart: false,
-  });
+  } = timer;
   const percentage = (remainingSeconds / totalSeconds) * 100;
 
   return (
@@ -128,7 +131,13 @@ export const RestTimer = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpen(false)}>Close</Button>
-          <Button variant="contained" onClick={() => setOpen(false)}>
+          <Button
+            variant="contained"
+            onClick={() => {
+              setOpen(false);
+              restart(dayjs().add(totalSeconds, "seconds").toDate(), false);
+            }}
+          >
             Skip
           </Button>
         </DialogActions>
