@@ -3,10 +3,10 @@ import type { Units } from "@/actions/getUnits";
 import type { SetWithRelations } from "@/types/workoutSet";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Check, DragHandle, MoreVert } from "@mui/icons-material";
+import { DragHandle, MoreVert } from "@mui/icons-material";
 import {
-  Avatar,
   Box,
+  Checkbox,
   IconButton,
   InputAdornment,
   ListItem,
@@ -15,8 +15,8 @@ import {
 import { SetTypeMenu } from "./SetTypeMenu";
 import { RepUnitMenu } from "./RepUnitMenu";
 import { WeightUnitMenu } from "./WeightUnitMenu";
-import { green, grey } from "@mui/material/colors";
 import { ListView } from "@/types/constants";
+import { WorkoutTimer } from "./WorkoutTimer";
 
 export const WorkoutSetRow = ({
   view,
@@ -124,26 +124,33 @@ export const WorkoutSetRow = ({
             });
           }}
         />
-        {view === ListView.CurrentSession && (
-          <IconButton
-            onClick={async () => {
-              editSet({ id: set.id, completed: !set.completed });
-              if (set.restTime && !set.completed) {
-                startRestTimer(set.restTime);
-              }
-            }}
-          >
-            <Avatar
-              sx={{
-                bgcolor: set.completed ? green[500] : grey[400],
-                width: 32,
-                height: 32,
+        {view === ListView.CurrentSession &&
+          (set.repetitionUnit.name === "Seconds" && !set.completed ? (
+            <WorkoutTimer
+              set={set}
+              onComplete={async () => {
+                await editSet({ id: set.id, completed: true });
+                if (set.restTime) {
+                  startRestTimer(set.restTime);
+                }
               }}
-            >
-              <Check />
-            </Avatar>
-          </IconButton>
-        )}
+            />
+          ) : (
+            <Box>
+              <Checkbox
+                size="small"
+                color="default"
+                aria-label="Mark as Completed"
+                checked={set.completed}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  editSet({ id: set.id, completed: event.target.checked });
+                  if (set.restTime && event.target.checked) {
+                    startRestTimer(set.restTime);
+                  }
+                }}
+              />
+            </Box>
+          ))}
       </Box>
     </ListItem>
   );

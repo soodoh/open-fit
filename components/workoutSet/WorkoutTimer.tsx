@@ -1,3 +1,4 @@
+import { SetWithRelations } from "@/types/workoutSet";
 import { Pause, PlayArrow, Timer, Timer10 } from "@mui/icons-material";
 import {
   Box,
@@ -8,44 +9,58 @@ import {
   DialogContent,
   DialogTitle,
   Fab,
+  IconButton,
   Typography,
 } from "@mui/material";
-import { green, grey } from "@mui/material/colors";
+import { grey } from "@mui/material/colors";
 import dayjs from "dayjs";
-import type { TimerResult } from "react-timer-hook";
+import { useEffect, useState } from "react";
+import { useTimer } from "react-timer-hook";
 
-export const RestTimer = ({
-  open,
-  setOpen,
-  totalSeconds,
-  setTotalSeconds,
-  timer,
+export const WorkoutTimer = ({
+  set,
+  onComplete,
 }: {
-  open: boolean;
-  setOpen: (isOpen: boolean) => void;
-  totalSeconds: number;
-  setTotalSeconds: (seconds: number) => void;
-  timer: TimerResult;
+  set: SetWithRelations;
+  onComplete: () => Promise<void>;
 }) => {
+  const [isTimerOpen, setTimerOpen] = useState(false);
+  const [totalSeconds, setTotalSeconds] = useState<number>(set.reps);
+  const expiryTimestamp = dayjs().add(totalSeconds, "seconds").toDate();
   const {
     isRunning,
     totalSeconds: remainingSeconds,
     start,
     pause,
     restart,
-  } = timer;
-  const percentage = (remainingSeconds / totalSeconds) * 100;
+  } = useTimer({
+    expiryTimestamp,
+    autoStart: false,
+  });
+  const percentage = !totalSeconds
+    ? 0
+    : (remainingSeconds / totalSeconds) * 100;
+
+  useEffect(() => {
+    setTotalSeconds(set.reps);
+  }, [set.reps]);
+
+  useEffect(() => {
+    if (isTimerOpen) {
+      start();
+    }
+  }, [isTimerOpen, start]);
 
   return (
     <>
       <Dialog
-        open={open}
-        onClose={() => setOpen(false)}
-        aria-labelledby="rest-timer-title"
+        open={isTimerOpen}
+        onClose={() => setTimerOpen(false)}
+        aria-labelledby="workout-timer-title"
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle id="rest-timer-title">Rest Timer</DialogTitle>
+        <DialogTitle id="workout-timer-title">Workout Timer</DialogTitle>
         <DialogContent>
           <Box sx={{ position: "relative", display: "flex" }}>
             <CircularProgress
@@ -130,36 +145,43 @@ export const RestTimer = ({
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpen(false)}>Close</Button>
+          <Button onClick={() => setTimerOpen(false)}>Close</Button>
           <Button
             variant="contained"
-            onClick={() => {
-              setOpen(false);
-              restart(dayjs().add(totalSeconds, "seconds").toDate(), false);
+            onClick={async () => {
+              setTimerOpen(false);
+              await onComplete();
             }}
           >
-            Skip
+            Mark as Completed
           </Button>
         </DialogActions>
       </Dialog>
 
-      <Box sx={{ position: "relative", margin: "6px" }}>
-        <Fab size="small" color="default" onClick={() => setOpen(!open)}>
-          <Timer />
+      <Box>
+        <IconButton
+          size="small"
+          color="default"
+          onClick={() => setTimerOpen(!isTimerOpen)}
+          sx={{ position: "relative", margin: "5px" }}
+        >
+          {!isRunning && remainingSeconds < totalSeconds ? (
+            <Pause fontSize="small" />
+          ) : (
+            <Timer fontSize="small" />
+          )}
+
           <CircularProgress
             variant="determinate"
             value={percentage}
-            size={52}
-            thickness={5}
+            size={35}
+            thickness={3}
             sx={{
-              color: green[500],
+              color: grey[500],
               position: "absolute",
-              top: -6,
-              left: -6,
-              zIndex: 1,
             }}
           />
-        </Fab>
+        </IconButton>
       </Box>
     </>
   );
