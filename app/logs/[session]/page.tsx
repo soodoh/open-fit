@@ -1,6 +1,6 @@
 import { getCurrentSession } from "@/actions/getCurrentSession";
 import { getUnits } from "@/actions/getUnits";
-import { CurrentSession } from "@/components/sessions/CurrentSession";
+import { CurrentSessionPage } from "@/components/sessions/CurrentSessionPage";
 import { EditSessionMenu } from "@/components/sessions/EditSessionMenu";
 import { SessionPage } from "@/components/sessions/SessionPage";
 import { prisma } from "@/lib/prisma";
@@ -44,75 +44,7 @@ export default async function Page({
   }
 
   if (session.id === currentSession?.id) {
-    return (
-      <>
-        <Container maxWidth="lg">
-          <Box
-            sx={{
-              my: 3,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Chip
-              variant="outlined"
-              label={dayjs(currentSession.startTime).format("MM/DD/YYYY")}
-            />
-
-            <Button
-              variant="contained"
-              startIcon={<ArrowBack />}
-              LinkComponent={Link}
-              href="/logs"
-            >
-              Logs
-            </Button>
-          </Box>
-
-          <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
-            <Typography variant="h4">{currentSession.name}</Typography>
-            <EditSessionMenu session={currentSession} />
-          </Box>
-        </Container>
-
-        <CurrentSession session={currentSession} units={units} />
-      </>
-    );
+    return <CurrentSessionPage session={currentSession} units={units} />;
   }
-  return (
-    <>
-      <Container maxWidth="lg">
-        <Box
-          sx={{
-            my: 3,
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Chip
-            variant="outlined"
-            label={dayjs(session.startTime).format("MM/DD/YYYY")}
-          />
-
-          <Button
-            variant="contained"
-            startIcon={<ArrowBack />}
-            LinkComponent={Link}
-            href="/logs"
-          >
-            Logs
-          </Button>
-        </Box>
-
-        <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
-          <Typography variant="h4">{session.name}</Typography>
-          <EditSessionMenu session={session} />
-        </Box>
-      </Container>
-
-      <SessionPage session={session} units={units} />
-    </>
-  );
+  return <SessionPage session={session} units={units} />;
 }
