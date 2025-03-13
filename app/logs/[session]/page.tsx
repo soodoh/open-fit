@@ -1,4 +1,6 @@
+import { getCurrentSession } from "@/actions/getCurrentSession";
 import { getUnits } from "@/actions/getUnits";
+import { CurrentSession } from "@/components/sessions/CurrentSession";
 import { EditSessionMenu } from "@/components/sessions/EditSessionMenu";
 import { SessionPage } from "@/components/sessions/SessionPage";
 import { prisma } from "@/lib/prisma";
@@ -15,6 +17,7 @@ export default async function Page({
 }) {
   const { session: sessionParam } = await params;
   const sessionId = parseInt(sessionParam, 10);
+  const currentSession = await getCurrentSession();
 
   if (Number.isNaN(sessionId)) {
     redirect("/logs");
@@ -40,6 +43,43 @@ export default async function Page({
     redirect("/logs");
   }
 
+  if (session.id === currentSession?.id) {
+    return (
+      <>
+        <Container maxWidth="lg">
+          <Box
+            sx={{
+              my: 3,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Chip
+              variant="outlined"
+              label={dayjs(currentSession.startTime).format("MM/DD/YYYY")}
+            />
+
+            <Button
+              variant="contained"
+              startIcon={<ArrowBack />}
+              LinkComponent={Link}
+              href="/logs"
+            >
+              Logs
+            </Button>
+          </Box>
+
+          <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
+            <Typography variant="h4">{currentSession.name}</Typography>
+            <EditSessionMenu session={currentSession} />
+          </Box>
+        </Container>
+
+        <CurrentSession session={currentSession} units={units} />
+      </>
+    );
+  }
   return (
     <>
       <Container maxWidth="lg">

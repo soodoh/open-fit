@@ -65,6 +65,5 @@ export async function createSetGroup({
     revalidatePath(`/day/${sessionOrDayId}`);
   } else {
     revalidatePath(`/logs/${sessionOrDayId}`);
-    revalidatePath(`/logs/current`);
   }
 }

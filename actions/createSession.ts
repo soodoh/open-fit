@@ -8,7 +8,7 @@ import dayjs from "dayjs";
 
 export async function createSession(
   newSessionData: Partial<WorkoutSession>,
-): Promise<boolean> {
+): Promise<WorkoutSession | null> {
   const session = await auth();
   if (!session?.user?.id) {
     throw new Error("Unauthorized");
@@ -35,7 +35,7 @@ export async function createSession(
 
     // Clone sets from routineDay template (if templateId was passed)
     if (!routineDay) {
-      return true;
+      return workoutSession;
     }
     for (const [
       setGroupOrder,
@@ -64,10 +64,11 @@ export async function createSession(
         });
       }
     }
+
+    return workoutSession;
   } catch (err) {
     console.error(err);
-    return false;
   }
 
-  return true;
+  return null;
 }

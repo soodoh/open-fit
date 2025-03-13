@@ -2,9 +2,10 @@
 
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { SessionWithRelations } from "@/types/workoutSession";
 import dayjs from "dayjs";
 
-export async function getCurrentSession() {
+export async function getCurrentSession(): Promise<SessionWithRelations | null> {
   const session = await auth();
   if (!session?.user?.id) {
     throw new Error("Unauthorized");

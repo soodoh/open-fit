@@ -40,7 +40,7 @@ export default async function Sessions() {
 
       {currentSession && (
         <Box sx={{ my: 3 }}>
-          <ResumeSessionButton />
+          <ResumeSessionButton session={currentSession} />
         </Box>
       )}
 

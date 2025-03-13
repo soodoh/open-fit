@@ -33,7 +33,6 @@ export async function bulkEditSets(
     }
     if (parentSetGroup?.sessionId) {
       revalidatePath(`/logs/${parentSetGroup.sessionId}`);
-      revalidatePath("/logs/current");
     }
   } catch (error) {
     console.error(error);

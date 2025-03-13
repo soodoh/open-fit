@@ -31,7 +31,7 @@ export default async function Routines() {
       <Grid container spacing={2}>
         {currentSession && (
           <Grid size={{ xs: 12 }}>
-            <ResumeSessionButton />
+            <ResumeSessionButton session={currentSession} />
           </Grid>
         )}
         {routines?.map((routine) => (

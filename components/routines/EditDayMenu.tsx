@@ -68,8 +68,12 @@ export const EditDayMenu = ({
         <MenuList dense disablePadding>
           <MenuItem
             onClick={async () => {
-              await createSession({ templateId: routineDay.id });
-              redirect("/logs/current");
+              const session = await createSession({
+                templateId: routineDay.id,
+              });
+              if (session) {
+                redirect(`/logs/${session.id}`);
+              }
             }}
             disabled={!!currentSession}
           >
