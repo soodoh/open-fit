@@ -1,13 +1,8 @@
 import { getCurrentSession } from "@/actions/getCurrentSession";
 import { getUnits } from "@/actions/getUnits";
 import { CurrentSessionPage } from "@/components/sessions/CurrentSessionPage";
-import { EditSessionMenu } from "@/components/sessions/EditSessionMenu";
 import { SessionPage } from "@/components/sessions/SessionPage";
 import { prisma } from "@/lib/prisma";
-import { ArrowBack } from "@mui/icons-material";
-import { Box, Button, Chip, Container, Typography } from "@mui/material";
-import dayjs from "dayjs";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 
 export default async function Page({

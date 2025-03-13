@@ -1,3 +1,4 @@
+import { getCurrentSession } from "@/actions/getCurrentSession";
 import { getUnits } from "@/actions/getUnits";
 import { auth } from "@/auth";
 import { DayPage } from "@/components/routines/DayPage";
@@ -40,6 +41,7 @@ export default async function Page({
     redirect("/routines");
   }
 
+  const currentSession = await getCurrentSession();
   const units = await getUnits();
 
   return (
@@ -52,7 +54,11 @@ export default async function Page({
           <Typography variant="h5" gutterBottom>
             {routineDay.description}
           </Typography>
-          <EditDayMenu routineDay={routineDay} icon={<Settings />} />
+          <EditDayMenu
+            currentSession={currentSession}
+            routineDay={routineDay}
+            icon={<Settings />}
+          />
         </Box>
         <Button
           variant="contained"

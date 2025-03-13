@@ -1,0 +1,5 @@
+.env
+.git
+.next
+.yarn
+node_modules
