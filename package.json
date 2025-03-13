@@ -21,6 +21,7 @@
     "@mui/icons-material": "^6.4.0",
     "@mui/material": "^6.4.0",
     "@mui/material-nextjs": "^6.3.1",
+    "@mui/system": "^6.4.7",
     "@mui/x-date-pickers": "^7.24.0",
     "@prisma/client": "^6.2.1",
     "bcrypt": "^5.1.1",

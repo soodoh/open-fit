@@ -1,5 +1,5 @@
 services:
-  db:
+  wger-db:
     image: postgres:latest
     restart: always
     container_name: wger-db
@@ -8,17 +8,33 @@ services:
       - "5432:5432"
     volumes:
       - postgres:/var/lib/postgresql/data
-  pgadmin:
-    image: elestio/pgadmin:latest
-    restart: unless-stopped
-    container_name: pgadmin
+    networks:
+      - wger-net
+
+  wger-ui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    container_name: wger-ui
     env_file: .env
     environment:
-      PGADMIN_DEFAULT_EMAIL: ${ADMIN_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${ADMIN_PASSWORD}
-      PGADMIN_LISTEN_PORT: 8080
+      TZ: $TZ
+      AUTH_TRUST_HOST: true
+      DATABASE_URL: postgres://postgres:postgres@wger-db:5432/postgres
+      ADMIN_EMAIL: $ADMIN_EMAIL
+      ADMIN_PASSWORD: $ADMIN_PASSWORD
     ports:
-      - "8080:8080"
+      - "3000:3000"
+    depends_on:
+      - wger-db
+    volumes:
+      - ./wger-ui:/app
+    networks:
+      - wger-net
 
 volumes:
   postgres:
+
+networks:
+  wger-net:
