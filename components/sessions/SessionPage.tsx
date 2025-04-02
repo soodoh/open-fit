@@ -3,7 +3,7 @@
 import {
   Rating,
   Typography,
-  Grid2 as Grid,
+  Grid,
   Container,
   Box,
   Chip,

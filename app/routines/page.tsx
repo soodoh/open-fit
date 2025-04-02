@@ -1,5 +1,5 @@
 import { Box, Container, Typography } from "@mui/material";
-import { Grid2 as Grid } from "@mui/material";
+import { Grid } from "@mui/material";
 import { CreateRoutine } from "@/components/routines/CreateRoutine";
 import { RoutineCard } from "@/components/routines/RoutineCard";
 import { auth } from "@/auth";

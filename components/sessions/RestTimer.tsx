@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import { green, grey } from "@mui/material/colors";
 import dayjs from "dayjs";
-import type { TimerResult } from "react-timer-hook";
+import { useTimer } from "react-timer-hook";
 
 export const RestTimer = ({
   open,
@@ -25,7 +25,7 @@ export const RestTimer = ({
   setOpen: (isOpen: boolean) => void;
   totalSeconds: number;
   setTotalSeconds: (seconds: number) => void;
-  timer: TimerResult;
+  timer: ReturnType<typeof useTimer>;
 }) => {
   const {
     isRunning,
