@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  Typography,
-  Grid2 as Grid,
-  Container,
-  Box,
-  Chip,
-  Button,
-} from "@mui/material";
+import { Typography, Grid, Container, Box, Chip, Button } from "@mui/material";
 import type { SessionWithRelations } from "@/types/workoutSession";
 import { Units } from "@/actions/getUnits";
 import { WorkoutList } from "../workoutSet/WorkoutList";

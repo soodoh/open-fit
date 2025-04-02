@@ -5,8 +5,8 @@ import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Wger",
-  description: "Wger New UI",
+  title: "OpenFit",
+  description: "Open source fitness app",
   icons: "/favicon.png",
 };
 
