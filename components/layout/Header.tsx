@@ -1,4 +1,4 @@
-import { AppBar, Box, Container, Toolbar, Link } from "@mui/material";
+import { AppBar, Box, Container, Link, Toolbar } from "@mui/material";
 import Image from "next/image";
 import NextLink from "next/link";
 import { AccountNavItem } from "./AccountNavItem";

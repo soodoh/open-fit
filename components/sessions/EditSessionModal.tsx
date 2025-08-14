@@ -1,3 +1,7 @@
+import { createSession } from "@/actions/createSession";
+import { editSession } from "@/actions/editSession";
+import { RoutineDayWithRoutine } from "@/actions/searchTemplates";
+import { SessionWithRelations } from "@/types/workoutSession";
 import {
   Box,
   Button,
@@ -9,13 +13,9 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
 import { DateTimePicker } from "@mui/x-date-pickers";
 import dayjs, { type Dayjs } from "dayjs";
-import { SessionWithRelations } from "@/types/workoutSession";
-import { RoutineDayWithRoutine } from "@/actions/searchTemplates";
-import { createSession } from "@/actions/createSession";
-import { editSession } from "@/actions/editSession";
+import { useState } from "react";
 import { SelectTemplate } from "./SelectTemplate";
 
 export const EditSessionModal = ({
