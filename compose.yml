@@ -1,8 +1,8 @@
 services:
-  wger-db:
+  postgres:
     image: postgres:latest
+    container_name: postgres
     restart: always
-    container_name: wger-db
     env_file: .env
     ports:
       - "5432:5432"
@@ -11,27 +11,27 @@ services:
     networks:
       - wger-net
 
-  wger-ui:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    restart: always
-    container_name: wger-ui
-    env_file: .env
-    environment:
-      TZ: $TZ
-      AUTH_TRUST_HOST: true
-      DATABASE_URL: postgres://postgres:postgres@wger-db:5432/postgres
-      ADMIN_EMAIL: $ADMIN_EMAIL
-      ADMIN_PASSWORD: $ADMIN_PASSWORD
-    ports:
-      - "3000:3000"
-    depends_on:
-      - wger-db
-    volumes:
-      - ./wger-ui:/app
-    networks:
-      - wger-net
+  # wger-ui:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   restart: always
+  #   container_name: wger-ui
+  #   env_file: .env
+  #   environment:
+  #     TZ: $TZ
+  #     AUTH_TRUST_HOST: true
+  #     DATABASE_URL: postgres://postgres:postgres@wger-db:5432/postgres
+  #     ADMIN_EMAIL: $ADMIN_EMAIL
+  #     ADMIN_PASSWORD: $ADMIN_PASSWORD
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - wger-db
+  #   volumes:
+  #     - ./wger-ui:/app
+  #   networks:
+  #     - wger-net
 
 volumes:
   postgres:
