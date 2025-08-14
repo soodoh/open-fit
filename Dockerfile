@@ -1,39 +1,45 @@
-# syntax=docker.io/docker/dockerfile:1
+# Stage 1: Build Stage
+FROM node:lts AS builder
 
-FROM node:lts-alpine AS base
+RUN apt-get -qy update && apt-get -qy install openssl
 
-RUN apk upgrade --no-cache
-RUN apk add --no-cache libc6-compat git
-
+# Set working directory
 WORKDIR /app
-COPY . .
 
-RUN \
-  corepack enable; \
-  yarn --frozen-lockfile; \
-  yarn build;
+# Copy package manager files
+COPY package.json yarn.lock .yarnrc.yml  ./
+COPY .yarn/ .yarn/
 
-# Next.js collects completely anonymous telemetry data about general usage.
-# Learn more here: https://nextjs.org/telemetry
-# Uncomment the following line in case you want to disable telemetry during the build.
-ENV NEXT_TELEMETRY_DISABLED=1
+# Install dependencies
+# RUN corepack enable
+RUN yarn install --frozen-lockfile
 
+# Copy the rest of the application files
+COPY ./ ./
+
+# Build the app in standalone mode
+RUN npx prisma generate
+RUN yarn build
+
+# Stage 2: Runtime Stage
+FROM node:18-slim AS runner
+
+RUN apt-get -qy update && apt-get -qy install openssl
+
+# Set working directory
+WORKDIR /app
+
+# Copy the standalone output and dependencies from the builder stage
+COPY --from=builder /app/.next/standalone/ ./
+COPY --from=builder /app/.next/static/ ./.next/static/
+COPY --from=builder /app/public/ ./public/
+
+# Set environment variable for production
 ENV NODE_ENV=production
 
-# Set correct permissions for nextjs user and don't run as root
-RUN addgroup nodejs
-RUN adduser -SDH nextjs
-RUN chown nextjs:nodejs .next
-
-USER nextjs
-
+# Expose the port the app runs on
 EXPOSE 3000
-ENV PORT=3000
-ENV HOSTNAME="0.0.0.0"
 
-# HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 CMD [ "wget", "-q0", "http://localhost:3000/health" ]
+# Start the application
+CMD ["node", "server.js"]
 
-# server.js is created by next build from the standalone output
-# https://nextjs.org/docs/pages/api-reference/config/next-config-js/output
-# CMD ["node", "/app/.next/standalone/server.js"]
-CMD ["tail", "-f", "/dev/null"]
