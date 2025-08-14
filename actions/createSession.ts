@@ -1,10 +1,10 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
-import { revalidatePath } from "next/cache";
-import { WorkoutSession } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import dayjs from "dayjs";
+import { revalidatePath } from "next/cache";
+import type { WorkoutSession } from "@/prisma/generated/client";
 
 export async function createSession(
   newSessionData: Partial<WorkoutSession>,

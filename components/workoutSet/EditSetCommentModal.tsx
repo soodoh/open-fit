@@ -7,8 +7,8 @@ import {
   DialogTitle,
   TextField,
 } from "@mui/material";
-import type { WorkoutSetGroup } from "@prisma/client";
 import { useState } from "react";
+import type { WorkoutSetGroup } from "@/prisma/generated/client";
 
 export const EditSetCommentModal = ({
   open,

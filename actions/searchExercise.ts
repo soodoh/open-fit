@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import type { Exercise } from "@prisma/client";
+import type { Exercise } from "@/prisma/generated/client";
 
 export async function searchExercise(searchTerm: string): Promise<Exercise[]> {
   const formattedSearchTerm = searchTerm.trim().split(/\s+/).join(" & ");

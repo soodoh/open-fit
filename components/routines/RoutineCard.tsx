@@ -1,8 +1,8 @@
+import { Card, CardHeader, Divider, List, Typography } from "@mui/material";
 import dayjs from "dayjs";
-import { Typography, Card, CardHeader, List, Divider } from "@mui/material";
 import { EditRoutineMenu } from "./EditRoutineMenu";
-import type { Prisma, WorkoutSession } from "@prisma/client";
 import { RoutineDayItem } from "./RoutineDayItem";
+import type { Prisma, WorkoutSession } from "@/prisma/generated/client";
 
 export async function RoutineCard({
   routine,

@@ -18,7 +18,7 @@ RUN yarn install --frozen-lockfile
 COPY ./ ./
 
 # Build the app in standalone mode
-RUN npx prisma generate
+RUN rm -rf node_modules/.prisma/client && npx prisma generate
 RUN yarn build
 
 # Stage 2: Runtime Stage
@@ -32,6 +32,7 @@ WORKDIR /app
 # Copy the standalone output and dependencies from the builder stage
 COPY --from=builder /app/.next/standalone/ ./
 COPY --from=builder /app/.next/static/ ./.next/static/
+COPY --from=builder /app/prisma/ ./prisma/
 COPY --from=builder /app/public/ ./public/
 
 # Set environment variable for production

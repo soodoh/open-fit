@@ -7,8 +7,8 @@ import {
   DialogTitle,
   TextField,
 } from "@mui/material";
-import type { Routine } from "@prisma/client";
 import { useActionState } from "react";
+import type { Routine } from "@/prisma/generated/client";
 
 export const EditRoutineModal = ({
   open,

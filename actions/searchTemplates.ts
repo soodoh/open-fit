@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import type { Prisma } from "@prisma/client";
+import type { Prisma } from "@/prisma/generated/client";
 
 export type RoutineDayWithRoutine = Prisma.RoutineDayGetPayload<{
   include: { routine: true };

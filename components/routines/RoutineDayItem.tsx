@@ -1,3 +1,4 @@
+import { MoreHoriz } from "@mui/icons-material";
 import {
   Box,
   Chip,
@@ -6,11 +7,10 @@ import {
   ListItemButton,
   ListItemText,
 } from "@mui/material";
-import { EditDayMenu } from "./EditDayMenu";
 import dayjs from "dayjs";
 import Link from "next/link";
-import type { RoutineDay, WorkoutSession } from "@prisma/client";
-import { MoreHoriz } from "@mui/icons-material";
+import { EditDayMenu } from "./EditDayMenu";
+import type { RoutineDay, WorkoutSession } from "@/prisma/generated/client";
 
 export const RoutineDayItem = ({
   routineDay,

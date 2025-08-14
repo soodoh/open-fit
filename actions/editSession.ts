@@ -1,9 +1,9 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
+import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { WorkoutSession } from "@prisma/client";
+import type { WorkoutSession } from "@/prisma/generated/client";
 
 export async function editSession(
   sessionId: number,

@@ -1,5 +1,5 @@
-import type { Prisma } from "@prisma/client";
 import type { SetGroupInclude } from "./workoutSet";
+import type { Prisma } from "@/prisma/generated/client";
 
 export type SessionWithRelations = Prisma.WorkoutSessionGetPayload<{
   include: {

@@ -1,3 +1,4 @@
+import { editDay } from "@/actions/editDay";
 import {
   Box,
   Button,
@@ -14,10 +15,9 @@ import {
   type SelectChangeEvent,
   TextField,
 } from "@mui/material";
-import { useState } from "react";
 import dayjs from "dayjs";
-import { type RoutineDay } from "@prisma/client";
-import { editDay } from "@/actions/editDay";
+import { useState } from "react";
+import type { RoutineDay } from "@/prisma/generated/client";
 
 export const EditDayModal = ({
   open,

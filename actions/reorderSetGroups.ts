@@ -1,9 +1,9 @@
 "use server";
 
-import { WorkoutSetGroup } from "@prisma/client";
-import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
+import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import type { WorkoutSetGroup } from "@/prisma/generated/client";
 
 export async function reorderSetGroups(
   setGroups: WorkoutSetGroup[],

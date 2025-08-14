@@ -2,7 +2,7 @@
 
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { RepetitionUnit, WeightUnit } from "@prisma/client";
+import type { RepetitionUnit, WeightUnit } from "@/prisma/generated/client";
 
 export type Units = {
   repetitionUnits: RepetitionUnit[];
