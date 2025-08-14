@@ -1,22 +1,22 @@
 "use client";
 
-import {
-  Rating,
-  Typography,
-  Grid,
-  Container,
-  Box,
-  Chip,
-  Button,
-} from "@mui/material";
-import dayjs from "dayjs";
-import type { SessionWithRelations } from "@/types/workoutSession";
 import { Units } from "@/actions/getUnits";
-import { WorkoutList } from "../workoutSet/WorkoutList";
+import { WorkoutList } from "@/components/workoutSet/WorkoutList";
 import { ListView } from "@/types/constants";
 import { ArrowBack } from "@mui/icons-material";
+import {
+  Box,
+  Button,
+  Chip,
+  Container,
+  Grid,
+  Rating,
+  Typography,
+} from "@mui/material";
+import dayjs from "dayjs";
 import Link from "next/link";
 import { EditSessionMenu } from "./EditSessionMenu";
+import type { SessionWithRelations } from "@/types/workoutSession";
 
 export const SessionPage = ({
   session,

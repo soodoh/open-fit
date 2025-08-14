@@ -1,5 +1,6 @@
 "use client";
 
+import { AccountCircle, Logout, Settings } from "@mui/icons-material";
 import {
   Button,
   ListItemIcon,
@@ -7,9 +8,8 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
-import { useState, type MouseEvent } from "react";
-import { Logout, Settings, AccountCircle } from "@mui/icons-material";
 import { signOut } from "next-auth/react";
+import { type MouseEvent, useState } from "react";
 
 export const AccountNavItem = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);

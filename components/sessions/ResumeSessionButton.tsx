@@ -1,7 +1,7 @@
-import type { SessionWithRelations } from "@/types/workoutSession";
 import { PlayArrow } from "@mui/icons-material";
 import { Button } from "@mui/material";
 import Link from "next/link";
+import type { SessionWithRelations } from "@/types/workoutSession";
 
 export const ResumeSessionButton = ({
   session,

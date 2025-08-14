@@ -1,12 +1,11 @@
-import { Box, Container, Typography } from "@mui/material";
-import { Grid } from "@mui/material";
+import { getCurrentSession } from "@/actions/getCurrentSession";
+import { auth } from "@/auth";
 import { CreateRoutine } from "@/components/routines/CreateRoutine";
 import { RoutineCard } from "@/components/routines/RoutineCard";
-import { auth } from "@/auth";
-import { redirect } from "next/navigation";
-import { prisma } from "@/lib/prisma";
-import { getCurrentSession } from "@/actions/getCurrentSession";
 import { ResumeSessionButton } from "@/components/sessions/ResumeSessionButton";
+import { prisma } from "@/lib/prisma";
+import { Box, Container, Grid, Typography } from "@mui/material";
+import { redirect } from "next/navigation";
 
 export default async function Routines() {
   const session = await auth();

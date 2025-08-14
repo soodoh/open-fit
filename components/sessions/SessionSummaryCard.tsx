@@ -1,3 +1,4 @@
+import { SessionWithRelations } from "@/types/workoutSession";
 import {
   Button,
   Card,
@@ -14,7 +15,6 @@ import {
 import dayjs from "dayjs";
 import Link from "next/link";
 import { EditSessionMenu } from "./EditSessionMenu";
-import { SessionWithRelations } from "@/types/workoutSession";
 
 export const SessionSummaryCard = ({
   session,

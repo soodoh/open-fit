@@ -1,10 +1,10 @@
 "use client";
 
-import { Container } from "@mui/material";
-import type { RoutineDayWithRelations } from "@/types/routineDay";
-import type { Units } from "@/actions/getUnits";
-import { WorkoutList } from "../workoutSet/WorkoutList";
+import { WorkoutList } from "@/components/workoutSet/WorkoutList";
 import { ListView } from "@/types/constants";
+import { Container } from "@mui/material";
+import type { Units } from "@/actions/getUnits";
+import type { RoutineDayWithRelations } from "@/types/routineDay";
 
 export const DayPage = ({
   routineDay,

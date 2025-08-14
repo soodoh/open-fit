@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { EditRoutineModal as CreateRoutineModal } from "@/components/routines/EditRoutineModal";
 import { Add } from "@mui/icons-material";
 import { Button } from "@mui/material";
-import { EditRoutineModal as CreateRoutineModal } from "@/components/routines/EditRoutineModal";
+import { useState } from "react";
 
 export const CreateRoutine = () => {
   const [showEditModal, setEditModal] = useState(false);

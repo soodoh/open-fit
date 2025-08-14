@@ -1,4 +1,7 @@
-import { useEffect, useState } from "react";
+import { Units } from "@/actions/getUnits";
+import { DeleteSetGroupModal } from "@/components/routines/DeleteSetGroupModal";
+import { ListView } from "@/types/constants";
+import { SetGroupWithRelations } from "@/types/workoutSet";
 import { Comment, Delete, Edit, MoreHoriz, Reorder } from "@mui/icons-material";
 import {
   IconButton,
@@ -8,12 +11,9 @@ import {
   MenuItem,
   MenuList,
 } from "@mui/material";
-import { SetGroupWithRelations } from "@/types/workoutSet";
-import { EditSetCommentModal } from "./EditSetCommentModal";
-import { DeleteSetGroupModal } from "../routines/DeleteSetGroupModal";
+import { useEffect, useState } from "react";
 import { BulkEditSetModal } from "./BulkEditSetModal";
-import { Units } from "@/actions/getUnits";
-import { ListView } from "@/types/constants";
+import { EditSetCommentModal } from "./EditSetCommentModal";
 
 enum Modal {
   BULK_EDIT = "bulkEdit",

@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Delete, Edit, Settings } from "@mui/icons-material";
 import {
   IconButton,
@@ -10,8 +9,9 @@ import {
   MenuItem,
   MenuList,
 } from "@mui/material";
-import { EditSessionModal } from "./EditSessionModal";
+import { useEffect, useState } from "react";
 import { DeleteSessionModal } from "./DeleteSessionModal";
+import { EditSessionModal } from "./EditSessionModal";
 import type { SessionWithRelations } from "@/types/workoutSession";
 
 enum Modal {

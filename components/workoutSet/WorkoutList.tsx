@@ -1,4 +1,8 @@
+import { Units } from "@/actions/getUnits";
 import { reorderSetGroups } from "@/actions/reorderSetGroups";
+import { AddExerciseRow } from "@/components/routines/AddExerciseRow";
+import { RestTimer } from "@/components/sessions/RestTimer";
+import { ListView } from "@/types/constants";
 import { SetGroupWithRelations } from "@/types/workoutSet";
 import {
   DndContext,
@@ -15,22 +19,18 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import {
+  Box,
   Container,
   Divider,
   FormControlLabel,
   FormGroup,
   List,
   Switch,
-  Box,
 } from "@mui/material";
-import { useOptimistic, useState, useTransition } from "react";
-import { WorkoutSetGroup } from "./WorkoutSetGroup";
-import { Units } from "@/actions/getUnits";
-import { ListView } from "@/types/constants";
-import { AddExerciseRow } from "../routines/AddExerciseRow";
-import { RestTimer } from "../sessions/RestTimer";
-import { useTimer } from "react-timer-hook";
 import dayjs from "dayjs";
+import { useOptimistic, useState, useTransition } from "react";
+import { useTimer } from "react-timer-hook";
+import { WorkoutSetGroup } from "./WorkoutSetGroup";
 
 export const WorkoutList = ({
   view = ListView.EditTemplate,

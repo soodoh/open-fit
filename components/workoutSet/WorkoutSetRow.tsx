@@ -1,6 +1,5 @@
 import { editSet } from "@/actions/editSet";
-import type { Units } from "@/actions/getUnits";
-import type { SetWithRelations } from "@/types/workoutSet";
+import { ListView } from "@/types/constants";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { DragHandle, MoreVert } from "@mui/icons-material";
@@ -12,11 +11,12 @@ import {
   ListItem,
   TextField,
 } from "@mui/material";
-import { SetTypeMenu } from "./SetTypeMenu";
 import { RepUnitMenu } from "./RepUnitMenu";
+import { SetTypeMenu } from "./SetTypeMenu";
 import { WeightUnitMenu } from "./WeightUnitMenu";
-import { ListView } from "@/types/constants";
 import { WorkoutTimer } from "./WorkoutTimer";
+import type { Units } from "@/actions/getUnits";
+import type { SetWithRelations } from "@/types/workoutSet";
 
 export const WorkoutSetRow = ({
   view,
