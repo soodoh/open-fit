@@ -1,5 +1,7 @@
 import { editSet } from "@/actions/editSet";
+import { SetType } from "@/prisma/generated/client";
 import { SetWithRelations } from "@/types/workoutSet";
+import { Whatshot } from "@mui/icons-material";
 import {
   Avatar,
   IconButton,
@@ -7,10 +9,8 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
-import { SetType } from "@prisma/client";
-import { type ReactNode, useState } from "react";
 import { red, yellow } from "@mui/material/colors";
-import { Whatshot } from "@mui/icons-material";
+import { type ReactNode, useState } from "react";
 
 // TODO do this better, with localization, etc.
 const setTypes: Record<SetType, { label: string }> = {

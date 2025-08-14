@@ -1,4 +1,4 @@
-import type { Prisma } from "@prisma/client";
+import type { Prisma } from "@/prisma/generated/client";
 
 export type SetInclude = {
   include: { exercise: true; repetitionUnit: true; weightUnit: true };

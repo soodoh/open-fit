@@ -7,7 +7,7 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
-import type { WorkoutSetGroup } from "@prisma/client";
+import type { WorkoutSetGroup } from "@/prisma/generated/client";
 
 export const DeleteSetGroupModal = ({
   open,

@@ -1,9 +1,9 @@
-import { Box, IconButton, TextField } from "@mui/material";
-import { AutocompleteExercise } from "../exercises/AutocompleteExercise";
-import { useState } from "react";
-import { Add } from "@mui/icons-material";
-import { Exercise } from "@prisma/client";
 import { createSetGroup } from "@/actions/createSetGroup";
+import { AutocompleteExercise } from "@/components/exercises/AutocompleteExercise";
+import { Add } from "@mui/icons-material";
+import { Box, IconButton, TextField } from "@mui/material";
+import { useState } from "react";
+import type { Exercise } from "@/prisma/generated/client";
 
 export const AddExerciseRow = ({
   sessionOrDayId,

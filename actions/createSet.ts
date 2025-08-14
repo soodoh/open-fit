@@ -2,7 +2,7 @@
 
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { SetType } from "@prisma/client";
+import { SetType } from "@/prisma/generated/client";
 import { revalidatePath } from "next/cache";
 
 export async function createSet(setGroupId: number, exerciseId: number) {

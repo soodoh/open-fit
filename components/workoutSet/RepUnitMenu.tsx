@@ -1,8 +1,8 @@
-import type { Units } from "@/actions/getUnits";
 import { ArrowDropDown } from "@mui/icons-material";
 import { IconButton, Menu, MenuItem } from "@mui/material";
-import type { RepetitionUnit } from "@prisma/client";
 import { useState } from "react";
+import type { Units } from "@/actions/getUnits";
+import type { RepetitionUnit } from "@/prisma/generated/client";
 
 export const RepUnitMenu = ({
   id,

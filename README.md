@@ -17,6 +17,12 @@ ADMIN_EMAIL=admin@admin.com
 ADMIN_PASSWORD=adminadmin
 ```
 
+## Generate prisma client
+
+```bash
+npx prisma generate
+```
+
 ## Spin up local services
 
 See the `compose.yml` file for reference.

@@ -1,3 +1,5 @@
+import bcrypt from "bcrypt";
+import { exercises } from "./defaultExercises";
 import {
   type Equipment,
   type ExerciseCategory,
@@ -5,11 +7,9 @@ import {
   type ExerciseLevel,
   type ExerciseMechanic,
   type MuscleGroup,
-  Role,
   PrismaClient,
-} from "@prisma/client";
-import { exercises } from "./defaultExercises";
-import bcrypt from "bcrypt";
+  Role,
+} from "./generated/client";
 
 const prisma = new PrismaClient();
 

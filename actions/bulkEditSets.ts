@@ -1,9 +1,9 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
+import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import type { WorkoutSet } from "@prisma/client";
+import type { WorkoutSet } from "@/prisma/generated/client";
 
 export async function bulkEditSets(
   setGroupId: number,

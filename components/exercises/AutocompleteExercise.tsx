@@ -1,3 +1,4 @@
+import { searchExercise } from "@/actions/searchExercise";
 import { Image as ImageIcon } from "@mui/icons-material";
 import {
   Autocomplete,
@@ -8,9 +9,8 @@ import {
   TextField,
 } from "@mui/material";
 import { useState } from "react";
-import { searchExercise } from "@/actions/searchExercise";
-import { Exercise } from "@prisma/client";
 import useSWR from "swr";
+import type { Exercise } from "@/prisma/generated/client";
 
 export const AutocompleteExercise = ({
   value,

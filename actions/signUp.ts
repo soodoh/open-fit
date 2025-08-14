@@ -1,10 +1,10 @@
 "use server";
 
-import { z } from "zod";
-import bcrypt from "bcrypt";
-import { prisma } from "@/lib/prisma";
 import { signIn } from "@/auth";
-import { Role } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
+import { Role } from "@/prisma/generated/client";
+import bcrypt from "bcrypt";
+import { z } from "zod";
 
 const SignUpSchema = z.object({
   email: z.string().email({ message: "Must be a valid email address" }),

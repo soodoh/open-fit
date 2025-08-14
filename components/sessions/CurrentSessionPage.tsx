@@ -1,15 +1,15 @@
 "use client";
 
-import { Typography, Grid, Container, Box, Chip, Button } from "@mui/material";
-import type { SessionWithRelations } from "@/types/workoutSession";
 import { Units } from "@/actions/getUnits";
-import { WorkoutList } from "../workoutSet/WorkoutList";
-import { CurrentDuration } from "./CurrentDuration";
+import { WorkoutList } from "@/components/workoutSet/WorkoutList";
 import { ListView } from "@/types/constants";
-import dayjs from "dayjs";
 import { ArrowBack } from "@mui/icons-material";
+import { Box, Button, Chip, Container, Grid, Typography } from "@mui/material";
+import dayjs from "dayjs";
 import Link from "next/link";
+import { CurrentDuration } from "./CurrentDuration";
 import { EditSessionMenu } from "./EditSessionMenu";
+import type { SessionWithRelations } from "@/types/workoutSession";
 
 export const CurrentSessionPage = ({
   session,

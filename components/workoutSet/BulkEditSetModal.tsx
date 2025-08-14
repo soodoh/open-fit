@@ -1,5 +1,4 @@
-import type { Units } from "@/actions/getUnits";
-import type { SetGroupWithRelations } from "@/types/workoutSet";
+import { bulkEditSets } from "@/actions/bulkEditSets";
 import {
   Box,
   Button,
@@ -10,13 +9,14 @@ import {
   InputAdornment,
   TextField,
 } from "@mui/material";
-import { bulkEditSets } from "@/actions/bulkEditSets";
-import { useState } from "react";
-import type { RepetitionUnit, WeightUnit } from "@prisma/client";
-import { RepUnitMenu } from "./RepUnitMenu";
-import { WeightUnitMenu } from "./WeightUnitMenu";
 import { DateTimeField } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from "dayjs";
+import { useState } from "react";
+import { RepUnitMenu } from "./RepUnitMenu";
+import { WeightUnitMenu } from "./WeightUnitMenu";
+import type { Units } from "@/actions/getUnits";
+import type { RepetitionUnit, WeightUnit } from "@/prisma/generated/client";
+import type { SetGroupWithRelations } from "@/types/workoutSet";
 
 export const BulkEditSetModal = ({
   open,

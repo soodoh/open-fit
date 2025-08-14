@@ -1,8 +1,8 @@
-import type { Units } from "@/actions/getUnits";
 import { ArrowDropDown } from "@mui/icons-material";
 import { IconButton, Menu, MenuItem } from "@mui/material";
 import { useState } from "react";
-import type { WeightUnit } from "@prisma/client";
+import type { Units } from "@/actions/getUnits";
+import type { WeightUnit } from "@/prisma/generated/client";
 
 export const WeightUnitMenu = ({
   id,

@@ -1,37 +1,8 @@
-import {
-  Avatar,
-  Collapse,
-  Fab,
-  IconButton,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemIcon,
-  ListItemText,
-  ListItemButton,
-  Typography,
-} from "@mui/material";
-import {
-  Add,
-  DragHandle,
-  Error,
-  Image as ImageIcon,
-} from "@mui/icons-material";
-import {
-  arrayMove,
-  SortableContext,
-  useSortable,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import {
-  useEffect,
-  useMemo,
-  useOptimistic,
-  useState,
-  useTransition,
-} from "react";
-import { WorkoutSetRow } from "./WorkoutSetRow";
+import { createSet } from "@/actions/createSet";
+import { type Units } from "@/actions/getUnits";
+import { reorderSets } from "@/actions/reorderSets";
+import { SetType } from "@/prisma/generated/client";
+import { ListView } from "@/types/constants";
 import {
   DndContext,
   DragEndEvent,
@@ -41,17 +12,46 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { reorderSets } from "@/actions/reorderSets";
-import { type Units } from "@/actions/getUnits";
+import {
+  arrayMove,
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import {
+  Add,
+  DragHandle,
+  Error,
+  Image as ImageIcon,
+} from "@mui/icons-material";
+import {
+  Avatar,
+  Collapse,
+  Fab,
+  IconButton,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Typography,
+} from "@mui/material";
+import {
+  useEffect,
+  useMemo,
+  useOptimistic,
+  useState,
+  useTransition,
+} from "react";
+import { EditSetGroupMenu } from "./EditSetGroupMenu";
+import { WorkoutSetRow } from "./WorkoutSetRow";
 import type {
   SetGroupWithRelations,
   SetWithNumber,
   SetWithRelations,
 } from "@/types/workoutSet";
-import { createSet } from "@/actions/createSet";
-import { EditSetGroupMenu } from "./EditSetGroupMenu";
-import { SetType } from "@prisma/client";
-import { ListView } from "@/types/constants";
 
 export const WorkoutSetGroup = ({
   view,

@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { DeleteRoutineModal } from "./DeleteRoutineModal";
 import { EditRoutineModal } from "@/components/routines/EditRoutineModal";
 import { Add, Delete, Edit, Settings } from "@mui/icons-material";
 import {
@@ -12,8 +10,10 @@ import {
   MenuItem,
   MenuList,
 } from "@mui/material";
+import { useEffect, useState } from "react";
+import { DeleteRoutineModal } from "./DeleteRoutineModal";
 import { EditDayModal as AddDayModal } from "./EditDayModal";
-import type { Routine } from "@prisma/client";
+import type { Routine } from "@/prisma/generated/client";
 
 enum Modal {
   EDIT = "edit",

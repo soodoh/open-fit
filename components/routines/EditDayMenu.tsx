@@ -1,7 +1,6 @@
 "use client";
 
-import { type ReactNode, useEffect, useState } from "react";
-import { EditDayModal } from "./EditDayModal";
+import { createSession } from "@/actions/createSession";
 import { Delete, Edit, PlayArrow } from "@mui/icons-material";
 import {
   IconButton,
@@ -11,10 +10,11 @@ import {
   MenuItem,
   MenuList,
 } from "@mui/material";
-import { DeleteDayModal } from "./DeleteDayModal";
-import type { RoutineDay, WorkoutSession } from "@prisma/client";
-import { createSession } from "@/actions/createSession";
 import { redirect } from "next/navigation";
+import { type ReactNode, useEffect, useState } from "react";
+import { DeleteDayModal } from "./DeleteDayModal";
+import { EditDayModal } from "./EditDayModal";
+import type { RoutineDay, WorkoutSession } from "@/prisma/generated/client";
 
 enum Modal {
   EDIT = "edit",
