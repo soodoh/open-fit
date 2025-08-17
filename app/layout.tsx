@@ -1,5 +1,4 @@
 import { AppWrapper } from "@/components/layout/AppWrapper";
-import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import type { Metadata } from "next";
 
 import "./globals.css";
@@ -18,9 +17,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <AppRouterCacheProvider options={{ enableCssLayer: true }}>
-          <AppWrapper>{children}</AppWrapper>
-        </AppRouterCacheProvider>
+        <AppWrapper>{children}</AppWrapper>
       </body>
     </html>
   );
