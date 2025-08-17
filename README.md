@@ -11,9 +11,12 @@ POSTGRES_DB=postgres
 DATABASE_URL="postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:5432/$POSTGRES_DB"
 
 # Must match email address regex
+# (Used for initial admin user during setup, this may change as the project matures)
 ADMIN_EMAIL=admin@admin.com
 ADMIN_PASSWORD=adminadmin
 ```
+
+Or alternatively, setup environment variables in your compose.yml
 
 ## Generate prisma client
 
@@ -60,6 +63,7 @@ npx prisma migrate dev --name {SOME_DESCRIPTIVE_NAME_FOR_CHANGES}
 ## Planned
 
 [] Dev experience
+    [] Script to hydrate DB with dummy routines/days/etc for easier development
     [] Remove SWR, use React Query
     [] Remove Next server functions, use regular API endpoints
     [] Github Actions w/ changeset flow to release Docker images
@@ -103,6 +107,8 @@ npx prisma migrate dev --name {SOME_DESCRIPTIVE_NAME_FOR_CHANGES}
 
 ## Someday
 
+[] Playwright testing for APIs & UI flows
+    [] Run tests in Github Actions, auto fail releases, typical CI best practices, etc.
 [] Nutrition planning feature, similar to wger?
 [] Ability to scrape exercises/routines from other web pages
 [] UI enhancements
