@@ -54,3 +54,56 @@ npx prisma generate
 # Apply the migration
 npx prisma migrate dev --name {SOME_DESCRIPTIVE_NAME_FOR_CHANGES}
 ```
+
+# Roadmap
+
+## Planned
+
+[] Dev experience
+    [] Remove SWR, use React Query
+    [] Remove Next server functions, use regular API endpoints
+    [] Github Actions w/ changeset flow to release Docker images
+        [] Github Actions to update documentation website
+    [] Streamline initial dataset (remove assets and make script to initialize DB by pulling from a separate repo/source, similar to wger)?
+        [] Use LLM to localize these exercises, instructions, etc.
+        [] Host public website to sync exercises (similar to wger)?
+    [] Documentation website
+    [] Auto-generated API documentation (redocly? swagger?)
+    [] Monorepo for mobile/web/documentation site?
+[] Dark mode, retheme
+[] PWA
+    [] Add manifest, icons, metadata, etc.
+    [] Use service workers
+    [] Offline support & syncing
+[] Home page
+    [] Show recommended routines / templates (days)
+    [] Show recent templates (or templates from recent routines)
+    [] Show PRs, progress graphs from recent exercises
+    [] Rename "Day" model to "Template", since I think this makes more sense for more use cases
+[] Admin page
+    [] User management
+    [] oauth / email + password authentication
+    [] Add, edit Equipment, Muscle Groups, etc.
+[] User Profile page
+    [] Dark mode / other themes
+    [] Choose default units (metric, imperial, etc.)
+    [] Create gyms, assign available equipment per gym
+[] Exercises page
+    [] Admins can edit global exercises
+    [] Users can add custom exercises
+    [] Users can upload images for exercises
+[] Metrics view per exercise
+    [] View graphs of historical exercises
+    [] Calculate 1 rep max & other relevant metrics
+    [] Show correlated data from similar exercises
+[] Globalization
+    [] Integrate a localization library of some sort
+    [] Use LLM to translate common strings
+    [] Use LLM to translate "default set" of exercises, etc.
+
+## Someday
+
+[] Nutrition planning feature, similar to wger?
+[] Ability to scrape exercises/routines from other web pages
+[] UI enhancements
+[] PWA wrapper for iOS/Android that can import data from Apple Health/Health Connect
