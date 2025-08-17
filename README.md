@@ -84,6 +84,9 @@ npx prisma migrate dev --name {SOME_DESCRIPTIVE_NAME_FOR_CHANGES}
     [] Show recent templates (or templates from recent routines)
     [] Show PRs, progress graphs from recent exercises
     [] Rename "Day" model to "Template", since I think this makes more sense for more use cases
+[] Workout page
+    [] Suggest alternate exercises based on muscle group
+    [] Filter exercises based on available equipment (per current gym selected)
 [] Admin page
     [] User management
     [] oauth / email + password authentication
