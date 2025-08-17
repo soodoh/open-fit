@@ -1,6 +1,7 @@
 "use client";
 
 import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
+import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
@@ -56,12 +57,14 @@ export const AppWrapper = ({ children }: Readonly<{ children: ReactNode }>) => {
   });
 
   return (
-    <ThemeProvider theme={theme}>
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <CssBaseline />
-        <Header />
-        {children}
-      </LocalizationProvider>
-    </ThemeProvider>
+    <AppRouterCacheProvider options={{ enableCssLayer: true }}>
+      <ThemeProvider theme={theme}>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <CssBaseline />
+          <Header />
+          {children}
+        </LocalizationProvider>
+      </ThemeProvider>
+    </AppRouterCacheProvider>
   );
 };
