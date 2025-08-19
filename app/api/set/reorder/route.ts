@@ -7,15 +7,15 @@ export async function POST(request: Request) {
     throw new Error("Unauthorized");
   }
 
-  const { setGroupIds } = await request.json();
-  const updatedSetGroups = await Promise.all(
-    setGroupIds.map(async (id: number, index: number) => {
-      return prisma.workoutSetGroup.update({
+  const { setIds } = await request.json();
+  const updatedSets = await Promise.all(
+    setIds.map(async (id: number, index: number) => {
+      return prisma.workoutSet.update({
         where: { id },
         data: { order: index },
       });
     }),
   );
 
-  return Response.json(updatedSetGroups);
+  return Response.json(updatedSets);
 }

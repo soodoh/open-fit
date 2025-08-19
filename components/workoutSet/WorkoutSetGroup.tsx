@@ -1,6 +1,4 @@
-import { createSet } from "@/actions/createSet";
 import { type Units } from "@/actions/getUnits";
-import { reorderSets } from "@/actions/reorderSets";
 import { SetType } from "@/prisma/generated/client";
 import { ListView } from "@/types/constants";
 import {
@@ -102,7 +100,13 @@ export const WorkoutSetGroup = ({
   const sensors = useSensors(mouseSensor, touchSensor, keyboardSensor);
 
   const handleAdd = async () => {
-    await createSet(setGroup.id, exercise.id);
+    await fetch("/api/set", {
+      method: "POST",
+      body: JSON.stringify({
+        setGroupId: setGroup.id,
+        exerciseId: exercise.id,
+      }),
+    });
   };
 
   const handleSort = (event: DragEndEvent) => {
@@ -117,7 +121,10 @@ export const WorkoutSetGroup = ({
     const newSets = arrayMove(sets, oldIndex, newIndex);
     startTransition(async () => {
       optimisticUpdateSets(newSets);
-      await reorderSets(newSets);
+      await fetch("/api/set/reorder", {
+        method: "POST",
+        body: JSON.stringify({ setIds: newSets.map(({ id }) => id) }),
+      });
     });
   };
 

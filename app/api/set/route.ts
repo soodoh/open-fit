@@ -1,11 +1,9 @@
-"use server";
-
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { SetType } from "@/prisma/generated/client";
 import { revalidatePath } from "next/cache";
 
-export async function createSet(setGroupId: number, exerciseId: number) {
+export async function POST(request: Request) {
   const session = await auth();
   if (!session?.user?.id) {
     throw new Error("Unauthorized");
@@ -17,6 +15,7 @@ export async function createSet(setGroupId: number, exerciseId: number) {
     throw new Error("User not found");
   }
 
+  const { setGroupId, exerciseId } = await request.json();
   const setGroup = await prisma.workoutSetGroup.findUnique({
     where: { id: setGroupId },
     include: { sets: { where: { exerciseId } } },
@@ -46,5 +45,5 @@ export async function createSet(setGroupId: number, exerciseId: number) {
     },
   });
   revalidatePath(`/day/${setGroup.routineDayId}`);
-  return newSet;
+  return Response.json(newSet);
 }

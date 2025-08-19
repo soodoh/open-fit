@@ -1,9 +1,9 @@
 import { getCurrentSession } from "@/actions/getCurrentSession";
+import { getRoutines } from "@/actions/getRoutines";
 import { auth } from "@/auth";
 import { CreateRoutine } from "@/components/routines/CreateRoutine";
 import { RoutineCard } from "@/components/routines/RoutineCard";
 import { ResumeSessionButton } from "@/components/sessions/ResumeSessionButton";
-import { prisma } from "@/lib/prisma";
 import { Box, Container, Grid, Typography } from "@mui/material";
 import { redirect } from "next/navigation";
 
@@ -13,11 +13,7 @@ export default async function Routines() {
     redirect("/signin");
   }
 
-  const routines = await prisma.routine.findMany({
-    orderBy: { updatedAt: "desc" },
-    where: { userId: session.user.id },
-    include: { routineDays: true },
-  });
+  const routines = await getRoutines();
   const currentSession = await getCurrentSession();
 
   return (

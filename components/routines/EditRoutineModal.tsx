@@ -1,4 +1,3 @@
-import { editRoutine, type RoutineActionState } from "@/actions/editRoutine";
 import {
   Button,
   Dialog,
@@ -9,6 +8,17 @@ import {
 } from "@mui/material";
 import { useActionState } from "react";
 import type { Routine } from "@/prisma/generated/client";
+
+type RoutineActionState = {
+  data: {
+    name: string;
+    description?: string;
+  };
+  errors?: {
+    name?: string[];
+    description?: string[];
+  };
+};
 
 export const EditRoutineModal = ({
   open,
@@ -21,7 +31,13 @@ export const EditRoutineModal = ({
 }) => {
   const [state, action, isPending] = useActionState(
     async (_prevState: RoutineActionState, formData: FormData) => {
-      const nextState = await editRoutine(formData, routine?.id);
+      const nextState = await fetch(
+        routine ? `/api/routine/${routine.id}` : "/api/routine",
+        {
+          method: "POST",
+          body: formData,
+        },
+      ).then((res) => res.json());
       if (!nextState.errors) {
         onClose();
       }
@@ -56,7 +72,7 @@ export const EditRoutineModal = ({
           required
           error={!!state.errors?.name}
           helperText={state.errors?.name?.[0]}
-          defaultValue={state.data.name}
+          defaultValue={state.name}
         />
         <TextField
           variant="filled"
@@ -67,7 +83,7 @@ export const EditRoutineModal = ({
           name="description"
           error={!!state.errors?.description}
           helperText={state.errors?.description?.[0]}
-          defaultValue={state.data.description}
+          defaultValue={state.description}
         />
       </DialogContent>
 

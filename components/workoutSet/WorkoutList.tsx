@@ -30,7 +30,6 @@ import dayjs from "dayjs";
 import { useOptimistic, useState, useTransition } from "react";
 import { useTimer } from "react-timer-hook";
 import { WorkoutSetGroup } from "./WorkoutSetGroup";
-import { reorderSetGroups } from "@/actions/reorderSetGroups";
 
 export const WorkoutList = ({
   view = ListView.EditTemplate,
@@ -86,7 +85,7 @@ export const WorkoutList = ({
       await fetch("/api/setgroup/reorder", {
         method: "POST",
         body: JSON.stringify({
-          setGroups: newSetGroups.map((setGroup) => ({ id: setGroup.id })),
+          setGroupIds: newSetGroups.map((setGroup) => setGroup.id),
         }),
       });
     });
