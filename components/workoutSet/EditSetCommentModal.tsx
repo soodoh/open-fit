@@ -1,4 +1,3 @@
-import { updateSetGroupComment } from "@/actions/updateSetGroupComment";
 import {
   Button,
   Dialog,
@@ -44,7 +43,10 @@ export const EditSetCommentModal = ({
         <Button onClick={onClose}>Cancel</Button>
         <Button
           onClick={async () => {
-            await updateSetGroupComment(setGroup.id, comment);
+            await fetch(`/api/setgroup/${setGroup.id}`, {
+              method: "POST",
+              body: JSON.stringify({ comment }),
+            });
             onClose();
           }}
         >

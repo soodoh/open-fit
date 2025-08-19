@@ -1,4 +1,3 @@
-import { deleteRoutine } from "@/actions/deleteRoutine";
 import {
   Button,
   Dialog,
@@ -26,7 +25,7 @@ export const DeleteRoutineModal = ({
       PaperProps={{
         component: "form",
         action: async () => {
-          await deleteRoutine(routineId);
+          await fetch(`/api/routine/${routineId}`, { method: "DELETE" });
           onClose();
         },
       }}

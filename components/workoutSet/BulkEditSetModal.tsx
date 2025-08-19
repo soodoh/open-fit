@@ -1,4 +1,3 @@
-import { bulkEditSets } from "@/actions/bulkEditSets";
 import {
   Box,
   Button,
@@ -115,13 +114,16 @@ export const BulkEditSetModal = ({
             const totalSeconds =
               (restTime?.get("minutes") ?? 0) * 60 +
               (restTime?.get("seconds") ?? 0);
-            await bulkEditSets(setGroup.id, {
-              // If empty string, leave unchanged (undefined)
-              reps: reps ? parseInt(reps, 10) : undefined,
-              weight: weight ? parseInt(weight, 10) : undefined,
-              repetitionUnitId: repUnit.id,
-              weightUnitId: weightUnit.id,
-              restTime: totalSeconds,
+            await fetch(`/api/setgroup/${setGroup.id}/bulkedit`, {
+              method: "POST",
+              body: JSON.stringify({
+                // If empty string, leave unchanged (undefined)
+                reps: reps ? parseInt(reps, 10) : undefined,
+                weight: weight ? parseInt(weight, 10) : undefined,
+                repetitionUnitId: repUnit.id,
+                weightUnitId: weightUnit.id,
+                restTime: totalSeconds,
+              }),
             });
             onClose();
           }}

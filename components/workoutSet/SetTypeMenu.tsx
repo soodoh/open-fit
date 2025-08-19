@@ -1,4 +1,3 @@
-import { editSet } from "@/actions/editSet";
 import { SetType } from "@/prisma/generated/client";
 import { SetWithRelations } from "@/types/workoutSet";
 import { Whatshot } from "@mui/icons-material";
@@ -77,9 +76,9 @@ export const SetTypeMenu = ({
           <MenuItem
             key={`set-type-${set.id}-${setType}`}
             onClick={async () => {
-              await editSet({
-                id: set.id,
-                type: setType,
+              fetch(`/api/set/${set.id}`, {
+                method: "POST",
+                body: JSON.stringify({ type: setType }),
               });
               setSetTypeMenu(null);
             }}

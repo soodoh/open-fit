@@ -1,9 +1,9 @@
 import { getCurrentSession } from "@/actions/getCurrentSession";
+import { getSessions } from "@/actions/getSessions";
 import { auth } from "@/auth";
 import { CreateSessionButton } from "@/components/sessions/CreateSession";
 import { ResumeSessionButton } from "@/components/sessions/ResumeSessionButton";
 import { SessionSummaryCard } from "@/components/sessions/SessionSummaryCard";
-import { prisma } from "@/lib/prisma";
 import { Box, Container, Typography } from "@mui/material";
 import { redirect } from "next/navigation";
 
@@ -13,22 +13,7 @@ export default async function Sessions() {
     redirect("/signin");
   }
 
-  const sessions = await prisma.workoutSession.findMany({
-    orderBy: { startTime: "desc" },
-    where: { userId: session.user.id },
-    include: {
-      template: { include: { routine: true } },
-      setGroups: {
-        orderBy: { order: "asc" },
-        include: {
-          sets: {
-            orderBy: { order: "asc" },
-            include: { exercise: true, repetitionUnit: true, weightUnit: true },
-          },
-        },
-      },
-    },
-  });
+  const sessions = await getSessions();
   const currentSession = await getCurrentSession();
 
   return (

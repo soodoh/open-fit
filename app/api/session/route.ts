@@ -1,3 +1,4 @@
+import { getSessions } from "@/actions/getSessions";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import dayjs from "dayjs";
@@ -68,26 +69,6 @@ export async function POST(request: Request) {
 }
 
 export async function GET() {
-  const session = await auth();
-  if (!session?.user?.id) {
-    throw new Error("Unauthorized");
-  }
-
-  const sessions = await prisma.workoutSession.findMany({
-    orderBy: { startTime: "desc" },
-    where: { userId: session.user.id },
-    include: {
-      template: { include: { routine: true } },
-      setGroups: {
-        orderBy: { order: "asc" },
-        include: {
-          sets: {
-            orderBy: { order: "asc" },
-            include: { exercise: true, repetitionUnit: true, weightUnit: true },
-          },
-        },
-      },
-    },
-  });
+  const sessions = await getSessions();
   return Response.json(sessions);
 }

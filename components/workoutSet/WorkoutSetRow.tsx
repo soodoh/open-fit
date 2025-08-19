@@ -1,4 +1,3 @@
-import { editSet } from "@/actions/editSet";
 import { ListView } from "@/types/constants";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -78,7 +77,10 @@ export const WorkoutSetRow = ({
                     id={set.id}
                     units={units}
                     onChange={(repUnit) => {
-                      editSet({ id: set.id, repetitionUnitId: repUnit.id });
+                      fetch(`/api/set/${set.id}`, {
+                        method: "POST",
+                        body: JSON.stringify({ repetitionUnitId: repUnit.id }),
+                      });
                     }}
                   />
                 </InputAdornment>
@@ -87,9 +89,11 @@ export const WorkoutSetRow = ({
           }}
           defaultValue={set.reps}
           onBlur={async (event) => {
-            await editSet({
-              id: set.id,
-              reps: parseInt(event.target.value, 10) || 0,
+            fetch(`/api/set/${set.id}`, {
+              method: "POST",
+              body: JSON.stringify({
+                reps: parseInt(event.target.value, 10) || 0,
+              }),
             });
           }}
         />
@@ -109,7 +113,10 @@ export const WorkoutSetRow = ({
                     id={set.id}
                     units={units}
                     onChange={(weightUnit) => {
-                      editSet({ id: set.id, weightUnitId: weightUnit.id });
+                      fetch(`/api/set/${set.id}`, {
+                        method: "POST",
+                        body: JSON.stringify({ weightUnitId: weightUnit.id }),
+                      });
                     }}
                   />
                 </InputAdornment>
@@ -118,9 +125,11 @@ export const WorkoutSetRow = ({
           }}
           defaultValue={set.weight}
           onBlur={async (event) => {
-            await editSet({
-              id: set.id,
-              weight: parseInt(event.target.value, 10) || 0,
+            fetch(`/api/set/${set.id}`, {
+              method: "POST",
+              body: JSON.stringify({
+                weight: parseInt(event.target.value, 10) || 0,
+              }),
             });
           }}
         />
@@ -129,7 +138,10 @@ export const WorkoutSetRow = ({
             <WorkoutTimer
               set={set}
               onComplete={async () => {
-                await editSet({ id: set.id, completed: true });
+                fetch(`/api/set/${set.id}`, {
+                  method: "POST",
+                  body: JSON.stringify({ completed: true }),
+                });
                 if (set.restTime) {
                   startRestTimer(set.restTime);
                 }
@@ -143,7 +155,10 @@ export const WorkoutSetRow = ({
                 aria-label="Mark as Completed"
                 checked={set.completed}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                  editSet({ id: set.id, completed: event.target.checked });
+                  fetch(`/api/set/${set.id}`, {
+                    method: "POST",
+                    body: JSON.stringify({ completed: event.target.checked }),
+                  });
                   if (set.restTime && event.target.checked) {
                     startRestTimer(set.restTime);
                   }

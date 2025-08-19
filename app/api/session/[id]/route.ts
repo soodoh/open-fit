@@ -1,3 +1,4 @@
+import { getSession } from "@/actions/getSessions";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
@@ -38,4 +39,12 @@ export async function DELETE(
   });
   revalidatePath("/logs");
   return Response.json(result);
+}
+
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const { id } = await params;
+  return getSession(parseInt(id, 10));
 }

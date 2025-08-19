@@ -1,8 +1,8 @@
 import { getCurrentSession } from "@/actions/getCurrentSession";
+import { getSession } from "@/actions/getSessions";
 import { getUnits } from "@/actions/getUnits";
 import { CurrentSessionPage } from "@/components/sessions/CurrentSessionPage";
 import { SessionPage } from "@/components/sessions/SessionPage";
-import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 
 export default async function Page({
@@ -18,21 +18,7 @@ export default async function Page({
     redirect("/logs");
   }
 
-  const session = await prisma.workoutSession.findUnique({
-    where: { id: sessionId },
-    include: {
-      template: { include: { routine: true } },
-      setGroups: {
-        orderBy: { order: "asc" },
-        include: {
-          sets: {
-            orderBy: { order: "asc" },
-            include: { exercise: true, repetitionUnit: true, weightUnit: true },
-          },
-        },
-      },
-    },
-  });
+  const session = await getSession(sessionId);
   const units = await getUnits();
   if (!session) {
     redirect("/logs");

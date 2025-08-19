@@ -1,9 +1,9 @@
 import { getCurrentSession } from "@/actions/getCurrentSession";
+import { getRoutineDay } from "@/actions/getDay";
 import { getUnits } from "@/actions/getUnits";
 import { auth } from "@/auth";
 import { DayPage } from "@/components/routines/DayPage";
 import { EditDayMenu } from "@/components/routines/EditDayMenu";
-import { prisma } from "@/lib/prisma";
 import { ArrowBack, Settings } from "@mui/icons-material";
 import { Box, Button, Chip, Container, Typography } from "@mui/material";
 import dayjs from "dayjs";
@@ -22,21 +22,7 @@ export default async function Page({
 
   const { day } = await params;
   const dayId = parseInt(day, 10);
-  const routineDay = await prisma.routineDay.findUnique({
-    where: { id: dayId },
-    include: {
-      routine: true,
-      setGroups: {
-        orderBy: { order: "asc" },
-        include: {
-          sets: {
-            orderBy: { order: "asc" },
-            include: { exercise: true, repetitionUnit: true, weightUnit: true },
-          },
-        },
-      },
-    },
-  });
+  const routineDay = await getRoutineDay(dayId);
   if (!routineDay) {
     redirect("/routines");
   }
