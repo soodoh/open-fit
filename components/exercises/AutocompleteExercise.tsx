@@ -67,7 +67,7 @@ export const AutocompleteExercise = ({
             </ListItemAvatar>
             <ListItemText
               primary={option.name}
-              secondary={option.primaryMuscles.join(", ")}
+              secondary={option.primaryMuscles?.join?.(", ")}
             />
           </ListItem>
         );

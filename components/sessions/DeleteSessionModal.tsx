@@ -1,4 +1,3 @@
-import { deleteSession } from "@/actions/deleteSession";
 import {
   Button,
   Dialog,
@@ -34,7 +33,7 @@ export const DeleteSessionModal = ({
         <Button onClick={onClose}>No</Button>
         <Button
           onClick={async () => {
-            await deleteSession(sessionId);
+            await fetch(`api/session/${sessionId}`, { method: "DELETE" });
             onClose();
           }}
         >
