@@ -1,4 +1,3 @@
-import { deleteSetGroup } from "@/actions/deleteSetGroup";
 import {
   Button,
   Dialog,
@@ -35,7 +34,7 @@ export const DeleteSetGroupModal = ({
         <Button onClick={onClose}>No</Button>
         <Button
           onClick={async () => {
-            await deleteSetGroup(setGroup.id);
+            await fetch(`/api/setgroup/${setGroup.id}`, { method: "DELETE" });
             onClose();
           }}
         >

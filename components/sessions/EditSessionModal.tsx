@@ -67,11 +67,10 @@ export const EditSessionModal = ({
             notes,
             impression,
           };
-          if (!session) {
-            createSession(sessionData);
-          } else {
-            editSession(session.id, sessionData);
-          }
+          await fetch(session ? `/api/session/${session.id}` : "/api/session", {
+            method: "POST",
+            body: JSON.stringify(sessionData),
+          });
           onClose();
         },
       }}

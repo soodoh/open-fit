@@ -1,4 +1,3 @@
-import { createSetGroup } from "@/actions/createSetGroup";
 import { AutocompleteExercise } from "@/components/exercises/AutocompleteExercise";
 import { Add } from "@mui/icons-material";
 import { Box, IconButton, TextField } from "@mui/material";
@@ -19,11 +18,14 @@ export const AddExerciseRow = ({
     if (!exercise) {
       return;
     }
-    await createSetGroup({
-      sessionOrDayId,
-      type,
-      exerciseId: exercise.id,
-      numSets: parseInt(numSets, 10),
+    await fetch("/api/setgroup", {
+      method: "POST",
+      body: JSON.stringify({
+        sessionOrDayId,
+        type,
+        exerciseId: exercise.id,
+        numSets: parseInt(numSets, 10),
+      }),
     });
   };
 

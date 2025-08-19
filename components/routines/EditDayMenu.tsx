@@ -1,6 +1,5 @@
 "use client";
 
-import { createSession } from "@/actions/createSession";
 import { Delete, Edit, PlayArrow } from "@mui/icons-material";
 import {
   IconButton,
@@ -68,9 +67,13 @@ export const EditDayMenu = ({
         <MenuList dense disablePadding>
           <MenuItem
             onClick={async () => {
-              const session = await createSession({
-                templateId: routineDay.id,
+              const response = await fetch("api/session", {
+                method: "POST",
+                body: JSON.stringify({
+                  templateId: routineDay.id,
+                }),
               });
+              const session = await response.json();
               if (session) {
                 redirect(`/logs/${session.id}`);
               }

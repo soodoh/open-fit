@@ -1,5 +1,4 @@
 import { Units } from "@/actions/getUnits";
-import { reorderSetGroups } from "@/actions/reorderSetGroups";
 import { AddExerciseRow } from "@/components/routines/AddExerciseRow";
 import { RestTimer } from "@/components/sessions/RestTimer";
 import { ListView } from "@/types/constants";
@@ -31,6 +30,7 @@ import dayjs from "dayjs";
 import { useOptimistic, useState, useTransition } from "react";
 import { useTimer } from "react-timer-hook";
 import { WorkoutSetGroup } from "./WorkoutSetGroup";
+import { reorderSetGroups } from "@/actions/reorderSetGroups";
 
 export const WorkoutList = ({
   view = ListView.EditTemplate,
@@ -83,7 +83,12 @@ export const WorkoutList = ({
     const newSetGroups = arrayMove(optimisticSetGroups, oldIndex, newIndex);
     startTransition(async () => {
       optimisticUpdateSetGroups(newSetGroups);
-      await reorderSetGroups(newSetGroups);
+      await fetch("/api/setgroup/reorder", {
+        method: "POST",
+        body: JSON.stringify({
+          setGroups: newSetGroups.map((setGroup) => ({ id: setGroup.id })),
+        }),
+      });
     });
   };
 

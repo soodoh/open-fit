@@ -1,26 +1,15 @@
-"use server";
-
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { SetGroupType, SetType } from "@/prisma/generated/client";
 import { revalidatePath } from "next/cache";
 
-export async function createSetGroup({
-  sessionOrDayId,
-  type,
-  exerciseId,
-  numSets,
-}: {
-  sessionOrDayId: number;
-  type: "session" | "routineDay";
-  exerciseId: number;
-  numSets: number;
-}) {
+export async function POST(request: Request) {
   const session = await auth();
   if (!session?.user?.id) {
     throw new Error("Unauthorized");
   }
 
+  const { sessionOrDayId, type, exerciseId, numSets } = await request.json();
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
   });
@@ -66,4 +55,6 @@ export async function createSetGroup({
   } else {
     revalidatePath(`/logs/${sessionOrDayId}`);
   }
+
+  return Response.json(setGroup);
 }

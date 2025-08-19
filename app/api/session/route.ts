@@ -1,41 +1,37 @@
-"use server";
-
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import dayjs from "dayjs";
 import { revalidatePath } from "next/cache";
-import type { WorkoutSession } from "@/prisma/generated/client";
 
-export async function createSession(
-  newSessionData: Partial<WorkoutSession>,
-): Promise<WorkoutSession | null> {
+export async function POST(request: Request) {
+  const body = await request.json();
   const session = await auth();
   if (!session?.user?.id) {
     throw new Error("Unauthorized");
   }
 
   try {
-    const routineDay = newSessionData.templateId
+    const routineDay = body.templateId
       ? await prisma.routineDay.findUnique({
-          where: { id: newSessionData.templateId },
+          where: { id: body.templateId },
           include: { setGroups: { include: { sets: true } } },
         })
       : null;
     const workoutSession = await prisma.workoutSession.create({
       data: {
-        ...newSessionData,
+        ...body,
         userId: session.user.id,
-        notes: newSessionData.notes ?? "",
-        startTime: newSessionData.startTime ?? dayjs().toISOString(),
-        name: newSessionData.name ?? routineDay?.description ?? "",
-        templateId: newSessionData.templateId,
+        notes: body.notes ?? "",
+        startTime: body.startTime ?? dayjs().toISOString(),
+        name: body.name ?? routineDay?.description ?? "",
+        templateId: body.templateId,
       },
     });
     revalidatePath("/logs");
 
     // Clone sets from routineDay template (if templateId was passed)
     if (!routineDay) {
-      return workoutSession;
+      return Response.json(workoutSession);
     }
     for (const [
       setGroupOrder,
@@ -65,10 +61,33 @@ export async function createSession(
       }
     }
 
-    return workoutSession;
+    return Response.json(workoutSession);
   } catch (err) {
     console.error(err);
   }
+}
 
-  return null;
+export async function GET() {
+  const session = await auth();
+  if (!session?.user?.id) {
+    throw new Error("Unauthorized");
+  }
+
+  const sessions = await prisma.workoutSession.findMany({
+    orderBy: { startTime: "desc" },
+    where: { userId: session.user.id },
+    include: {
+      template: { include: { routine: true } },
+      setGroups: {
+        orderBy: { order: "asc" },
+        include: {
+          sets: {
+            orderBy: { order: "asc" },
+            include: { exercise: true, repetitionUnit: true, weightUnit: true },
+          },
+        },
+      },
+    },
+  });
+  return Response.json(sessions);
 }
