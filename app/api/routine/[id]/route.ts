@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import type { NextRequest } from "next/server";
 
 const RoutineSchema = z.object({
   name: z.string().min(1, { message: "Routine name is required." }),
@@ -8,7 +9,7 @@ const RoutineSchema = z.object({
 });
 
 export async function POST(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const session = await auth();
@@ -47,7 +48,7 @@ export async function POST(
 }
 
 export async function DELETE(
-  request: Request,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const session = await auth();

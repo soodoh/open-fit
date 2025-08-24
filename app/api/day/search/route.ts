@@ -1,16 +1,11 @@
-"use server";
-
 import { prisma } from "@/lib/prisma";
-import type { Prisma } from "@/prisma/generated/client";
+import type { RoutineDayWithRoutine } from "@/types/routine";
+import type { NextRequest } from "next/server";
 
-export type RoutineDayWithRoutine = Prisma.RoutineDayGetPayload<{
-  include: { routine: true };
-}>;
-
-export async function searchTemplates(
-  searchTerm: string,
-): Promise<RoutineDayWithRoutine[]> {
-  const formattedSearchTerm = searchTerm.trim().split(/\s+/).join(" & ");
+export async function GET(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams;
+  const searchTerm = searchParams.get("searchTerm");
+  const formattedSearchTerm = searchTerm?.trim().split(/\s+/).join(" & ");
   if (!formattedSearchTerm) {
     // TODO show most popular items if no searchTerm present?
     const firstTemplates = await prisma.routineDay.findMany({
@@ -18,7 +13,7 @@ export async function searchTemplates(
       // limit: 10,
       include: { routine: true },
     });
-    return firstTemplates;
+    return Response.json(firstTemplates);
   }
   const searchQuery = `${formattedSearchTerm}:*`;
 
@@ -34,9 +29,9 @@ export async function searchTemplates(
     WHERE to_tsvector('english', "RoutineDay"."description" || ' ' || "Routine"."name"::text)
     @@ to_tsquery('english', ${searchQuery});
     `;
-    return templates;
+    return Response.json(templates);
   } catch (err) {
     console.error(err);
-    return [];
+    return Response.json([]);
   }
 }

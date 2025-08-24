@@ -1,4 +1,3 @@
-import { searchExercise } from "@/actions/searchExercise";
 import { Image as ImageIcon } from "@mui/icons-material";
 import {
   Autocomplete,
@@ -20,9 +19,16 @@ export const AutocompleteExercise = ({
   onChange: (exercise: Exercise | null) => void;
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const { data: options, isLoading } = useSWR(searchTerm, searchExercise, {
-    keepPreviousData: true,
-  });
+  const { data: options, isLoading } = useSWR(
+    { searchTerm },
+    ({ searchTerm }) =>
+      fetch(`/api/exercise/search?searchTerm=${searchTerm}`).then((response) =>
+        response.json(),
+      ),
+    {
+      keepPreviousData: true,
+    },
+  );
 
   return (
     <Autocomplete

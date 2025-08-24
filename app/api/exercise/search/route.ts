@@ -1,13 +1,14 @@
-"use server";
-
 import { prisma } from "@/lib/prisma";
-import type { Exercise } from "@/prisma/generated/client";
+import type { Exercise } from "@/prisma/generated";
+import type { NextRequest } from "next/server";
 
-export async function searchExercise(searchTerm: string): Promise<Exercise[]> {
-  const formattedSearchTerm = searchTerm.trim().split(/\s+/).join(" & ");
+export async function GET(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams;
+  const searchTerm = searchParams.get("searchTerm");
+  const formattedSearchTerm = searchTerm?.trim().split(/\s+/).join(" & ");
   if (!formattedSearchTerm) {
     // TODO show most popular items if no searchTerm present?
-    return [];
+    return Response.json([]);
   }
   const searchQuery = `${formattedSearchTerm}:*`;
 
@@ -24,9 +25,9 @@ export async function searchExercise(searchTerm: string): Promise<Exercise[]> {
     WHERE to_tsvector('english', "Exercise"."name" || ' ' || "Exercise"."primaryMuscles"::text)
     @@ to_tsquery('english', ${searchQuery});
     `;
-    return exercises;
+    return Response.json(exercises);
   } catch (err) {
     console.error(err);
-    return [];
+    return Response.json([]);
   }
 }

@@ -5,3 +5,7 @@ export type RoutineWithRelations = Prisma.RoutineGetPayload<{
     routineDays: true;
   };
 }>;
+
+export type RoutineDayWithRoutine = Prisma.RoutineDayGetPayload<{
+  include: { routine: true };
+}>;
