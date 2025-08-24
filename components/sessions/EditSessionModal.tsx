@@ -1,6 +1,3 @@
-import { createSession } from "@/actions/createSession";
-import { editSession } from "@/actions/editSession";
-import { RoutineDayWithRoutine } from "@/actions/searchTemplates";
 import { SessionWithRelations } from "@/types/workoutSession";
 import {
   Box,
@@ -17,6 +14,7 @@ import { DateTimePicker } from "@mui/x-date-pickers";
 import dayjs, { type Dayjs } from "dayjs";
 import { useState } from "react";
 import { SelectTemplate } from "./SelectTemplate";
+import type { RoutineDayWithRoutine } from "@/types/routine";
 
 export const EditSessionModal = ({
   session,

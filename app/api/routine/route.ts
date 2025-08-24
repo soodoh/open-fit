@@ -3,21 +3,20 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import type { NextRequest } from "next/server";
 
 const RoutineSchema = z.object({
   name: z.string().min(1, { message: "Routine name is required." }),
   description: z.optional(z.string()),
 });
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) {
     throw new Error("Unauthorized");
   }
 
-  const formData = await request.formData();
-  const name = formData.get("name") as string;
-  const description = formData.get("description") as string;
+  const { name, description } = await request.json();
 
   const validatedFields = RoutineSchema.safeParse({
     name,

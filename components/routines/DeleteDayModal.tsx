@@ -1,4 +1,3 @@
-import { deleteDay } from "@/actions/deleteDay";
 import {
   Button,
   Dialog,
@@ -34,7 +33,7 @@ export const DeleteDayModal = ({
         <Button onClick={onClose}>No</Button>
         <Button
           onClick={async () => {
-            await deleteDay(dayId);
+            await fetch(`/api/day/${dayId}`, { method: "DELETE" });
             onClose();
           }}
         >

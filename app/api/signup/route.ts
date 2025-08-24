@@ -1,13 +1,12 @@
-"use server";
-
 import { signIn } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Role } from "@/prisma/generated/client";
 import bcrypt from "bcrypt";
 import { z } from "zod";
+import type { NextRequest } from "next/server";
 
 const SignUpSchema = z.object({
-  email: z.string().email({ message: "Must be a valid email address" }),
+  email: z.email({ message: "Must be a valid email address" }),
   password: z
     .string()
     .min(8, { message: "Be at least 8 characters long" })
@@ -29,24 +28,25 @@ export type SignUpActionState = {
   };
 };
 
-export async function signUp(
-  _prevState: SignUpActionState,
-  form: FormData,
-): Promise<SignUpActionState> {
-  const email = form.get("email") as string;
-  const password = form.get("password") as string;
+export async function POST(request: NextRequest) {
+  const { email, password } = await request.json();
 
   const validatedFields = SignUpSchema.safeParse({
     email,
     password,
   });
 
-  if (!validatedFields.success) {
-    return {
-      email,
-      password,
-      errors: validatedFields.error.flatten().fieldErrors,
-    };
+  if (validatedFields.error) {
+    const errors = z.treeifyError(validatedFields.error);
+    return Response.json(
+      {
+        errors: {
+          email: errors.properties?.email?.errors[0] ?? "",
+          password: errors.properties?.password?.errors[0] ?? "",
+        },
+      },
+      { status: 500 },
+    );
   }
 
   // Check if the username already exists
@@ -54,13 +54,14 @@ export async function signUp(
     where: { email },
   });
   if (userExists) {
-    return {
-      email,
-      password,
-      errors: {
-        email: ["Email already exists."],
+    return Response.json(
+      {
+        errors: {
+          email: "Email already exists.",
+        },
       },
-    };
+      { status: 500 },
+    );
   }
 
   const saltRounds = 10;
@@ -77,5 +78,5 @@ export async function signUp(
   // Log in
   await signIn("credentials", { email, password });
 
-  return { email: "", password: "" };
+  return Response.json({ success: true });
 }

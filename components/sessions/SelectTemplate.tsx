@@ -1,10 +1,7 @@
-import {
-  RoutineDayWithRoutine,
-  searchTemplates,
-} from "@/actions/searchTemplates";
 import { Autocomplete, ListItem, ListItemText, TextField } from "@mui/material";
 import { useState } from "react";
 import useSWR from "swr";
+import type { RoutineDayWithRoutine } from "@/types/routine";
 
 export const SelectTemplate = ({
   value,
@@ -20,7 +17,10 @@ export const SelectTemplate = ({
   const [searchTerm, setSearchTerm] = useState("");
   const { data: options, isLoading } = useSWR(
     { searchTerm },
-    ({ searchTerm }) => searchTemplates(searchTerm),
+    ({ searchTerm }) =>
+      fetch(`/api/day/search?searchTerm=${searchTerm}`).then((response) =>
+        response.json(),
+      ),
     {
       keepPreviousData: true,
       fallbackData: value ? [value] : [],

@@ -1,4 +1,3 @@
-import { editDay } from "@/actions/editDay";
 import {
   Box,
   Button,
@@ -33,21 +32,30 @@ export const EditDayModal = ({
   const [selectedWeekdays, setWeekdays] = useState<number[]>(
     routineDay?.weekdays ?? [],
   );
+  const [description, setDescription] = useState(routineDay?.description ?? "");
 
   const handleWeekdayChange = (event: SelectChangeEvent<number[]>) => {
     const newWeekdays = event.target.value as number[];
     setWeekdays(newWeekdays.sort((a, b) => a - b));
   };
 
-  const action = async (formData: FormData) => {
-    await editDay(
-      formData.get("description") as string,
-      routineId,
-      selectedWeekdays,
-      routineDay?.id,
-    );
+  const onSubmit = async (event: SubmitEvent) => {
+    event.preventDefault();
+    await fetch(routineDay ? `/api/day/${routineDay.id}` : "/api/day", {
+      method: "POST",
+      body: JSON.stringify({
+        routineId,
+        description,
+        weekdays: selectedWeekdays,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
     onClose();
     setWeekdays([]);
+    setDescription("");
   };
 
   return (
@@ -58,7 +66,7 @@ export const EditDayModal = ({
       fullWidth
       PaperProps={{
         component: "form",
-        action,
+        onSubmit,
       }}
     >
       <DialogTitle>
@@ -74,7 +82,9 @@ export const EditDayModal = ({
           variant="filled"
           label="Description"
           name="description"
-          defaultValue={routineDay?.description}
+          value={description}
+          onChange={(event) => setDescription(event.target.value)}
+          required
         />
         <FormControl fullWidth>
           <InputLabel id={`${routineDay?.id ?? "new"}-weekday-label`}>
@@ -86,6 +96,7 @@ export const EditDayModal = ({
             multiple
             onChange={handleWeekdayChange}
             value={selectedWeekdays}
+            required
             input={<OutlinedInput label="Weekdays" />}
             renderValue={(selected) => (
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
