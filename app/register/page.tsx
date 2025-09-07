@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import { SignUpForm } from "@/components/auth/signUpForm";
+import { LoginForm } from "@/components/auth/LoginForm";
 import { redirect } from "next/navigation";
 
 export default async function RegisterPage() {
@@ -9,5 +9,5 @@ export default async function RegisterPage() {
     redirect("/");
   }
 
-  return <SignUpForm />;
+  return <LoginForm register />;
 }
