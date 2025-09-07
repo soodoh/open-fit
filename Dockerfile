@@ -22,7 +22,7 @@ RUN rm -rf node_modules/.prisma/client && npx prisma generate
 RUN yarn build
 
 # Stage 2: Runtime Stage
-FROM node:18-slim AS runner
+FROM node:22-slim AS runner
 
 RUN apt-get -qy update && apt-get -qy install openssl
 
