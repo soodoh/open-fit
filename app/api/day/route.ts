@@ -5,7 +5,8 @@ import type { NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
   const session = await auth();
-  if (!session?.user?.id) {
+  const userId = session?.user?.id;
+  if (!userId) {
     throw new Error("Unauthorized");
   }
 
@@ -34,6 +35,7 @@ export async function POST(request: NextRequest) {
 
   const routineDay = await prisma.routineDay.create({
     data: {
+      userId,
       routineId,
       description,
       weekdays,

@@ -1,10 +1,11 @@
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["fullTextSearchPostgres", "queryCompiler", "driverAdapters"]
-  output   = "../prisma/generated"
+  provider               = "prisma-client-js"
+  previewFeatures        = ["fullTextSearchPostgres", "queryCompiler", "driverAdapters"]
+  output                 = "../prisma/generated"
+  engineType             = "client"
   moduleFormat           = "esm"
   generatedFileExtension = "ts"
-  importFileExtension = "ts"
+  importFileExtension    = "ts"
 }
 
 datasource db {
@@ -37,8 +38,11 @@ model User {
   defaultWeightUnit       WeightUnit     @relation(fields: [defaultWeightUnitId], references: [id])
   defaultWeightUnitId     Int            @default(1)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  WorkoutSetGroup WorkoutSetGroup[]
+  WorkoutSet      WorkoutSet[]
+  RoutineDay      RoutineDay[]
 }
 
 model Account {
@@ -99,6 +103,8 @@ model RoutineDay {
   description    String
   setGroups      WorkoutSetGroup[]
   WorkoutSession WorkoutSession[]
+  user           User              @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId         String
   createdAt      DateTime          @default(now())
   updatedAt      DateTime          @updatedAt
 }
@@ -118,6 +124,10 @@ model WorkoutSetGroup {
   type         SetGroupType    @default(NORMAL)
   order        Int
   comment      String?
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId       String
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
 }
 
 enum SetType {
@@ -143,6 +153,10 @@ model WorkoutSet {
   order            Int
   restTime         Int             @default(0)
   completed        Boolean         @default(false)
+  user             User            @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId           String
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
 }
 
 enum ExerciseForce {
