@@ -5,11 +5,12 @@ import { revalidatePath } from "next/cache";
 
 export async function POST(request: Request) {
   const session = await auth();
-  if (!session?.user?.id) {
+  const userId = session?.user?.id;
+  if (!userId) {
     throw new Error("Unauthorized");
   }
   const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
+    where: { id: userId },
   });
   if (!user) {
     throw new Error("User not found");
@@ -34,6 +35,7 @@ export async function POST(request: Request) {
     user.defaultRepetitionUnitId;
   const newSet = await prisma.workoutSet.create({
     data: {
+      userId,
       setGroupId,
       exerciseId,
       type: SetType.NORMAL,

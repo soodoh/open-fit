@@ -43,6 +43,12 @@ npx prisma db seed
 npx prisma generate
 ```
 
+## (Optional) fill DB with additional data for local development & testing
+
+```bash
+npx tsx prisma/testData.ts
+```
+
 ## Run local dev server:
 
 ```bash

@@ -5,13 +5,14 @@ import { revalidatePath } from "next/cache";
 
 export async function POST(request: Request) {
   const session = await auth();
-  if (!session?.user?.id) {
+  const userId = session?.user?.id;
+  if (!userId) {
     throw new Error("Unauthorized");
   }
 
   const { sessionOrDayId, type, exerciseId, numSets } = await request.json();
   const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
+    where: { id: userId },
   });
   if (!user) {
     throw new Error("User not found");
@@ -20,9 +21,6 @@ export async function POST(request: Request) {
     throw new Error("Invalid number of sets");
   }
 
-  if (type === "routineDay") {
-  } else {
-  }
   const existingSetGroups = await prisma.workoutSetGroup.findMany({
     where:
       type === "routineDay"
@@ -34,12 +32,14 @@ export async function POST(request: Request) {
       ...(type === "routineDay"
         ? { routineDayId: sessionOrDayId }
         : { sessionId: sessionOrDayId }),
+      userId,
       type: SetGroupType.NORMAL,
       order: existingSetGroups.length,
     },
   });
   await prisma.workoutSet.createMany({
     data: Array.from({ length: numSets }, (_, index) => ({
+      userId,
       exerciseId,
       type: SetType.NORMAL,
       order: index,

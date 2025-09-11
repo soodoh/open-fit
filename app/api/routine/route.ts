@@ -12,7 +12,8 @@ const RoutineSchema = z.object({
 
 export async function POST(request: NextRequest) {
   const session = await auth();
-  if (!session?.user?.id) {
+  const userId = session?.user?.id;
+  if (!userId) {
     throw new Error("Unauthorized");
   }
 
@@ -35,7 +36,7 @@ export async function POST(request: NextRequest) {
 
   const routine = await prisma.routine.create({
     data: {
-      userId: session.user.id,
+      userId,
       name,
       description,
     },

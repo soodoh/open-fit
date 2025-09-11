@@ -1,4 +1,5 @@
-import bcrypt from "bcrypt";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { hash } from "bcrypt";
 import { exercises } from "./defaultExercises";
 import {
   type Equipment,
@@ -11,7 +12,8 @@ import {
   Role,
 } from "./generated/client";
 
-const prisma = new PrismaClient();
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   // Repetition Units
@@ -42,7 +44,7 @@ async function main() {
   }
 
   // Admin user
-  const hashedPassword = await bcrypt.hash("adminadmin", 10);
+  const hashedPassword = await hash("adminadmin", 10);
   await prisma.user.upsert({
     where: { email: "admin@admin.com" },
     update: {},
@@ -86,11 +88,10 @@ async function main() {
 }
 
 main()
-  .then(async () => {
-    await prisma.$disconnect();
-  })
   .catch(async (error) => {
     console.error(error);
-    await prisma.$disconnect();
     process.exit(1);
+  })
+  .finally(() => {
+    prisma.$disconnect();
   });
