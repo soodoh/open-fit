@@ -102,7 +102,7 @@ export const EditDayModal = ({
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                 {selected.map((value) => (
                   <Chip
-                    key={`weekday-${value}`}
+                    key={`${routineDay?.id || "new"}-weekday-input-${value}`}
                     label={dayjs().day(value).format("dddd")}
                   />
                 ))}
@@ -111,7 +111,7 @@ export const EditDayModal = ({
           >
             {Array.from({ length: 7 }, (_, i) => i + 1).map((weekday) => (
               <MenuItem
-                key={`${routineDay?.id ?? "new"}-${weekday}`}
+                key={`${routineDay?.id || "new"}-${weekday}`}
                 value={weekday}
               >
                 {dayjs().day(weekday).format("dddd")}
