@@ -47,7 +47,7 @@ export const RoutineDayItem = ({
               >
                 {routineDay.weekdays.map((weekday) => (
                   <Chip
-                    key={`${routineDay.id}-${weekday}`}
+                    key={`${routineDay.id}-weekday-chip-${weekday}`}
                     component="span"
                     label={dayjs().day(weekday).format("ddd")}
                   />

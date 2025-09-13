@@ -29,12 +29,13 @@ export async function RoutineCard({
         }
       />
 
+      <Divider />
+
       <List dense disablePadding sx={{ flexGrow: 1 }}>
-        <Divider />
         {routine.routineDays.map((routineDay) => {
           return (
             <RoutineDayItem
-              key={`day-${routineDay.id}`}
+              key={`${routine.id}-day-${routineDay.id}`}
               routineDay={routineDay}
               currentSession={currentSession}
             />

@@ -203,7 +203,7 @@ export const WorkoutSetGroup = ({
               {setsWithNumber.map(({ set, setNum }) => {
                 return (
                   <WorkoutSetRow
-                    key={`set-${set.id}`}
+                    key={`set-row-${set.id}`}
                     view={view}
                     set={set}
                     setNum={setNum}
