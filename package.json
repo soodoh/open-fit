@@ -20,7 +20,7 @@
     "@mui/material": "^7.3.4",
     "@mui/material-nextjs": "^7.3.3",
     "@mui/system": "^7.3.3",
-    "@mui/x-date-pickers": "^8.14.1",
+    "@mui/x-date-pickers": "^8.15.0",
     "@prisma/adapter-pg": "^6.18.0",
     "@prisma/client": "^6.18.0",
     "bcrypt": "^6.0.0",
