@@ -2,8 +2,6 @@
 
 # dependencies
 /node_modules
-
-# pnpm
 .pnpm-debug.log*
 
 # testing
@@ -19,10 +17,6 @@
 # misc
 .DS_Store
 *.pem
-
-# debug
-npm-debug.log*
-pnpm-debug.log*
 
 # env files (can opt-in for committing if needed)
 .env*
