@@ -52,7 +52,7 @@ npx tsx prisma/testData.ts
 ## Run local dev server:
 
 ```bash
-yarn dev
+pnpm dev
 ```
 
 # Making changes to the database
