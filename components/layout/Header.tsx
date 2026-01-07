@@ -1,13 +1,13 @@
-import { AppBar, Box, Container, Link, Toolbar } from "@mui/material";
+import { Container } from "@/components/ui/container";
 import Image from "next/image";
-import NextLink from "next/link";
+import Link from "next/link";
 import { AccountNavItem } from "./AccountNavItem";
 
 export const Header = () => {
   return (
-    <AppBar position="static">
+    <header className="bg-primary text-primary-foreground">
       <Container maxWidth="xl">
-        <Toolbar disableGutters>
+        <nav className="flex items-center py-4">
           <Link href="/">
             <Image
               src="/logo-bg-white.png"
@@ -17,45 +17,29 @@ export const Header = () => {
               height={40}
             />
           </Link>
-          <Box
-            sx={{
-              flexGrow: 1,
-              ml: 3,
-              gap: 4,
-              display: { xs: "none", md: "flex" },
-            }}
-          >
+          <div className="ml-8 hidden flex-1 gap-8 md:flex">
             <Link
-              component={NextLink}
               href="/routines"
-              sx={{
-                color: "primary.contrastText",
-              }}
+              className="text-primary-foreground hover:underline"
             >
               Routines
             </Link>
             <Link
-              component={NextLink}
               href="/exercises"
-              sx={{
-                color: "primary.contrastText",
-              }}
+              className="text-primary-foreground hover:underline"
             >
               Exercises
             </Link>
             <Link
-              component={NextLink}
               href="/logs"
-              sx={{
-                color: "primary.contrastText",
-              }}
+              className="text-primary-foreground hover:underline"
             >
               Logs
             </Link>
-          </Box>
+          </div>
           <AccountNavItem />
-        </Toolbar>
+        </nav>
       </Container>
-    </AppBar>
+    </header>
   );
 };

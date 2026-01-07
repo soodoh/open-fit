@@ -1,31 +1,78 @@
-:root {
-  /* Colors */
-  --space-cadet: #22223b;
-  --ultra-violet: #4a4e69;
-  --rose-quartz: #9a8c98;
-  --pale-dogwood: #c9ada7;
-  --isabelline: #f2e9e4;
-  /* Defaults */
-  --background: var(--isabelline);
-  --foreground: var(--space-cadet);
-  --max-width: 1320px;
-  /* Mui Theme */
-  --mui-palette-primary-main: var(--space-cadet);
-  --mui-palette-primary-light: var(--ultra-violet);
-  --mui-palette-primary-dark: var(--space-cadet);
-  --mui-palette-primary-contrast-text: var(--isabelline);
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Custom colors */
+    --space-cadet: #22223b;
+    --ultra-violet: #4a4e69;
+    --rose-quartz: #9a8c98;
+    --pale-dogwood: #c9ada7;
+    --isabelline: #f2e9e4;
+    --max-width: 1320px;
+    
+    /* shadcn/ui color system */
+    --background: 43 26% 94%; /* isabelline */
+    --foreground: 244 27% 18%; /* space-cadet */
+    --card: 43 26% 94%;
+    --card-foreground: 244 27% 18%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 244 27% 18%;
+    --primary: 244 27% 18%; /* space-cadet */
+    --primary-foreground: 43 26% 94%; /* isabelline */
+    --secondary: 244 13% 37%; /* ultra-violet */
+    --secondary-foreground: 43 26% 94%;
+    --muted: 270 11% 62%; /* rose-quartz */
+    --muted-foreground: 244 27% 18%;
+    --accent: 14 18% 73%; /* pale-dogwood */
+    --accent-foreground: 244 27% 18%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 270 11% 62%;
+    --input: 270 11% 62%;
+    --ring: 244 27% 18%;
+    --radius: 0.5rem;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+  }
+
+  .dark {
+    --background: 244 27% 18%;
+    --foreground: 43 26% 94%;
+    --card: 244 27% 18%;
+    --card-foreground: 43 26% 94%;
+    --popover: 244 27% 13%;
+    --popover-foreground: 43 26% 94%;
+    --primary: 43 26% 94%;
+    --primary-foreground: 244 27% 18%;
+    --secondary: 244 13% 37%;
+    --secondary-foreground: 43 26% 94%;
+    --muted: 270 11% 40%;
+    --muted-foreground: 43 26% 80%;
+    --accent: 14 18% 45%;
+    --accent-foreground: 43 26% 94%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 43 26% 94%;
+    --border: 270 11% 40%;
+    --input: 270 11% 40%;
+    --ring: 43 26% 94%;
+  }
 }
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-  min-height: 100vh;
-  background-color: var(--background);
-  color: var(--foreground);
-}
-
-body {
-  display: flex;
-  flex-direction: column;
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+  html,
+  body {
+    @apply overflow-x-hidden min-h-screen bg-background text-foreground;
+    max-width: 100vw;
+  }
+  body {
+    @apply flex flex-col;
+  }
 }

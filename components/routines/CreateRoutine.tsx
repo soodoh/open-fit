@@ -1,8 +1,8 @@
 "use client";
 
 import { EditRoutineModal as CreateRoutineModal } from "@/components/routines/EditRoutineModal";
-import { Add } from "@mui/icons-material";
-import { Button } from "@mui/material";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 import { useState } from "react";
 
 export const CreateRoutine = () => {
@@ -11,11 +11,10 @@ export const CreateRoutine = () => {
   return (
     <>
       <Button
-        variant="contained"
-        startIcon={<Add />}
-        size="medium"
         onClick={() => setEditModal(true)}
+        className="gap-2"
       >
+        <Plus className="h-4 w-4" />
         Create
       </Button>
 

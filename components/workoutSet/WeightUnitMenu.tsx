@@ -1,5 +1,11 @@
-import { ArrowDropDown } from "@mui/icons-material";
-import { IconButton, Menu, MenuItem } from "@mui/material";
+import { ChevronDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useState } from "react";
 import type { Units } from "@/actions/getUnits";
 import type { WeightUnit } from "@/prisma/generated/client";
@@ -13,43 +19,28 @@ export const WeightUnitMenu = ({
   onChange: (weightUnit: WeightUnit) => void;
   units: Units;
 }) => {
-  const [weightUnitMenu, setWeightUnitMenu] = useState<null | HTMLElement>(
-    null,
-  );
+  const [open, setOpen] = useState(false);
+
   return (
-    <>
-      <IconButton
-        size="medium"
-        edge="end"
-        id={`${id}-weight-unit-menu-button`}
-        aria-controls={weightUnitMenu ? `${id}-weight-unit-menu` : undefined}
-        aria-haspopup="true"
-        aria-expanded={weightUnitMenu ? "true" : undefined}
-        onClick={(event) => setWeightUnitMenu(event.currentTarget)}
-      >
-        <ArrowDropDown fontSize="small" />
-      </IconButton>
-      <Menu
-        id={`${id}-weight-unit-menu`}
-        anchorEl={weightUnitMenu}
-        open={!!weightUnitMenu}
-        onClose={() => setWeightUnitMenu(null)}
-        MenuListProps={{
-          "aria-labelledby": `${id}-weight-unit-menu-button`,
-        }}
-      >
+    <DropdownMenu open={open} onOpenChange={setOpen}>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" className="h-8 w-8">
+          <ChevronDown className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
         {units.weightUnits.map((unit) => (
-          <MenuItem
+          <DropdownMenuItem
             key={`weight-unit-${id}-${unit.id}`}
             onClick={() => {
               onChange(unit);
-              setWeightUnitMenu(null);
+              setOpen(false);
             }}
           >
             {unit.name}
-          </MenuItem>
+          </DropdownMenuItem>
         ))}
-      </Menu>
-    </>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };

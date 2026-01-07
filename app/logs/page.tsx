@@ -4,7 +4,7 @@ import { auth } from "@/auth";
 import { CreateSessionButton } from "@/components/sessions/CreateSession";
 import { ResumeSessionButton } from "@/components/sessions/ResumeSessionButton";
 import { SessionSummaryCard } from "@/components/sessions/SessionSummaryCard";
-import { Box, Container, Typography } from "@mui/material";
+import { Container } from "@/components/ui/container";
 import { redirect } from "next/navigation";
 
 export default async function Sessions() {
@@ -18,22 +18,22 @@ export default async function Sessions() {
 
   return (
     <Container maxWidth="xl">
-      <Box sx={{ my: 3, display: "flex", justifyContent: "space-between" }}>
-        <Typography variant="h4">Workout Logs</Typography>
+      <div className="my-8 flex items-center justify-between">
+        <h1 className="text-4xl font-bold">Workout Logs</h1>
         <CreateSessionButton />
-      </Box>
+      </div>
 
       {currentSession && (
-        <Box sx={{ my: 3 }}>
+        <div className="my-8">
           <ResumeSessionButton session={currentSession} />
-        </Box>
+        </div>
       )}
 
-      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
+      <div className="flex flex-wrap gap-4">
         {sessions.map((session) => (
           <SessionSummaryCard key={session.id} session={session} />
         ))}
-      </Box>
+      </div>
     </Container>
   );
 }

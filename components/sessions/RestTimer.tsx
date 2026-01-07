@@ -1,16 +1,12 @@
-import { Pause, PlayArrow, Timer, Timer10 } from "@mui/icons-material";
+import { Pause, Play, Timer, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
-  Box,
-  Button,
-  CircularProgress,
   Dialog,
-  DialogActions,
   DialogContent,
+  DialogFooter,
+  DialogHeader,
   DialogTitle,
-  Fab,
-  Typography,
-} from "@mui/material";
-import { green, grey } from "@mui/material/colors";
+} from "@/components/ui/dialog";
 import dayjs from "dayjs";
 import { useTimer } from "react-timer-hook";
 
@@ -38,129 +34,134 @@ export const RestTimer = ({
 
   return (
     <>
-      <Dialog
-        open={open}
-        onClose={() => setOpen(false)}
-        aria-labelledby="rest-timer-title"
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle id="rest-timer-title">Rest Timer</DialogTitle>
-        <DialogContent>
-          <Box sx={{ position: "relative", display: "flex" }}>
-            <CircularProgress
-              variant="determinate"
-              value={100}
-              size="100%"
-              thickness={2}
-              sx={{
-                position: "absolute",
-                color: grey[200],
-              }}
-            />
-            <CircularProgress
-              variant="determinate"
-              value={percentage}
-              size="100%"
-              thickness={2}
-              color="primary"
-            />
-            <Box
-              sx={{
-                position: "absolute",
-                top: 0,
-                bottom: 0,
-                width: "100%",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                gap: 1,
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Rest Timer</DialogTitle>
+          </DialogHeader>
+          
+          <div className="relative flex justify-center items-center">
+            {/* Background circle */}
+            <svg className="w-48 h-48 transform -rotate-90" viewBox="0 0 100 100">
+              <circle
+                cx="50"
+                cy="50"
+                r="45"
+                stroke="currentColor"
+                strokeWidth="2"
+                fill="none"
+                className="text-gray-200"
+              />
+              <circle
+                cx="50"
+                cy="50"
+                r="45"
+                stroke="currentColor"
+                strokeWidth="2"
+                fill="none"
+                strokeDasharray={`${2 * Math.PI * 45}`}
+                strokeDashoffset={`${2 * Math.PI * 45 * (1 - percentage / 100)}`}
+                className="text-primary transition-all duration-1000 ease-in-out"
+                strokeLinecap="round"
+              />
+            </svg>
+            
+            {/* Timer content */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <h2 className="text-3xl font-bold">
+                {dayjs.duration(remainingSeconds, "seconds").format("mm:ss")}
+              </h2>
+              <div className="flex gap-2 mt-4">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    setTotalSeconds(Math.max(0, totalSeconds - 10));
+                    restart(
+                      dayjs()
+                        .add(Math.max(0, remainingSeconds - 10), "seconds")
+                        .toDate(),
+                      isRunning,
+                    );
+                  }}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    if (isRunning) {
+                      pause();
+                    } else {
+                      start();
+                    }
+                  }}
+                >
+                  {isRunning ? (
+                    <Pause className="h-4 w-4" />
+                  ) : (
+                    <Play className="h-4 w-4" />
+                  )}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    setTotalSeconds(totalSeconds + 10);
+                    restart(
+                      dayjs()
+                        .add(remainingSeconds + 10, "seconds")
+                        .toDate(),
+                      isRunning,
+                    );
+                  }}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpen(false)}>
+              Close
+            </Button>
+            <Button
+              onClick={() => {
+                setOpen(false);
+                restart(dayjs().add(totalSeconds, "seconds").toDate(), false);
               }}
             >
-              <Box sx={{ display: "flex", flexDirection: "column" }}>
-                <Typography variant="h3">
-                  {dayjs.duration(remainingSeconds, "seconds").format("mm:ss")}
-                </Typography>
-                <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
-                  <Fab
-                    size="small"
-                    color="default"
-                    onClick={() => {
-                      setTotalSeconds(Math.max(0, totalSeconds - 10));
-                      restart(
-                        dayjs()
-                          .add(Math.max(0, remainingSeconds - 10), "seconds")
-                          .toDate(),
-                        isRunning,
-                      );
-                    }}
-                  >
-                    <Timer10 />
-                  </Fab>
-                  <Fab
-                    size="small"
-                    onClick={() => {
-                      if (isRunning) {
-                        pause();
-                      } else {
-                        start();
-                      }
-                    }}
-                  >
-                    {isRunning ? <Pause /> : <PlayArrow />}
-                  </Fab>
-                  <Fab
-                    size="small"
-                    color="primary"
-                    onClick={() => {
-                      setTotalSeconds(totalSeconds + 10);
-                      restart(
-                        dayjs()
-                          .add(remainingSeconds + 10, "seconds")
-                          .toDate(),
-                        isRunning,
-                      );
-                    }}
-                  >
-                    <Timer10 />
-                  </Fab>
-                </Box>
-              </Box>
-            </Box>
-          </Box>
+              Skip
+            </Button>
+          </DialogFooter>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpen(false)}>Close</Button>
-          <Button
-            variant="contained"
-            onClick={() => {
-              setOpen(false);
-              restart(dayjs().add(totalSeconds, "seconds").toDate(), false);
-            }}
-          >
-            Skip
-          </Button>
-        </DialogActions>
       </Dialog>
 
-      <Box sx={{ position: "relative", margin: "6px" }}>
-        <Fab size="small" color="default" onClick={() => setOpen(!open)}>
-          <Timer />
-          <CircularProgress
-            variant="determinate"
-            value={percentage}
-            size={52}
-            thickness={5}
-            sx={{
-              color: green[500],
-              position: "absolute",
-              top: -6,
-              left: -6,
-              zIndex: 1,
-            }}
-          />
-        </Fab>
-      </Box>
+      <div className="relative m-1.5">
+        <Button
+          size="sm"
+          variant="outline"
+          className="rounded-full w-12 h-12 p-0 relative"
+          onClick={() => setOpen(!open)}
+        >
+          <Timer className="h-4 w-4" />
+          <svg className="absolute inset-0 w-12 h-12 transform -rotate-90" viewBox="0 0 24 24">
+            <circle
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="2"
+              fill="none"
+              strokeDasharray={`${2 * Math.PI * 10}`}
+              strokeDashoffset={`${2 * Math.PI * 10 * (1 - percentage / 100)}`}
+              className="text-green-500 transition-all duration-1000 ease-in-out"
+              strokeLinecap="round"
+            />
+          </svg>
+        </Button>
+      </div>
     </>
   );
 };

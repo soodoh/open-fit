@@ -2,15 +2,14 @@ import { Units } from "@/actions/getUnits";
 import { DeleteSetGroupModal } from "@/components/routines/DeleteSetGroupModal";
 import { ListView } from "@/types/constants";
 import { SetGroupWithRelations } from "@/types/workoutSet";
-import { Comment, Delete, Edit, MoreHoriz, Reorder } from "@mui/icons-material";
+import { MessageSquare, Trash2, Edit, MoreHorizontal, ArrowUpDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
-  IconButton,
-  ListItemIcon,
-  ListItemText,
-  Menu,
-  MenuItem,
-  MenuList,
-} from "@mui/material";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useEffect, useState } from "react";
 import { BulkEditSetModal } from "./BulkEditSetModal";
 import { EditSetCommentModal } from "./EditSetCommentModal";
@@ -35,13 +34,12 @@ export const EditSetGroupMenu = ({
   units: Units;
 }) => {
   const [modal, setModal] = useState<Modal | null>(null);
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const menuOpen = Boolean(anchorEl);
+  const [open, setOpen] = useState(false);
   const handleClose = () => setModal(null);
 
   useEffect(() => {
     if (modal) {
-      setAnchorEl(null);
+      setOpen(false);
     }
   }, [modal]);
 
@@ -64,70 +62,45 @@ export const EditSetGroupMenu = ({
         units={units}
       />
 
-      <Menu
-        id={`edit-set-group-actions-${setGroup.id}-menu`}
-        aria-labelledby={`edit-set-group-actions-${setGroup.id}`}
-        open={menuOpen}
-        onClose={() => setAnchorEl(null)}
-        anchorEl={anchorEl}
-        transformOrigin={{ horizontal: "right", vertical: "top" }}
-        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-        disableScrollLock
-      >
-        <MenuList dense disablePadding>
+      <DropdownMenu open={open} onOpenChange={setOpen}>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label={`Edit actions for set group ${setGroup.id}`}
+          >
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
           {view === ListView.CurrentSession && (
-            <MenuItem
+            <DropdownMenuItem
               onClick={() => {
                 onReorder();
-                setAnchorEl(null);
+                setOpen(false);
               }}
             >
-              <ListItemIcon>
-                <Reorder fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>
-                {reorder ? "Hide Reorder" : "Show Reorder"}
-              </ListItemText>
-            </MenuItem>
+              <ArrowUpDown className="mr-2 h-4 w-4" />
+              {reorder ? "Hide Reorder" : "Show Reorder"}
+            </DropdownMenuItem>
           )}
 
-          <MenuItem onClick={() => setModal(Modal.BULK_EDIT)}>
-            <ListItemIcon>
-              <Edit fontSize="small" />
-            </ListItemIcon>
-            <ListItemText>Bulk edit</ListItemText>
-          </MenuItem>
+          <DropdownMenuItem onClick={() => setModal(Modal.BULK_EDIT)}>
+            <Edit className="mr-2 h-4 w-4" />
+            Bulk edit
+          </DropdownMenuItem>
 
-          <MenuItem onClick={() => setModal(Modal.COMMENT)}>
-            <ListItemIcon>
-              <Comment fontSize="small" />
-            </ListItemIcon>
-            <ListItemText>Comment</ListItemText>
-          </MenuItem>
+          <DropdownMenuItem onClick={() => setModal(Modal.COMMENT)}>
+            <MessageSquare className="mr-2 h-4 w-4" />
+            Comment
+          </DropdownMenuItem>
 
-          <MenuItem onClick={() => setModal(Modal.DELETE)}>
-            <ListItemIcon>
-              <Delete fontSize="small" />
-            </ListItemIcon>
-            <ListItemText>Delete</ListItemText>
-          </MenuItem>
-        </MenuList>
-      </Menu>
-
-      <IconButton
-        aria-label={`Edit actions for set group ${setGroup.id}`}
-        id={`edit-set-group-actions-${setGroup.id}`}
-        aria-controls={
-          menuOpen ? `edit-set-group-actions-${setGroup.id}-menu` : undefined
-        }
-        aria-haspopup="true"
-        aria-expanded={menuOpen ? "true" : undefined}
-        onClick={(event: React.MouseEvent<HTMLElement>) => {
-          setAnchorEl(event.currentTarget);
-        }}
-      >
-        <MoreHoriz />
-      </IconButton>
+          <DropdownMenuItem onClick={() => setModal(Modal.DELETE)}>
+            <Trash2 className="mr-2 h-4 w-4" />
+            Delete
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </>
   );
 };

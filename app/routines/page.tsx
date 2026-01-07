@@ -4,7 +4,7 @@ import { auth } from "@/auth";
 import { CreateRoutine } from "@/components/routines/CreateRoutine";
 import { RoutineCard } from "@/components/routines/RoutineCard";
 import { ResumeSessionButton } from "@/components/sessions/ResumeSessionButton";
-import { Box, Container, Grid, Typography } from "@mui/material";
+import { Container } from "@/components/ui/container";
 import { redirect } from "next/navigation";
 
 export default async function Routines() {
@@ -17,24 +17,26 @@ export default async function Routines() {
   const currentSession = await getCurrentSession();
 
   return (
-    <Container maxWidth="xl" sx={{ my: 3 }}>
-      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 3 }}>
-        <Typography variant="h4">Routines</Typography>
+    <Container maxWidth="xl" className="my-8">
+      <div className="mb-8 flex items-center justify-between">
+        <h1 className="text-4xl font-bold">Routines</h1>
         <CreateRoutine />
-      </Box>
+      </div>
 
-      <Grid container spacing={2}>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
         {currentSession && (
-          <Grid size={{ xs: 12 }}>
+          <div className="col-span-full">
             <ResumeSessionButton session={currentSession} />
-          </Grid>
+          </div>
         )}
         {routines?.map((routine) => (
-          <Grid key={`routine-${routine.id}`} size={{ xs: 12, sm: 6, md: 4 }}>
-            <RoutineCard routine={routine} currentSession={currentSession} />
-          </Grid>
+          <RoutineCard
+            key={`routine-${routine.id}`}
+            routine={routine}
+            currentSession={currentSession}
+          />
         ))}
-      </Grid>
+      </div>
     </Container>
   );
 }

@@ -17,15 +17,10 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import {
-  Box,
-  Container,
-  Divider,
-  FormControlLabel,
-  FormGroup,
-  List,
-  Switch,
-} from "@mui/material";
+import { Container } from "@/components/ui/container";
+import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import dayjs from "dayjs";
 import { useOptimistic, useState, useTransition } from "react";
 import { useTimer } from "react-timer-hook";
@@ -99,18 +94,15 @@ export const WorkoutList = ({
           type={view === ListView.EditTemplate ? "routineDay" : "session"}
         />
 
-        <Box sx={{ my: 2, display: "flex", alignItems: "center" }}>
-          <FormGroup>
-            <FormControlLabel
-              control={
-                <Switch
-                  value={isReorderActive}
-                  onChange={(event) => setReorderActive(event.target.checked)}
-                />
-              }
-              label="Reorder Sets"
+        <div className="my-4 flex items-center gap-4">
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="reorder-switch"
+              checked={isReorderActive}
+              onCheckedChange={setReorderActive}
             />
-          </FormGroup>
+            <Label htmlFor="reorder-switch">Reorder Sets</Label>
+          </div>
 
           {view === ListView.CurrentSession && (
             <RestTimer
@@ -121,12 +113,12 @@ export const WorkoutList = ({
               timer={timer}
             />
           )}
-        </Box>
+        </div>
       </Container>
 
-      <Divider sx={{ my: 2 }} />
+      <Separator className="my-4" />
 
-      <List dense disablePadding>
+      <div className="space-y-2">
         <DndContext id="set-groups" onDragEnd={handleSort} sensors={sensors}>
           <SortableContext
             items={optimisticSetGroups}
@@ -146,7 +138,7 @@ export const WorkoutList = ({
             })}
           </SortableContext>
         </DndContext>
-      </List>
+      </div>
     </>
   );
 };

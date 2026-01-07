@@ -1,12 +1,19 @@
-import { Image as ImageIcon } from "@mui/icons-material";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-  Autocomplete,
-  Avatar,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
-  TextField,
-} from "@mui/material";
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { Input } from "@/components/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Image } from "lucide-react";
 import { useState } from "react";
 import useSWR from "swr";
 import type { Exercise } from "@/prisma/generated/client";
@@ -19,6 +26,8 @@ export const AutocompleteExercise = ({
   onChange: (exercise: Exercise | null) => void;
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [open, setOpen] = useState(false);
+
   const { data: options, isLoading } = useSWR(
     { searchTerm },
     ({ searchTerm }) =>
@@ -30,54 +39,71 @@ export const AutocompleteExercise = ({
     },
   );
 
+  console.log(options);
   return (
-    <Autocomplete
-      autoComplete
-      fullWidth
-      value={value}
-      inputValue={searchTerm}
-      options={options ?? []}
-      isOptionEqualToValue={(option, value) => option?.id === value?.id}
-      getOptionLabel={(option) => option?.name ?? "Unknown"}
-      getOptionKey={(option) => `exercise-${option?.id}`}
-      filterOptions={(option) => option}
-      loading={isLoading}
-      noOptionsText="No exercises found"
-      onChange={(_, selectedExercise) => {
-        onChange(selectedExercise);
-      }}
-      onInputChange={(_, newInputValue: string) => {
-        setSearchTerm(newInputValue);
-      }}
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          label="Add an exercise"
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild onClick={(e) => e.preventDefault()}>
+        <Input
           placeholder="Start typing to search for exercises"
+          value={value?.name || searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            if (!open) setOpen(true);
+          }}
+          onFocus={() => setOpen(true)}
+          className="w-full"
         />
-      )}
-      renderOption={({ key, ...optionProps }, option) => {
-        return (
-          <ListItem key={key} {...optionProps}>
-            <ListItemAvatar>
-              {option.images[0] ? (
-                <Avatar
-                  alt={`${option.name} thumbnail`}
-                  src={`/exercises/${option.images[0]}`}
-                />
-              ) : (
-                <Avatar>
-                  <ImageIcon />
-                </Avatar>
-              )}
-            </ListItemAvatar>
-            <ListItemText
-              primary={option.name}
-              secondary={option.primaryMuscles?.join?.(", ")}
-            />
-          </ListItem>
-        );
-      }}
-    />
+      </PopoverTrigger>
+      <PopoverContent className="w-full p-0" align="start">
+        <Command>
+          <CommandInput
+            placeholder="Start typing to search for exercises"
+            value={searchTerm}
+            onValueChange={(value) => {
+              setSearchTerm(value);
+            }}
+          />
+          <CommandList>
+            <CommandEmpty>
+              {isLoading ? "Loading exercises..." : "No exercises found"}
+            </CommandEmpty>
+            <CommandGroup>
+              {options?.map((option: Exercise) => (
+                <CommandItem
+                  key={`exercise-${option.id}`}
+                  value={option.name}
+                  onSelect={() => {
+                    onChange(option);
+                    setSearchTerm("");
+                    setOpen(false);
+                  }}
+                  className="flex items-center gap-3 p-3"
+                >
+                  <Avatar className="h-10 w-10">
+                    {option.images[0] ? (
+                      <AvatarImage
+                        src={`/exercises/${option.images[0]}`}
+                        alt={`${option.name} thumbnail`}
+                      />
+                    ) : null}
+                    <AvatarFallback className="flex items-center justify-center">
+                      <Image className="h-4 w-4" />
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col">
+                    <span className="font-medium">{option.name}</span>
+                    {option.primaryMuscles && (
+                      <span className="text-sm text-muted-foreground">
+                        {option.primaryMuscles}
+                      </span>
+                    )}
+                  </div>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   );
 };

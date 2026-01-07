@@ -1,4 +1,5 @@
-import { Card, CardHeader, Divider, List, Typography } from "@mui/material";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import dayjs from "dayjs";
 import { EditRoutineMenu } from "./EditRoutineMenu";
 import { RoutineDayItem } from "./RoutineDayItem";
@@ -13,35 +14,37 @@ export async function RoutineCard({
   currentSession: WorkoutSession | null;
 }) {
   return (
-    <Card sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
-      <CardHeader
-        action={<EditRoutineMenu routine={routine} />}
-        title={routine.name}
-        subheader={
-          <>
-            {routine.description && (
-              <Typography variant="subtitle2">{routine.description}</Typography>
-            )}
-            <Typography variant="caption" gutterBottom>
-              {`Last Updated: ${dayjs(routine.updatedAt).format("MM/DD/YYYY")}`}
-            </Typography>
-          </>
-        }
-      />
+    <Card className="flex flex-col h-full">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <div className="flex flex-col space-y-2">
+          <CardTitle className="text-xl">{routine.name}</CardTitle>
+          {routine.description && (
+            <CardDescription className="text-sm font-medium">
+              {routine.description}
+            </CardDescription>
+          )}
+          <CardDescription className="text-xs">
+            {`Last Updated: ${dayjs(routine.updatedAt).format("MM/DD/YYYY")}`}
+          </CardDescription>
+        </div>
+        <EditRoutineMenu routine={routine} />
+      </CardHeader>
 
-      <Divider />
+      <Separator />
 
-      <List dense disablePadding sx={{ flexGrow: 1 }}>
-        {routine.routineDays.map((routineDay) => {
-          return (
-            <RoutineDayItem
-              key={`${routine.id}-day-${routineDay.id}`}
-              routineDay={routineDay}
-              currentSession={currentSession}
-            />
-          );
-        })}
-      </List>
+      <CardContent className="flex-1 p-0">
+        <div className="space-y-0">
+          {routine.routineDays.map((routineDay) => {
+            return (
+              <RoutineDayItem
+                key={`${routine.id}-day-${routineDay.id}`}
+                routineDay={routineDay}
+                currentSession={currentSession}
+              />
+            );
+          })}
+        </div>
+      </CardContent>
     </Card>
   );
 }

@@ -1,5 +1,11 @@
-import { ArrowDropDown } from "@mui/icons-material";
-import { IconButton, Menu, MenuItem } from "@mui/material";
+import { ChevronDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useState } from "react";
 import type { Units } from "@/actions/getUnits";
 import type { RepetitionUnit } from "@/prisma/generated/client";
@@ -13,41 +19,28 @@ export const RepUnitMenu = ({
   onChange: (repUnit: RepetitionUnit) => void;
   units: Units;
 }) => {
-  const [repUnitMenu, setRepUnitMenu] = useState<null | HTMLElement>(null);
+  const [open, setOpen] = useState(false);
+
   return (
-    <>
-      <IconButton
-        size="medium"
-        edge="end"
-        id={`${id}-rep-unit-menu-button`}
-        aria-controls={repUnitMenu ? `${id}-rep-unit-menu` : undefined}
-        aria-haspopup="true"
-        aria-expanded={repUnitMenu ? "true" : undefined}
-        onClick={(event) => setRepUnitMenu(event.currentTarget)}
-      >
-        <ArrowDropDown fontSize="small" />
-      </IconButton>
-      <Menu
-        id={`${id}-rep-unit-menu`}
-        anchorEl={repUnitMenu}
-        open={!!repUnitMenu}
-        onClose={() => setRepUnitMenu(null)}
-        MenuListProps={{
-          "aria-labelledby": `${id}-rep-unit-menu-button`,
-        }}
-      >
+    <DropdownMenu open={open} onOpenChange={setOpen}>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" className="h-8 w-8">
+          <ChevronDown className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
         {units.repetitionUnits.map((unit) => (
-          <MenuItem
+          <DropdownMenuItem
             key={`rep-unit-${id}-${unit.id}`}
             onClick={() => {
               onChange(unit);
-              setRepUnitMenu(null);
+              setOpen(false);
             }}
           >
             {unit.name}
-          </MenuItem>
+          </DropdownMenuItem>
         ))}
-      </Menu>
-    </>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };

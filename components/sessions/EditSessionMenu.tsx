@@ -1,14 +1,13 @@
 "use client";
 
-import { Delete, Edit, Settings } from "@mui/icons-material";
+import { Trash2, Edit, Settings } from "lucide-react";
 import {
-  IconButton,
-  ListItemIcon,
-  ListItemText,
-  Menu,
-  MenuItem,
-  MenuList,
-} from "@mui/material";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { DeleteSessionModal } from "./DeleteSessionModal";
 import { EditSessionModal } from "./EditSessionModal";
@@ -25,13 +24,12 @@ export const EditSessionMenu = ({
   session: SessionWithRelations;
 }) => {
   const [modal, setModal] = useState<Modal | null>(null);
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const menuOpen = Boolean(anchorEl);
+  const [menuOpen, setMenuOpen] = useState(false);
   const handleClose = () => setModal(null);
 
   useEffect(() => {
     if (modal) {
-      setAnchorEl(null);
+      setMenuOpen(false);
     }
   }, [modal]);
 
@@ -49,46 +47,27 @@ export const EditSessionMenu = ({
         session={session}
       />
 
-      <Menu
-        id={`edit-session-actions-${session.id}-menu`}
-        aria-labelledby={`edit-day-actions-${session.id}`}
-        open={menuOpen}
-        onClose={() => setAnchorEl(null)}
-        anchorEl={anchorEl}
-        transformOrigin={{ horizontal: "right", vertical: "top" }}
-        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-        disableScrollLock
-      >
-        <MenuList dense disablePadding>
-          <MenuItem onClick={() => setModal(Modal.EDIT)}>
-            <ListItemIcon>
-              <Edit fontSize="small" />
-            </ListItemIcon>
-            <ListItemText>Edit</ListItemText>
-          </MenuItem>
-          <MenuItem onClick={() => setModal(Modal.DELETE)}>
-            <ListItemIcon>
-              <Delete fontSize="small" />
-            </ListItemIcon>
-            <ListItemText>Delete</ListItemText>
-          </MenuItem>
-        </MenuList>
-      </Menu>
-
-      <IconButton
-        aria-label={`Edit actions for workout session ${session.id}`}
-        id={`edit-day-actions-${session.id}`}
-        aria-controls={
-          menuOpen ? `edit-day-actions-${session.id}-menu` : undefined
-        }
-        aria-haspopup="true"
-        aria-expanded={menuOpen ? "true" : undefined}
-        onClick={(event: React.MouseEvent<HTMLElement>) => {
-          setAnchorEl(event.currentTarget);
-        }}
-      >
-        <Settings />
-      </IconButton>
+      <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label={`Edit actions for workout session ${session.id}`}
+          >
+            <Settings className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={() => setModal(Modal.EDIT)}>
+            <Edit className="mr-2 h-4 w-4" />
+            Edit
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setModal(Modal.DELETE)}>
+            <Trash2 className="mr-2 h-4 w-4" />
+            Delete
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </>
   );
 };

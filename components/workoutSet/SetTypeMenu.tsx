@@ -1,14 +1,14 @@
 import { SetType } from "@/prisma/generated/client";
 import { SetWithRelations } from "@/types/workoutSet";
-import { Whatshot } from "@mui/icons-material";
+import { Flame } from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
-  Avatar,
-  IconButton,
-  ListItemAvatar,
-  Menu,
-  MenuItem,
-} from "@mui/material";
-import { red, yellow } from "@mui/material/colors";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { type ReactNode, useState } from "react";
 
 // TODO do this better, with localization, etc.
@@ -30,13 +30,21 @@ const setTypes: Record<SetType, { label: string }> = {
 
 const setTypeIcons: Partial<Record<SetType, ReactNode>> = {
   [SetType.WARMUP]: (
-    <Avatar sx={{ bgcolor: yellow[700], width: 32, height: 32 }}>
-      <Whatshot />
+    <Avatar className="bg-yellow-600 text-white w-8 h-8">
+      <AvatarFallback>
+        <Flame className="h-4 w-4" />
+      </AvatarFallback>
     </Avatar>
   ),
-  [SetType.DROPSET]: <Avatar sx={{ width: 32, height: 32 }}>D</Avatar>,
+  [SetType.DROPSET]: (
+    <Avatar className="w-8 h-8">
+      <AvatarFallback>D</AvatarFallback>
+    </Avatar>
+  ),
   [SetType.FAILURE]: (
-    <Avatar sx={{ bgcolor: red[900], width: 32, height: 32 }}>F</Avatar>
+    <Avatar className="bg-red-900 text-white w-8 h-8">
+      <AvatarFallback>F</AvatarFallback>
+    </Avatar>
   ),
 };
 
@@ -47,46 +55,37 @@ export const SetTypeMenu = ({
   set: SetWithRelations;
   setNum: number;
 }) => {
-  const [setTypeMenu, setSetTypeMenu] = useState<null | HTMLElement>(null);
+  const [open, setOpen] = useState(false);
+
   return (
-    <>
-      <ListItemAvatar>
-        <IconButton
-          id={`${set.id}-set-type-menu-button`}
-          aria-controls={setTypeMenu ? `${set.id}-set-type-menu` : undefined}
-          aria-haspopup="true"
-          aria-expanded={setTypeMenu ? "true" : undefined}
-          onClick={(event) => setSetTypeMenu(event.currentTarget)}
-        >
-          {setTypeIcons[set.type] ?? (
-            <Avatar sx={{ width: 32, height: 32 }}>{setNum}</Avatar>
-          )}
-        </IconButton>
-      </ListItemAvatar>
-      <Menu
-        id={`${set.id}-set-type-menu`}
-        anchorEl={setTypeMenu}
-        open={!!setTypeMenu}
-        onClose={() => setSetTypeMenu(null)}
-        MenuListProps={{
-          "aria-labelledby": `${set.id}-set-type-menu-button`,
-        }}
-      >
-        {Object.values(SetType).map((setType) => (
-          <MenuItem
-            key={`set-type-${set.id}-${setType}`}
-            onClick={async () => {
-              fetch(`/api/set/${set.id}`, {
-                method: "POST",
-                body: JSON.stringify({ type: setType }),
-              });
-              setSetTypeMenu(null);
-            }}
-          >
-            {setTypes[setType].label}
-          </MenuItem>
-        ))}
-      </Menu>
-    </>
+    <div className="flex items-center">
+      <DropdownMenu open={open} onOpenChange={setOpen}>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="p-0 h-auto">
+            {setTypeIcons[set.type] ?? (
+              <Avatar className="w-8 h-8">
+                <AvatarFallback>{setNum}</AvatarFallback>
+              </Avatar>
+            )}
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          {Object.values(SetType).map((setType) => (
+            <DropdownMenuItem
+              key={`set-type-${set.id}-${setType}`}
+              onClick={async () => {
+                fetch(`/api/set/${set.id}`, {
+                  method: "POST",
+                  body: JSON.stringify({ type: setType }),
+                });
+                setOpen(false);
+              }}
+            >
+              {setTypes[setType].label}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   );
 };

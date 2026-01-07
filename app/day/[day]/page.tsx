@@ -4,8 +4,10 @@ import { getUnits } from "@/actions/getUnits";
 import { auth } from "@/auth";
 import { DayPage } from "@/components/routines/DayPage";
 import { EditDayMenu } from "@/components/routines/EditDayMenu";
-import { ArrowBack, Settings } from "@mui/icons-material";
-import { Box, Button, Chip, Container, Typography } from "@mui/material";
+import { Container } from "@/components/ui/container";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, Settings } from "lucide-react";
 import dayjs from "dayjs";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -32,45 +34,28 @@ export default async function Page({
 
   return (
     <>
-      <Container
-        maxWidth="lg"
-        sx={{ mt: 3, display: "flex", justifyContent: "space-between" }}
-      >
-        <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
-          <Typography variant="h5" gutterBottom>
-            {routineDay.description}
-          </Typography>
+      <Container maxWidth="lg" className="mt-8 flex justify-between">
+        <div className="flex items-center gap-2">
+          <h1 className="text-3xl font-bold">{routineDay.description}</h1>
           <EditDayMenu
             currentSession={currentSession}
             routineDay={routineDay}
             icon={<Settings />}
           />
-        </Box>
-        <Button
-          variant="contained"
-          startIcon={<ArrowBack />}
-          LinkComponent={Link}
-          href="/routines"
-        >
-          Routines
+        </div>
+        <Button asChild>
+          <Link href="/routines">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Routines
+          </Link>
         </Button>
       </Container>
 
-      <Container
-        maxWidth="lg"
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          flexWrap: "wrap",
-          gap: 0.5,
-          my: 1,
-        }}
-      >
+      <Container maxWidth="lg" className="my-4 flex flex-wrap items-center gap-2">
         {routineDay.weekdays.map((weekday) => (
-          <Chip
-            key={`day-${routineDay.id}-weekday-${weekday}`}
-            label={dayjs().day(weekday).format("dddd")}
-          />
+          <Badge key={`day-${routineDay.id}-weekday-${weekday}`} variant="secondary">
+            {dayjs().day(weekday).format("dddd")}
+          </Badge>
         ))}
       </Container>
 

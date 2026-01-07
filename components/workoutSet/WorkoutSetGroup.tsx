@@ -1,4 +1,11 @@
 import { type Units } from "@/actions/getUnits";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { SetType } from "@/prisma/generated/client";
 import { ListView } from "@/types/constants";
 import {
@@ -18,24 +25,11 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import {
-  Add,
-  DragHandle,
-  Error,
+  AlertCircle,
+  GripVertical,
   Image as ImageIcon,
-} from "@mui/icons-material";
-import {
-  Avatar,
-  Collapse,
-  Fab,
-  IconButton,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Typography,
-} from "@mui/material";
+  Plus,
+} from "lucide-react";
 import {
   useEffect,
   useMemo,
@@ -129,101 +123,108 @@ export const WorkoutSetGroup = ({
   };
 
   return (
-    <>
-      <ListItem
-        disablePadding
+    <Collapsible open={!isReorderActive && expanded} className="w-full">
+      <div
         ref={setNodeRef}
-        sx={{ transform: CSS.Transform.toString(transform), transition }}
-        secondaryAction={
-          !isReorderActive && (
-            <EditSetGroupMenu
-              view={view}
-              setGroup={setGroup}
-              reorder={canReorderSets}
-              onReorder={() => setReorderSets(!canReorderSets)}
-              units={units}
-            />
-          )
-        }
+        style={{ transform: CSS.Transform.toString(transform), transition }}
+        className="flex items-center justify-between p-3 border-b border-gray-200 hover:bg-gray-50"
       >
-        <ListItemButton onClick={() => setExpanded(!expanded)}>
+        <CollapsibleTrigger
+          onClick={() => setExpanded(!expanded)}
+          className="flex items-center gap-3 flex-1 text-left"
+        >
           {isReorderActive && (
-            <ListItemIcon>
-              <IconButton
-                sx={{ touchAction: "manipulation" }}
-                {...attributes}
-                {...listeners}
-              >
-                <DragHandle />
-              </IconButton>
-            </ListItemIcon>
-          )}
-
-          <ListItemAvatar>
-            {exercise ? (
-              <Avatar
-                alt={`${exercise.name} set item`}
-                src={`/exercises/${exercise.images[0]}`}
-              />
-            ) : (
-              <Avatar>{exercise ? <ImageIcon /> : <Error />}</Avatar>
-            )}
-          </ListItemAvatar>
-
-          <ListItemText
-            primary={
-              <Typography
-                sx={
-                  setGroup.sets.every((set) => set.completed)
-                    ? { textDecoration: "line-through" }
-                    : {}
-                }
-              >
-                {exercise?.name ?? "Unknown exercise"}
-              </Typography>
-            }
-            secondary={`${sets.length} sets`}
-          />
-        </ListItemButton>
-      </ListItem>
-
-      <Collapse in={!isReorderActive && expanded} timeout="auto" unmountOnExit>
-        <List component="div" disablePadding>
-          {setGroup.comment && (
-            <ListItem dense sx={{ pl: 4 }}>
-              <ListItemText secondary={setGroup.comment} />
-            </ListItem>
-          )}
-
-          <DndContext id="sets" onDragEnd={handleSort} sensors={sensors}>
-            <SortableContext
-              items={sets}
-              strategy={verticalListSortingStrategy}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="touch-manipulation"
+              {...attributes}
+              {...listeners}
             >
-              {setsWithNumber.map(({ set, setNum }) => {
-                return (
-                  <WorkoutSetRow
-                    key={`set-row-${set.id}`}
-                    view={view}
-                    set={set}
-                    setNum={setNum}
-                    units={units}
-                    reorder={canReorderSets}
-                    startRestTimer={startRestTimer}
-                  />
-                );
-              })}
-            </SortableContext>
-          </DndContext>
+              <GripVertical className="h-4 w-4" />
+            </Button>
+          )}
 
-          <ListItem sx={{ display: "flex", gap: 2 }}>
-            <Fab size="medium" variant="extended" onClick={handleAdd}>
-              <Add />
-              New set
-            </Fab>
-          </ListItem>
-        </List>
-      </Collapse>
-    </>
+          <Avatar className="h-8 w-8">
+            {exercise ? (
+              <>
+                <AvatarImage
+                  src={`/exercises/${exercise.images[0]}`}
+                  alt={`${exercise.name} set item`}
+                />
+                <AvatarFallback>
+                  <ImageIcon className="h-4 w-4" />
+                </AvatarFallback>
+              </>
+            ) : (
+              <AvatarFallback>
+                <AlertCircle className="h-4 w-4" />
+              </AvatarFallback>
+            )}
+          </Avatar>
+
+          <div className="flex-1">
+            <div
+              className={`font-medium ${
+                setGroup.sets.every((set) => set.completed)
+                  ? "line-through text-gray-500"
+                  : "text-gray-900"
+              }`}
+            >
+              {exercise?.name ?? "Unknown exercise"}
+            </div>
+            <div className="text-sm text-gray-500">{sets.length} sets</div>
+          </div>
+        </CollapsibleTrigger>
+
+        {!isReorderActive && (
+          <EditSetGroupMenu
+            view={view}
+            setGroup={setGroup}
+            reorder={canReorderSets}
+            onReorder={() => setReorderSets(!canReorderSets)}
+            units={units}
+          />
+        )}
+      </div>
+
+      <CollapsibleContent>
+          <div className="pl-4">
+            {setGroup.comment && (
+              <div className="pl-8 py-2 text-sm text-gray-600">
+                {setGroup.comment}
+              </div>
+            )}
+
+            <DndContext id="sets" onDragEnd={handleSort} sensors={sensors}>
+              <SortableContext
+                items={sets}
+                strategy={verticalListSortingStrategy}
+              >
+                {setsWithNumber.map(({ set, setNum }) => {
+                  return (
+                    <WorkoutSetRow
+                      key={`set-row-${set.id}`}
+                      view={view}
+                      set={set}
+                      setNum={setNum}
+                      units={units}
+                      reorder={canReorderSets}
+                      startRestTimer={startRestTimer}
+                    />
+                  );
+                })}
+              </SortableContext>
+            </DndContext>
+
+            <div className="flex gap-2 p-3">
+              <Button onClick={handleAdd} className="flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                New set
+              </Button>
+            </div>
+          </div>
+      </CollapsibleContent>
+    </Collapsible>
   );
 };

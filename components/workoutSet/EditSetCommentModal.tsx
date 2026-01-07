@@ -1,11 +1,13 @@
+import { Button } from "@/components/ui/button";
 import {
-  Button,
   Dialog,
-  DialogActions,
   DialogContent,
+  DialogHeader,
   DialogTitle,
-  TextField,
-} from "@mui/material";
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import type { WorkoutSetGroup } from "@/prisma/generated/client";
 
@@ -21,38 +23,36 @@ export const EditSetCommentModal = ({
   const [comment, setComment] = useState(setGroup.comment ?? "");
 
   return (
-    <Dialog
-      open={open}
-      maxWidth="sm"
-      onClose={onClose}
-      aria-labelledby="update-set-title"
-      aria-describedby="update-set-description"
-    >
-      <DialogTitle id="update-set-title">Update Set Comment</DialogTitle>
-      <DialogContent>
-        <TextField
-          sx={{ mt: 2 }}
-          value={comment}
-          onChange={(event) => setComment(event.target.value)}
-          label="Comment"
-          multiline
-          rows={4}
-        />
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Update Set Comment</DialogTitle>
+        </DialogHeader>
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="comment">Comment</Label>
+          <Textarea
+            id="comment"
+            value={comment}
+            onChange={(event) => setComment(event.target.value)}
+            rows={4}
+            placeholder="Add a comment..."
+          />
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>Cancel</Button>
+          <Button
+            onClick={async () => {
+              await fetch(`/api/setgroup/${setGroup.id}`, {
+                method: "POST",
+                body: JSON.stringify({ comment }),
+              });
+              onClose();
+            }}
+          >
+            Update
+          </Button>
+        </DialogFooter>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button
-          onClick={async () => {
-            await fetch(`/api/setgroup/${setGroup.id}`, {
-              method: "POST",
-              body: JSON.stringify({ comment }),
-            });
-            onClose();
-          }}
-        >
-          Update
-        </Button>
-      </DialogActions>
     </Dialog>
   );
 };

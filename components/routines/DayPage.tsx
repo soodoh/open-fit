@@ -1,8 +1,8 @@
 "use client";
 
 import { WorkoutList } from "@/components/workoutSet/WorkoutList";
+import { Container } from "@/components/ui/container";
 import { ListView } from "@/types/constants";
-import { Container } from "@mui/material";
 import type { Units } from "@/actions/getUnits";
 import type { RoutineDayWithRelations } from "@/types/routineDay";
 
@@ -14,7 +14,7 @@ export const DayPage = ({
   units: Units;
 }) => {
   return (
-    <Container disableGutters maxWidth="lg">
+    <Container maxWidth="lg" className="p-0">
       <WorkoutList
         view={ListView.EditTemplate}
         sessionOrDayId={routineDay.id}

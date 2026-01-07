@@ -1,6 +1,7 @@
 import { AutocompleteExercise } from "@/components/exercises/AutocompleteExercise";
-import { Add } from "@mui/icons-material";
-import { Box, IconButton, TextField } from "@mui/material";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Plus } from "lucide-react";
 import { useState } from "react";
 import type { Exercise } from "@/prisma/generated/client";
 
@@ -30,31 +31,25 @@ export const AddExerciseRow = ({
   };
 
   return (
-    <Box
-      sx={{ display: "flex", gap: 2, alignItems: "center", flexWrap: "wrap" }}
-      component="form"
-      action={handleSubmit}
-    >
-      <Box sx={{ minWidth: 150, maxWidth: 400, flexGrow: 1 }}>
+    <form action={handleSubmit} className="flex items-center gap-4 flex-wrap">
+      <div className="min-w-[150px] max-w-[400px] flex-grow">
         <AutocompleteExercise
           value={exercise}
           onChange={(newExercise) => setExercise(newExercise)}
         />
-      </Box>
-      <TextField
-        variant="outlined"
-        type="number"
-        label="Sets"
-        value={numSets}
-        onChange={(event) => setNumSets(event.target.value)}
-        slotProps={{
-          htmlInput: { min: 1 },
-        }}
-        sx={{ minWidth: 50, maxWidth: 75 }}
-      />
-      <IconButton type="submit">
-        <Add />
-      </IconButton>
-    </Box>
+      </div>
+      <div className="min-w-[50px] max-w-[75px]">
+        <Input
+          type="number"
+          placeholder="Sets"
+          value={numSets}
+          onChange={(event) => setNumSets(event.target.value)}
+          min={1}
+        />
+      </div>
+      <Button type="submit" size="icon" variant="ghost">
+        <Plus className="h-4 w-4" />
+      </Button>
+    </form>
   );
 };

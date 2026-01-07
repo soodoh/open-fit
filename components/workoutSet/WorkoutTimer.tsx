@@ -1,18 +1,14 @@
 import { SetWithRelations } from "@/types/workoutSet";
-import { Pause, PlayArrow, Timer, Timer10 } from "@mui/icons-material";
+import { Pause, Play, Timer, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
-  Box,
-  Button,
-  CircularProgress,
   Dialog,
-  DialogActions,
   DialogContent,
+  DialogHeader,
   DialogTitle,
-  Fab,
-  IconButton,
-  Typography,
-} from "@mui/material";
-import { grey } from "@mui/material/colors";
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { ProgressCircle } from "@/components/ui/progress-circle";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { useTimer } from "react-timer-hook";
@@ -53,53 +49,25 @@ export const WorkoutTimer = ({
 
   return (
     <>
-      <Dialog
-        open={isTimerOpen}
-        onClose={() => setTimerOpen(false)}
-        aria-labelledby="workout-timer-title"
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle id="workout-timer-title">Workout Timer</DialogTitle>
-        <DialogContent>
-          <Box sx={{ position: "relative", display: "flex" }}>
-            <CircularProgress
-              variant="determinate"
-              value={100}
-              size="100%"
-              thickness={2}
-              sx={{
-                position: "absolute",
-                color: grey[200],
-              }}
-            />
-            <CircularProgress
-              variant="determinate"
+      <Dialog open={isTimerOpen} onOpenChange={setTimerOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Workout Timer</DialogTitle>
+          </DialogHeader>
+          <div className="flex justify-center p-6">
+            <ProgressCircle
               value={percentage}
-              size="100%"
-              thickness={2}
-              color="primary"
-            />
-            <Box
-              sx={{
-                position: "absolute",
-                top: 0,
-                bottom: 0,
-                width: "100%",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                gap: 1,
-              }}
+              size={200}
+              className="relative"
             >
-              <Box sx={{ display: "flex", flexDirection: "column" }}>
-                <Typography variant="h3">
+              <div className="flex flex-col items-center gap-4">
+                <div className="text-3xl font-bold">
                   {dayjs.duration(remainingSeconds, "seconds").format("mm:ss")}
-                </Typography>
-                <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
-                  <Fab
-                    size="small"
-                    color="default"
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
                     onClick={() => {
                       setTotalSeconds(Math.max(0, totalSeconds - 10));
                       restart(
@@ -110,10 +78,10 @@ export const WorkoutTimer = ({
                       );
                     }}
                   >
-                    <Timer10 />
-                  </Fab>
-                  <Fab
-                    size="small"
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="sm"
                     onClick={() => {
                       if (isRunning) {
                         pause();
@@ -122,11 +90,11 @@ export const WorkoutTimer = ({
                       }
                     }}
                   >
-                    {isRunning ? <Pause /> : <PlayArrow />}
-                  </Fab>
-                  <Fab
-                    size="small"
-                    color="primary"
+                    {isRunning ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="default"
                     onClick={() => {
                       setTotalSeconds(totalSeconds + 10);
                       restart(
@@ -137,52 +105,48 @@ export const WorkoutTimer = ({
                       );
                     }}
                   >
-                    <Timer10 />
-                  </Fab>
-                </Box>
-              </Box>
-            </Box>
-          </Box>
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </ProgressCircle>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setTimerOpen(false)}>
+              Close
+            </Button>
+            <Button
+              onClick={async () => {
+                setTimerOpen(false);
+                await onComplete();
+              }}
+            >
+              Mark as Completed
+            </Button>
+          </DialogFooter>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setTimerOpen(false)}>Close</Button>
-          <Button
-            variant="contained"
-            onClick={async () => {
-              setTimerOpen(false);
-              await onComplete();
-            }}
-          >
-            Mark as Completed
-          </Button>
-        </DialogActions>
       </Dialog>
 
-      <Box>
-        <IconButton
-          size="small"
-          color="default"
+      <div className="flex items-center">
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={() => setTimerOpen(!isTimerOpen)}
-          sx={{ position: "relative", margin: "5px" }}
+          className="relative h-10 w-10"
         >
           {!isRunning && remainingSeconds < totalSeconds ? (
-            <Pause fontSize="small" />
+            <Pause className="h-4 w-4" />
           ) : (
-            <Timer fontSize="small" />
+            <Timer className="h-4 w-4" />
           )}
-
-          <CircularProgress
-            variant="determinate"
+          <ProgressCircle
             value={percentage}
-            size={35}
-            thickness={3}
-            sx={{
-              color: grey[500],
-              position: "absolute",
-            }}
+            size={40}
+            strokeWidth={2}
+            className="absolute inset-0 text-gray-500"
           />
-        </IconButton>
-      </Box>
+        </Button>
+      </div>
     </>
   );
 };

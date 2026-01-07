@@ -1,16 +1,15 @@
 "use client";
 
-import { Delete, Edit, PlayArrow } from "@mui/icons-material";
+import { Button } from "@/components/ui/button";
 import {
-  IconButton,
-  ListItemIcon,
-  ListItemText,
-  Menu,
-  MenuItem,
-  MenuList,
-} from "@mui/material";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Trash2, Edit, Play } from "lucide-react";
 import { redirect } from "next/navigation";
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useState } from "react";
 import { DeleteDayModal } from "./DeleteDayModal";
 import { EditDayModal } from "./EditDayModal";
 import type { RoutineDay, WorkoutSession } from "@/prisma/generated/client";
@@ -30,15 +29,7 @@ export const EditDayMenu = ({
   icon: ReactNode;
 }) => {
   const [modal, setModal] = useState<Modal | null>(null);
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const menuOpen = Boolean(anchorEl);
   const handleClose = () => setModal(null);
-
-  useEffect(() => {
-    if (modal) {
-      setAnchorEl(null);
-    }
-  }, [modal]);
 
   return (
     <>
@@ -54,18 +45,18 @@ export const EditDayMenu = ({
         dayId={routineDay.id}
       />
 
-      <Menu
-        id={`edit-day-actions-${routineDay.id}-menu`}
-        aria-labelledby={`edit-day-actions-${routineDay.id}`}
-        open={menuOpen}
-        onClose={() => setAnchorEl(null)}
-        anchorEl={anchorEl}
-        transformOrigin={{ horizontal: "right", vertical: "top" }}
-        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-        disableScrollLock
-      >
-        <MenuList dense disablePadding>
-          <MenuItem
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label={`Edit actions for workout day ${routineDay.id}`}
+          >
+            {icon}
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem
             onClick={async () => {
               const response = await fetch("api/session", {
                 method: "POST",
@@ -79,43 +70,23 @@ export const EditDayMenu = ({
               }
             }}
             disabled={!!currentSession}
+            className="cursor-pointer"
           >
-            <ListItemIcon>
-              <PlayArrow fontSize="small" />
-            </ListItemIcon>
-            <ListItemText>Start</ListItemText>
-          </MenuItem>
+            <Play className="mr-2 h-4 w-4" />
+            Start
+          </DropdownMenuItem>
 
-          <MenuItem onClick={() => setModal(Modal.EDIT)}>
-            <ListItemIcon>
-              <Edit fontSize="small" />
-            </ListItemIcon>
-            <ListItemText>Edit</ListItemText>
-          </MenuItem>
+          <DropdownMenuItem onClick={() => setModal(Modal.EDIT)} className="cursor-pointer">
+            <Edit className="mr-2 h-4 w-4" />
+            Edit
+          </DropdownMenuItem>
 
-          <MenuItem onClick={() => setModal(Modal.DELETE)}>
-            <ListItemIcon>
-              <Delete fontSize="small" />
-            </ListItemIcon>
-            <ListItemText>Delete</ListItemText>
-          </MenuItem>
-        </MenuList>
-      </Menu>
-
-      <IconButton
-        aria-label={`Edit actions for workout day ${routineDay.id}`}
-        id={`edit-day-actions-${routineDay.id}`}
-        aria-controls={
-          menuOpen ? `edit-day-actions-${routineDay.id}-menu` : undefined
-        }
-        aria-haspopup="true"
-        aria-expanded={menuOpen ? "true" : undefined}
-        onClick={(event: React.MouseEvent<HTMLElement>) => {
-          setAnchorEl(event.currentTarget);
-        }}
-      >
-        {icon}
-      </IconButton>
+          <DropdownMenuItem onClick={() => setModal(Modal.DELETE)} className="cursor-pointer">
+            <Trash2 className="mr-2 h-4 w-4" />
+            Delete
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </>
   );
 };

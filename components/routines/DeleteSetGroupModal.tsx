@@ -1,11 +1,12 @@
 import {
-  Button,
   Dialog,
-  DialogActions,
   DialogContent,
-  DialogContentText,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
   DialogTitle,
-} from "@mui/material";
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import type { WorkoutSetGroup } from "@/prisma/generated/client";
 
 export const DeleteSetGroupModal = ({
@@ -18,29 +19,29 @@ export const DeleteSetGroupModal = ({
   setGroup: WorkoutSetGroup;
 }) => {
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      aria-labelledby="delete-set-title"
-      aria-describedby="delete-set-description"
-    >
-      <DialogTitle id="delete-set-title">Delete Set</DialogTitle>
+    <Dialog open={open} onOpenChange={() => onClose()}>
       <DialogContent>
-        <DialogContentText id="delete-set-description">
-          Are you sure you want to delete this exercise set?
-        </DialogContentText>
+        <DialogHeader>
+          <DialogTitle>Delete Set</DialogTitle>
+          <DialogDescription>
+            Are you sure you want to delete this exercise set?
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>
+            No
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={async () => {
+              await fetch(`/api/setgroup/${setGroup.id}`, { method: "DELETE" });
+              onClose();
+            }}
+          >
+            Yes
+          </Button>
+        </DialogFooter>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>No</Button>
-        <Button
-          onClick={async () => {
-            await fetch(`/api/setgroup/${setGroup.id}`, { method: "DELETE" });
-            onClose();
-          }}
-        >
-          Yes
-        </Button>
-      </DialogActions>
     </Dialog>
   );
 };

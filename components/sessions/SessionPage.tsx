@@ -3,16 +3,10 @@
 import { Units } from "@/actions/getUnits";
 import { WorkoutList } from "@/components/workoutSet/WorkoutList";
 import { ListView } from "@/types/constants";
-import { ArrowBack } from "@mui/icons-material";
-import {
-  Box,
-  Button,
-  Chip,
-  Container,
-  Grid,
-  Rating,
-  Typography,
-} from "@mui/material";
+import { ArrowLeft } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Container } from "@/components/ui/container";
 import dayjs from "dayjs";
 import Link from "next/link";
 import { EditSessionMenu } from "./EditSessionMenu";
@@ -36,59 +30,60 @@ export const SessionPage = ({
   return (
     <>
       <Container maxWidth="lg">
-        <Box
-          sx={{
-            my: 3,
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Chip
-            variant="outlined"
-            label={dayjs(session.startTime).format("MM/DD/YYYY")}
-          />
+        <div className="my-6 flex justify-between items-center">
+          <Badge variant="outline">
+            {dayjs(session.startTime).format("MM/DD/YYYY")}
+          </Badge>
 
-          <Button
-            variant="contained"
-            startIcon={<ArrowBack />}
-            LinkComponent={Link}
-            href="/logs"
-          >
-            Logs
+          <Button asChild>
+            <Link href="/logs">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Logs
+            </Link>
           </Button>
-        </Box>
+        </div>
 
-        <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
-          <Typography variant="h4">{session.name}</Typography>
+        <div className="flex gap-2 items-center">
+          <h1 className="text-3xl font-bold">{session.name}</h1>
           <EditSessionMenu session={session} />
-        </Box>
+        </div>
       </Container>
 
       <Container maxWidth="lg">
-        <Grid sx={{ my: 2 }} container spacing={2}>
-          <Grid size={{ xs: 12, sm: 4 }}>
-            <Typography variant="subtitle1">Duration</Typography>
-            <Typography variant="subtitle2">{durationString}</Typography>
-          </Grid>
+        <div className="my-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div>
+            <h3 className="text-sm font-medium">Duration</h3>
+            <p className="text-sm text-muted-foreground">{durationString}</p>
+          </div>
 
-          <Grid size={{ xs: 12, sm: 4 }}>
-            <Typography variant="subtitle1" component="legend">
-              General Impression
-            </Typography>
-            <Rating size="large" max={5} value={session.impression} readOnly />
-          </Grid>
+          <div>
+            <h3 className="text-sm font-medium mb-1">General Impression</h3>
+            <div className="flex">
+              {Array.from({ length: 5 }, (_, i) => (
+                <span
+                  key={i}
+                  className={`text-lg ${
+                    i < (session.impression || 0)
+                      ? "text-yellow-400"
+                      : "text-gray-300"
+                  }`}
+                >
+                  ★
+                </span>
+              ))}
+            </div>
+          </div>
 
           {session.notes && (
-            <Grid size={{ xs: 12, sm: 4 }}>
-              <Typography variant="subtitle1">Notes</Typography>
-              <Typography variant="subtitle2">{session.notes}</Typography>
-            </Grid>
+            <div>
+              <h3 className="text-sm font-medium">Notes</h3>
+              <p className="text-sm text-muted-foreground">{session.notes}</p>
+            </div>
           )}
-        </Grid>
+        </div>
       </Container>
 
-      <Container disableGutters maxWidth="lg">
+      <Container maxWidth="lg" className="px-0">
         <WorkoutList
           view={ListView.EditSession}
           sessionOrDayId={session.id}

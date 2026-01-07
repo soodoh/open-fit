@@ -1,8 +1,8 @@
-import { Container } from "@mui/material";
+import { Container } from "@/components/ui/container";
 
 export default function Home() {
   return (
-    <Container maxWidth="xl" sx={{ mt: 3 }}>
+    <Container maxWidth="xl" className="mt-8">
       TODO home page dashboard
     </Container>
   );

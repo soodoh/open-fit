@@ -1,9 +1,5 @@
 "use client";
 
-import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
-import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
-import { LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import { Roboto } from "next/font/google";
@@ -20,51 +16,10 @@ const roboto = Roboto({
 dayjs.extend(duration);
 
 export const AppWrapper = ({ children }: Readonly<{ children: ReactNode }>) => {
-  const theme = createTheme({
-    cssVariables: true,
-    typography: {
-      fontFamily: roboto.style.fontFamily,
-    },
-    components: {
-      MuiButton: {
-        styleOverrides: {
-          root: {
-            textTransform: "none",
-          },
-          outlined: {
-            borderColor: "var(--mui-palette-primary-main)",
-          },
-        },
-      },
-      MuiFab: {
-        styleOverrides: {
-          root: {
-            textTransform: "none",
-          },
-        },
-      },
-      MuiLink: {
-        styleOverrides: {
-          root: {
-            textDecoration: "none",
-            "&:hover": {
-              textDecoration: "underline",
-            },
-          },
-        },
-      },
-    },
-  });
-
   return (
-    <AppRouterCacheProvider options={{ enableCssLayer: true }}>
-      <ThemeProvider theme={theme}>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <CssBaseline />
-          <Header />
-          {children}
-        </LocalizationProvider>
-      </ThemeProvider>
-    </AppRouterCacheProvider>
+    <div className={roboto.variable}>
+      <Header />
+      {children}
+    </div>
   );
 };

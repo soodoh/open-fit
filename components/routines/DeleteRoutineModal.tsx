@@ -1,11 +1,12 @@
 import {
-  Button,
   Dialog,
-  DialogActions,
   DialogContent,
-  DialogContentText,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
   DialogTitle,
-} from "@mui/material";
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 export const DeleteRoutineModal = ({
   open,
@@ -17,29 +18,28 @@ export const DeleteRoutineModal = ({
   routineId: number;
 }) => {
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      aria-labelledby="delete-routine-title"
-      aria-describedby="delete-routine-description"
-      PaperProps={{
-        component: "form",
-        action: async () => {
+    <Dialog open={open} onOpenChange={() => onClose()}>
+      <DialogContent>
+        <form action={async () => {
           await fetch(`/api/routine/${routineId}`, { method: "DELETE" });
           onClose();
-        },
-      }}
-    >
-      <DialogTitle id="delete-routine-title">Delete Workout</DialogTitle>
-      <DialogContent>
-        <DialogContentText id="delete-routine-description">
-          Are you sure you want to delete this workout?
-        </DialogContentText>
+        }}>
+          <DialogHeader>
+            <DialogTitle>Delete Workout</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this workout?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={onClose}>
+              No
+            </Button>
+            <Button type="submit" variant="destructive">
+              Yes
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>No</Button>
-        <Button type="submit">Yes</Button>
-      </DialogActions>
     </Dialog>
   );
 };

@@ -1,8 +1,8 @@
 "use client";
 
 import { EditSessionModal as NewSessionModal } from "@/components/sessions/EditSessionModal";
-import { Add } from "@mui/icons-material";
-import { Button } from "@mui/material";
+import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
 export const CreateSessionButton = () => {
@@ -12,11 +12,8 @@ export const CreateSessionButton = () => {
     <>
       <NewSessionModal open={open} onClose={() => setOpen(false)} />
 
-      <Button
-        variant="contained"
-        startIcon={<Add />}
-        onClick={() => setOpen(true)}
-      >
+      <Button onClick={() => setOpen(true)}>
+        <Plus className="mr-2 h-4 w-4" />
         Create
       </Button>
     </>

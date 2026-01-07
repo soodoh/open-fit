@@ -1,14 +1,14 @@
+import { Button } from "@/components/ui/button";
 import {
-  Box,
-  Button,
   Dialog,
-  DialogActions,
   DialogContent,
+  DialogHeader,
   DialogTitle,
-  InputAdornment,
-  TextField,
-} from "@mui/material";
-import { DateTimeField } from "@mui/x-date-pickers";
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { DateTimeField } from "@/components/ui/date-time-field";
 import dayjs, { Dayjs } from "dayjs";
 import { useState } from "react";
 import { RepUnitMenu } from "./RepUnitMenu";
@@ -39,98 +39,87 @@ export const BulkEditSetModal = ({
   );
 
   return (
-    <Dialog
-      open={open}
-      maxWidth="sm"
-      onClose={onClose}
-      aria-labelledby="update-set-title"
-      aria-describedby="update-set-description"
-    >
-      <DialogTitle id="update-set-title">Bulk Update Sets</DialogTitle>
-      <DialogContent>
-        <Box sx={{ mt: 1, display: "flex", flexDirection: "column", gap: 2 }}>
-          <TextField
-            size="small"
-            variant="outlined"
-            type="string"
-            label={repUnit.name}
-            value={reps}
-            placeholder={`${setGroup.sets[0].reps}`}
-            onChange={(event) => setReps(event.target.value)}
-            slotProps={{
-              input: {
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <RepUnitMenu
-                      id={`bulk-rep-${setGroup.id}`}
-                      units={units}
-                      onChange={(repUnit) => setRepUnit(repUnit)}
-                    />
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Bulk Update Sets</DialogTitle>
+        </DialogHeader>
+        <div className="flex flex-col gap-4">
+          <div className="relative">
+            <Input
+              type="text"
+              value={reps}
+              placeholder={`${setGroup.sets[0].reps}`}
+              onChange={(event) => setReps(event.target.value)}
+              className="pr-12"
+            />
+            <Label className="absolute -top-2 left-2 bg-white px-1 text-xs text-gray-500">
+              {repUnit.name}
+            </Label>
+            <div className="absolute right-1 top-1/2 -translate-y-1/2">
+              <RepUnitMenu
+                id={`bulk-rep-${setGroup.id}`}
+                units={units}
+                onChange={(repUnit) => setRepUnit(repUnit)}
+              />
+            </div>
+          </div>
 
-          <TextField
-            size="small"
-            variant="outlined"
-            type="string"
-            label={weightUnit.name}
-            value={weight}
-            placeholder={`${setGroup.sets[0].weight}`}
-            onChange={(event) => setWeight(event.target.value)}
-            slotProps={{
-              input: {
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <WeightUnitMenu
-                      id={`bulk-weight-${setGroup.id}`}
-                      units={units}
-                      onChange={(weightUnit) => setWeightUnit(weightUnit)}
-                    />
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
+          <div className="relative">
+            <Input
+              type="text"
+              value={weight}
+              placeholder={`${setGroup.sets[0].weight}`}
+              onChange={(event) => setWeight(event.target.value)}
+              className="pr-12"
+            />
+            <Label className="absolute -top-2 left-2 bg-white px-1 text-xs text-gray-500">
+              {weightUnit.name}
+            </Label>
+            <div className="absolute right-1 top-1/2 -translate-y-1/2">
+              <WeightUnitMenu
+                id={`bulk-weight-${setGroup.id}`}
+                units={units}
+                onChange={(weightUnit) => setWeightUnit(weightUnit)}
+              />
+            </div>
+          </div>
 
           <DateTimeField
             label="Rest Timer"
-            format="mm:ss"
-            value={restTime}
+            value={restTime?.toDate() || null}
             onChange={(newTime) => {
               if (newTime) {
-                setRestTime(newTime);
+                setRestTime(dayjs(newTime));
               }
             }}
           />
-        </Box>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>Cancel</Button>
+          <Button
+            onClick={async () => {
+              const totalSeconds =
+                (restTime?.get("minutes") ?? 0) * 60 +
+                (restTime?.get("seconds") ?? 0);
+              await fetch(`/api/setgroup/${setGroup.id}/bulkedit`, {
+                method: "POST",
+                body: JSON.stringify({
+                  // If empty string, leave unchanged (undefined)
+                  reps: reps ? parseInt(reps, 10) : undefined,
+                  weight: weight ? parseInt(weight, 10) : undefined,
+                  repetitionUnitId: repUnit.id,
+                  weightUnitId: weightUnit.id,
+                  restTime: totalSeconds,
+                }),
+              });
+              onClose();
+            }}
+          >
+            Update
+          </Button>
+        </DialogFooter>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button
-          onClick={async () => {
-            const totalSeconds =
-              (restTime?.get("minutes") ?? 0) * 60 +
-              (restTime?.get("seconds") ?? 0);
-            await fetch(`/api/setgroup/${setGroup.id}/bulkedit`, {
-              method: "POST",
-              body: JSON.stringify({
-                // If empty string, leave unchanged (undefined)
-                reps: reps ? parseInt(reps, 10) : undefined,
-                weight: weight ? parseInt(weight, 10) : undefined,
-                repetitionUnitId: repUnit.id,
-                weightUnitId: weightUnit.id,
-                restTime: totalSeconds,
-              }),
-            });
-            onClose();
-          }}
-        >
-          Update
-        </Button>
-      </DialogActions>
     </Dialog>
   );
 };

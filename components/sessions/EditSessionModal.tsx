@@ -1,16 +1,15 @@
 import { SessionWithRelations } from "@/types/workoutSession";
 import {
-  Box,
-  Button,
   Dialog,
-  DialogActions,
   DialogContent,
+  DialogFooter,
+  DialogHeader,
   DialogTitle,
-  Rating,
-  TextField,
-  Typography,
-} from "@mui/material";
-import { DateTimePicker } from "@mui/x-date-pickers";
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { DateTimePicker } from "@/components/ui/date-time-picker";
 import dayjs, { type Dayjs } from "dayjs";
 import { useState } from "react";
 import { SelectTemplate } from "./SelectTemplate";
@@ -39,46 +38,42 @@ export const EditSessionModal = ({
   const [workoutTemplate, setWorkoutTemplate] =
     useState<RoutineDayWithRoutine | null>(session?.template ?? null);
 
-  return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      maxWidth="sm"
-      fullWidth
-      PaperProps={{
-        component: "form",
-        action: async () => {
-          // Must be null or valid date
-          const isStartValid = startTime === null || startTime.isValid();
-          const isEndValid = endTime === null || endTime.isValid();
-          // Prevent negative durations (if both are valid dates)
-          const isDurationValid =
-            !startTime || !endTime || startTime.isBefore(endTime);
-          if (!isStartValid || !isEndValid || !isDurationValid) {
-            return;
-          }
-          const sessionData = {
-            templateId: workoutTemplate?.id,
-            name,
-            startTime: startTime?.toDate(),
-            endTime: endTime?.toDate(),
-            notes,
-            impression,
-          };
-          await fetch(session ? `/api/session/${session.id}` : "/api/session", {
-            method: "POST",
-            body: JSON.stringify(sessionData),
-          });
-          onClose();
-        },
-      }}
-    >
-      <DialogTitle>
-        {session ? "Edit Workout Session" : "Create Workout Session"}
-      </DialogTitle>
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    // Must be null or valid date
+    const isStartValid = startTime === null || startTime.isValid();
+    const isEndValid = endTime === null || endTime.isValid();
+    // Prevent negative durations (if both are valid dates)
+    const isDurationValid =
+      !startTime || !endTime || startTime.isBefore(endTime);
+    if (!isStartValid || !isEndValid || !isDurationValid) {
+      return;
+    }
+    const sessionData = {
+      templateId: workoutTemplate?.id,
+      name,
+      startTime: startTime?.toDate(),
+      endTime: endTime?.toDate(),
+      notes,
+      impression,
+    };
+    await fetch(session ? `/api/session/${session.id}` : "/api/session", {
+      method: "POST",
+      body: JSON.stringify(sessionData),
+    });
+    onClose();
+  };
 
-      <DialogContent>
-        <Box sx={{ mt: 1, display: "flex", flexDirection: "column", gap: 2 }}>
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>
+            {session ? "Edit Workout Session" : "Create Workout Session"}
+          </DialogTitle>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
           <SelectTemplate
             disabled={!!session}
             label={session ? "Created with template" : "Start with template"}
@@ -91,58 +86,78 @@ export const EditSessionModal = ({
             }}
           />
 
-          <TextField
-            variant="outlined"
-            label="Name"
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-          />
+          <div className="space-y-2">
+            <Label htmlFor="name">Name</Label>
+            <Input
+              id="name"
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+            />
+          </div>
 
           <DateTimePicker
             label="Start Time"
             value={startTime}
-            maxTime={endTime ?? undefined}
             onChange={(newTime) => {
               setStartTime(newTime);
             }}
           />
+          
           <DateTimePicker
             label="End Time"
             value={endTime}
-            minTime={startTime ?? undefined}
             onChange={(newTime) => {
               setEndTime(newTime);
             }}
           />
 
-          <Box>
-            <Typography component="legend">General Impression</Typography>
-            <Rating
-              size="medium"
-              max={5}
-              value={impression}
-              onChange={(_, newValue) => {
-                if (newValue) {
-                  setImpression(newValue);
-                }
-              }}
+          <div className="space-y-2">
+            <Label>General Impression</Label>
+            <div className="flex gap-1">
+              {Array.from({ length: 5 }, (_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => setImpression(i + 1)}
+                  className={`text-xl ${
+                    i < (impression || 0)
+                      ? "text-yellow-400"
+                      : "text-gray-300 hover:text-yellow-300"
+                  } transition-colors`}
+                >
+                  ★
+                </button>
+              ))}
+              {impression && (
+                <button
+                  type="button"
+                  onClick={() => setImpression(null)}
+                  className="ml-2 text-sm text-muted-foreground hover:text-foreground"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="notes">Notes</Label>
+            <textarea
+              id="notes"
+              className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              value={notes}
+              onChange={(event) => setNotes(event.target.value)}
             />
-          </Box>
+          </div>
 
-          <TextField
-            multiline
-            rows={4}
-            label="Notes"
-            value={notes}
-            onChange={(event) => setNotes(event.target.value)}
-          />
-        </Box>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="submit">Save</Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
-
-      <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button type="submit">Save</Button>
-      </DialogActions>
     </Dialog>
   );
 };

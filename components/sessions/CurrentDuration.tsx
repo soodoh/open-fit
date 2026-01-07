@@ -1,6 +1,5 @@
 "use client";
 
-import { Box, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 
@@ -20,9 +19,9 @@ export const CurrentDuration = ({ startTime }: { startTime: Date }) => {
   }, [startTime]);
 
   return (
-    <Box>
-      <Typography variant="subtitle1">Duration</Typography>
-      <Typography variant="subtitle2">{durationString}</Typography>
-    </Box>
+    <div>
+      <h3 className="text-sm font-medium">Duration</h3>
+      <p className="text-sm text-muted-foreground">{durationString}</p>
+    </div>
   );
 };

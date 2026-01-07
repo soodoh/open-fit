@@ -1,17 +1,13 @@
 import { SessionWithRelations } from "@/types/workoutSession";
 import {
-  Button,
   Card,
-  CardActions,
   CardContent,
+  CardFooter,
   CardHeader,
-  Chip,
-  List,
-  ListItem,
-  ListItemText,
-  Rating,
-  Typography,
-} from "@mui/material";
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import dayjs from "dayjs";
 import Link from "next/link";
 import { EditSessionMenu } from "./EditSessionMenu";
@@ -30,66 +26,58 @@ export const SessionSummaryCard = ({
     : "Not entered";
 
   return (
-    <Card
-      sx={{
-        minWidth: 300,
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      <CardHeader
-        title={
-          <>
-            <Typography variant="h6" gutterBottom sx={{ mr: 2 }}>
-              {session.name}
-            </Typography>
-            <Chip
-              variant="outlined"
-              label={dayjs(session.startTime).format("MM/DD/YYYY")}
-            />
-          </>
-        }
-        disableTypography
-        action={<EditSessionMenu session={session} />}
-      />
+    <Card className="min-w-[300px] flex flex-col">
+      <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
+        <div className="space-y-2">
+          <CardTitle className="text-lg">{session.name}</CardTitle>
+          <Badge variant="outline">
+            {dayjs(session.startTime).format("MM/DD/YYYY")}
+          </Badge>
+        </div>
+        <EditSessionMenu session={session} />
+      </CardHeader>
 
-      <CardContent sx={{ py: 0, flexGrow: 1 }}>
-        <List dense>
-          <ListItem disableGutters>
-            <ListItemText primary="Duration" secondary={durationString} />
-          </ListItem>
+      <CardContent className="flex-grow space-y-4">
+        <div className="space-y-1">
+          <p className="text-sm font-medium">Duration</p>
+          <p className="text-sm text-muted-foreground">{durationString}</p>
+        </div>
 
-          <ListItem disableGutters>
-            <ListItemText
-              primary="General Impression"
-              secondary={
-                session.impression ? (
-                  <Rating
-                    size="small"
-                    max={5}
-                    value={session.impression}
-                    readOnly
-                  />
-                ) : (
-                  "Not rated"
-                )
-              }
-            />
-          </ListItem>
-
-          {session.notes && (
-            <ListItem disableGutters>
-              <ListItemText primary="Notes" secondary={session.notes} />
-            </ListItem>
+        <div className="space-y-1">
+          <p className="text-sm font-medium">General Impression</p>
+          {session.impression ? (
+            <div className="flex">
+              {Array.from({ length: 5 }, (_, i) => (
+                <span
+                  key={i}
+                  className={`text-sm ${
+                    i < session.impression
+                      ? "text-yellow-400"
+                      : "text-gray-300"
+                  }`}
+                >
+                  ★
+                </span>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">Not rated</p>
           )}
-        </List>
+        </div>
+
+        {session.notes && (
+          <div className="space-y-1">
+            <p className="text-sm font-medium">Notes</p>
+            <p className="text-sm text-muted-foreground">{session.notes}</p>
+          </div>
+        )}
       </CardContent>
 
-      <CardActions sx={{ alignSelf: "flex-end" }}>
-        <Button LinkComponent={Link} href={`/logs/${session.id}`}>
-          View Session
+      <CardFooter className="justify-end">
+        <Button asChild variant="ghost">
+          <Link href={`/logs/${session.id}`}>View Session</Link>
         </Button>
-      </CardActions>
+      </CardFooter>
     </Card>
   );
 };
