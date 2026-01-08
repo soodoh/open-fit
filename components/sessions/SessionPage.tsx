@@ -1,22 +1,24 @@
 "use client";
 
-import { Units } from "@/actions/getUnits";
-import { WorkoutList } from "@/components/workoutSet/WorkoutList";
-import { ListView } from "@/types/constants";
-import { ArrowLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
+import { WorkoutList } from "@/components/workoutSet/WorkoutList";
+import {
+  ListView,
+  type Units,
+  type WorkoutSessionWithData,
+} from "@/lib/convex-types";
 import dayjs from "dayjs";
+import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { EditSessionMenu } from "./EditSessionMenu";
-import type { SessionWithRelations } from "@/types/workoutSession";
 
 export const SessionPage = ({
   session,
   units,
 }: {
-  session: SessionWithRelations;
+  session: WorkoutSessionWithData;
   units: Units;
 }) => {
   const durationDate =
@@ -85,8 +87,8 @@ export const SessionPage = ({
 
       <Container maxWidth="lg" className="px-0">
         <WorkoutList
-          view={ListView.EditSession}
-          sessionOrDayId={session.id}
+          view={ListView.ViewSession}
+          sessionOrDayId={session._id}
           setGroups={session.setGroups}
           units={units}
         />

@@ -1,3 +1,7 @@
+"use client";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -5,13 +9,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
+import { api } from "@/convex/_generated/api";
+import { useMutation } from "convex/react";
 import dayjs from "dayjs";
 import { useState } from "react";
-import type { RoutineDay } from "@/prisma/generated/client";
+import type { RoutineDay, RoutineId } from "@/lib/convex-types";
 
 export const EditDayModal = ({
   open,
@@ -21,13 +25,16 @@ export const EditDayModal = ({
 }: {
   open: boolean;
   onClose: () => void;
-  routineId: number;
+  routineId: RoutineId;
   routineDay?: RoutineDay;
 }) => {
   const [selectedWeekdays, setWeekdays] = useState<number[]>(
     routineDay?.weekdays ?? [],
   );
   const [description, setDescription] = useState(routineDay?.description ?? "");
+
+  const createDay = useMutation(api.mutations.routineDays.create);
+  const updateDay = useMutation(api.mutations.routineDays.update);
 
   const toggleWeekday = (weekday: number) => {
     const newWeekdays = selectedWeekdays.includes(weekday)
@@ -36,19 +43,21 @@ export const EditDayModal = ({
     setWeekdays(newWeekdays);
   };
 
-  const onSubmit = async (event: SubmitEvent) => {
+  const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    await fetch(routineDay ? `/api/day/${routineDay.id}` : "/api/day", {
-      method: "POST",
-      body: JSON.stringify({
+    if (routineDay) {
+      await updateDay({
+        id: routineDay._id,
+        description,
+        weekdays: selectedWeekdays,
+      });
+    } else {
+      await createDay({
         routineId,
         description,
         weekdays: selectedWeekdays,
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+      });
+    }
 
     onClose();
     setWeekdays([]);
@@ -82,9 +91,11 @@ export const EditDayModal = ({
               <div className="grid grid-cols-7 gap-2">
                 {Array.from({ length: 7 }, (_, i) => i + 1).map((weekday) => (
                   <Button
-                    key={`${routineDay?.id || "new"}-${weekday}`}
+                    key={`${routineDay?._id || "new"}-${weekday}`}
                     type="button"
-                    variant={selectedWeekdays.includes(weekday) ? "default" : "outline"}
+                    variant={
+                      selectedWeekdays.includes(weekday) ? "default" : "outline"
+                    }
                     size="sm"
                     onClick={() => toggleWeekday(weekday)}
                     className="p-2 text-xs"
@@ -97,7 +108,7 @@ export const EditDayModal = ({
                 <div className="flex flex-wrap gap-1 mt-2">
                   {selectedWeekdays.map((weekday) => (
                     <Badge
-                      key={`${routineDay?.id || "new"}-selected-${weekday}`}
+                      key={`${routineDay?._id || "new"}-selected-${weekday}`}
                       variant="secondary"
                     >
                       {dayjs().day(weekday).format("dddd")}

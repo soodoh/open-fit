@@ -1,4 +1,7 @@
-import { SessionWithRelations } from "@/types/workoutSession";
+"use client";
+
+import { Button } from "@/components/ui/button";
+import { DateTimePicker } from "@/components/ui/date-time-picker";
 import {
   Dialog,
   DialogContent,
@@ -6,14 +9,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { DateTimePicker } from "@/components/ui/date-time-picker";
+import { api } from "@/convex/_generated/api";
+import { useMutation } from "convex/react";
 import dayjs, { type Dayjs } from "dayjs";
 import { useState } from "react";
 import { SelectTemplate } from "./SelectTemplate";
-import type { RoutineDayWithRoutine } from "@/types/routine";
+import type {
+  RoutineDayWithRoutine,
+  WorkoutSessionWithData,
+} from "@/lib/convex-types";
 
 export const EditSessionModal = ({
   session,
@@ -21,7 +27,7 @@ export const EditSessionModal = ({
   onClose,
 }: {
   open: boolean;
-  session?: SessionWithRelations;
+  session?: WorkoutSessionWithData;
   onClose: () => void;
 }) => {
   const [name, setName] = useState<string>(session?.name ?? "");
@@ -36,7 +42,10 @@ export const EditSessionModal = ({
     session?.endTime ? dayjs(session.endTime) : null,
   );
   const [workoutTemplate, setWorkoutTemplate] =
-    useState<RoutineDayWithRoutine | null>(session?.template ?? null);
+    useState<RoutineDayWithRoutine | null>(null);
+
+  const createSession = useMutation(api.mutations.sessions.create);
+  const updateSession = useMutation(api.mutations.sessions.update);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,18 +58,26 @@ export const EditSessionModal = ({
     if (!isStartValid || !isEndValid || !isDurationValid) {
       return;
     }
-    const sessionData = {
-      templateId: workoutTemplate?.id,
-      name,
-      startTime: startTime?.toDate(),
-      endTime: endTime?.toDate(),
-      notes,
-      impression,
-    };
-    await fetch(session ? `/api/session/${session.id}` : "/api/session", {
-      method: "POST",
-      body: JSON.stringify(sessionData),
-    });
+
+    if (session) {
+      await updateSession({
+        id: session._id,
+        name,
+        startTime: startTime?.valueOf(),
+        endTime: endTime?.valueOf() ?? undefined,
+        notes,
+        impression: impression ?? undefined,
+      });
+    } else {
+      await createSession({
+        templateId: workoutTemplate?._id,
+        name,
+        startTime: startTime?.valueOf() ?? Date.now(),
+        endTime: endTime?.valueOf(),
+        notes,
+        impression: impression ?? undefined,
+      });
+    }
     onClose();
   };
 
@@ -77,7 +94,7 @@ export const EditSessionModal = ({
           <SelectTemplate
             disabled={!!session}
             label={session ? "Created with template" : "Start with template"}
-            value={session?.template ?? null}
+            value={null}
             onChange={(selectedTemplate) => {
               setWorkoutTemplate(selectedTemplate);
               if (selectedTemplate?.description) {
@@ -102,7 +119,7 @@ export const EditSessionModal = ({
               setStartTime(newTime);
             }}
           />
-          
+
           <DateTimePicker
             label="End Time"
             value={endTime}

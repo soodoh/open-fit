@@ -1,0 +1,92 @@
+// Re-export Convex types for convenience
+import { Doc, Id } from "@/convex/_generated/dataModel";
+
+// Enums (matching schema)
+export const SetType = {
+  NORMAL: "NORMAL",
+  WARMUP: "WARMUP",
+  DROPSET: "DROPSET",
+  FAILURE: "FAILURE",
+} as const;
+export type SetType = (typeof SetType)[keyof typeof SetType];
+
+export const SetGroupType = {
+  NORMAL: "NORMAL",
+  SUPERSET: "SUPERSET",
+} as const;
+export type SetGroupType = (typeof SetGroupType)[keyof typeof SetGroupType];
+
+// View mode constant (was in @/types/constants)
+export const ListView = {
+  EditTemplate: "EditTemplate",
+  CurrentSession: "CurrentSession",
+  ViewSession: "ViewSession",
+} as const;
+export type ListView = (typeof ListView)[keyof typeof ListView];
+
+// Document types
+export type Exercise = Doc<"exercises">;
+export type Routine = Doc<"routines">;
+export type RoutineDay = Doc<"routineDays">;
+export type WorkoutSession = Doc<"workoutSessions">;
+export type WorkoutSetGroup = Doc<"workoutSetGroups">;
+export type WorkoutSet = Doc<"workoutSets">;
+export type RepetitionUnit = Doc<"repetitionUnits">;
+export type WeightUnit = Doc<"weightUnits">;
+
+// ID types
+export type ExerciseId = Id<"exercises">;
+export type RoutineId = Id<"routines">;
+export type RoutineDayId = Id<"routineDays">;
+export type WorkoutSessionId = Id<"workoutSessions">;
+export type WorkoutSetGroupId = Id<"workoutSetGroups">;
+export type WorkoutSetId = Id<"workoutSets">;
+export type RepetitionUnitId = Id<"repetitionUnits">;
+export type WeightUnitId = Id<"weightUnits">;
+
+// Complex types with relations
+export type RoutineWithDays = Routine & {
+  routineDays: RoutineDay[];
+};
+
+export type RoutineDayWithRoutine = RoutineDay & {
+  routine: Routine | null;
+};
+
+export type WorkoutSetWithRelations = WorkoutSet & {
+  exercise: Exercise;
+  repetitionUnit: RepetitionUnit;
+  weightUnit: WeightUnit;
+};
+
+export type WorkoutSetGroupWithSets = WorkoutSetGroup & {
+  sets: WorkoutSetWithRelations[];
+};
+
+export type RoutineDayWithData = RoutineDay & {
+  routine: Routine | null;
+  setGroups: WorkoutSetGroupWithSets[];
+};
+
+export type WorkoutSessionWithData = WorkoutSession & {
+  setGroups: WorkoutSetGroupWithSets[];
+};
+
+export type Units = {
+  repetitionUnits: RepetitionUnit[];
+  weightUnits: WeightUnit[];
+};
+
+// Aliases for backwards compatibility with old imports
+export type SetWithRelations = WorkoutSetWithRelations;
+export type SetGroupWithRelations = WorkoutSetGroupWithSets;
+export type RoutineDayWithRelations = RoutineDayWithData;
+export type SessionWithRelations = WorkoutSessionWithData & {
+  template?: RoutineDayWithRoutine | null;
+};
+
+// Helper type for set row numbering
+export type SetWithNumber = {
+  set: WorkoutSetWithRelations;
+  setNum: number;
+};

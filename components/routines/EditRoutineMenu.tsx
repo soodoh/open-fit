@@ -8,11 +8,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Plus, Trash2, Edit, Settings } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Edit, Plus, Settings, Trash2 } from "lucide-react";
+import { useState } from "react";
 import { DeleteRoutineModal } from "./DeleteRoutineModal";
 import { EditDayModal as AddDayModal } from "./EditDayModal";
-import type { Routine } from "@/prisma/generated/client";
+import type { Routine } from "@/lib/convex-types";
 
 enum Modal {
   EDIT = "edit",
@@ -29,7 +29,7 @@ export const EditRoutineMenu = ({ routine }: { routine: Routine }) => {
       <AddDayModal
         open={modal === Modal.ADD}
         onClose={handleClose}
-        routineId={routine.id}
+        routineId={routine._id}
       />
       <EditRoutineModal
         open={modal === Modal.EDIT}
@@ -39,7 +39,7 @@ export const EditRoutineMenu = ({ routine }: { routine: Routine }) => {
       <DeleteRoutineModal
         open={modal === Modal.DELETE}
         onClose={handleClose}
-        routineId={routine.id}
+        routineId={routine._id}
       />
 
       <DropdownMenu>
@@ -53,15 +53,24 @@ export const EditRoutineMenu = ({ routine }: { routine: Routine }) => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => setModal(Modal.ADD)} className="cursor-pointer">
+          <DropdownMenuItem
+            onClick={() => setModal(Modal.ADD)}
+            className="cursor-pointer"
+          >
             <Plus className="mr-2 h-4 w-4" />
             Add Day
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setModal(Modal.EDIT)} className="cursor-pointer">
+          <DropdownMenuItem
+            onClick={() => setModal(Modal.EDIT)}
+            className="cursor-pointer"
+          >
             <Edit className="mr-2 h-4 w-4" />
             Edit
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setModal(Modal.DELETE)} className="cursor-pointer">
+          <DropdownMenuItem
+            onClick={() => setModal(Modal.DELETE)}
+            className="cursor-pointer"
+          >
             <Trash2 className="mr-2 h-4 w-4" />
             Delete
           </DropdownMenuItem>

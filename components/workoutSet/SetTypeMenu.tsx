@@ -1,6 +1,5 @@
-import { SetType } from "@/prisma/generated/client";
-import { SetWithRelations } from "@/types/workoutSet";
-import { Flame } from "lucide-react";
+"use client";
+
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,6 +8,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { api } from "@/convex/_generated/api";
+import { SetType, type SetWithRelations } from "@/lib/convex-types";
+import { useMutation } from "convex/react";
+import { Flame } from "lucide-react";
 import { type ReactNode, useState } from "react";
 
 // TODO do this better, with localization, etc.
@@ -56,6 +59,7 @@ export const SetTypeMenu = ({
   setNum: number;
 }) => {
   const [open, setOpen] = useState(false);
+  const updateSet = useMutation(api.mutations.sets.update);
 
   return (
     <div className="flex items-center">
@@ -72,11 +76,11 @@ export const SetTypeMenu = ({
         <DropdownMenuContent>
           {Object.values(SetType).map((setType) => (
             <DropdownMenuItem
-              key={`set-type-${set.id}-${setType}`}
+              key={`set-type-${set._id}-${setType}`}
               onClick={async () => {
-                fetch(`/api/set/${set.id}`, {
-                  method: "POST",
-                  body: JSON.stringify({ type: setType }),
+                await updateSet({
+                  id: set._id,
+                  type: setType,
                 });
                 setOpen(false);
               }}

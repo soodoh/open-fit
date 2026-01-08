@@ -1,12 +1,34 @@
-import { auth } from "@/auth";
+"use client";
+
 import { LoginForm } from "@/components/auth/LoginForm";
-import { redirect } from "next/navigation";
+import { Container } from "@/components/ui/container";
+import { useConvexAuth } from "convex/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
-export default async function RegisterPage() {
-  const session = await auth();
+export default function RegisterPage() {
+  const { isLoading, isAuthenticated } = useConvexAuth();
+  const router = useRouter();
 
-  if (session?.user) {
-    redirect("/");
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      router.push("/");
+    }
+  }, [isLoading, isAuthenticated, router]);
+
+  if (isLoading) {
+    return (
+      <Container
+        maxWidth="sm"
+        className="flex flex-1 items-center justify-center"
+      >
+        <p className="text-muted-foreground">Loading...</p>
+      </Container>
+    );
+  }
+
+  if (isAuthenticated) {
+    return null;
   }
 
   return <LoginForm register />;

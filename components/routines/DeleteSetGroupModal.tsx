@@ -1,3 +1,6 @@
+"use client";
+
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -6,8 +9,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import type { WorkoutSetGroup } from "@/prisma/generated/client";
+import { api } from "@/convex/_generated/api";
+import { useMutation } from "convex/react";
+import type { WorkoutSetGroup } from "@/lib/convex-types";
 
 export const DeleteSetGroupModal = ({
   open,
@@ -18,6 +22,8 @@ export const DeleteSetGroupModal = ({
   onClose: () => void;
   setGroup: WorkoutSetGroup;
 }) => {
+  const deleteSetGroup = useMutation(api.mutations.setGroups.remove);
+
   return (
     <Dialog open={open} onOpenChange={() => onClose()}>
       <DialogContent>
@@ -34,7 +40,7 @@ export const DeleteSetGroupModal = ({
           <Button
             variant="destructive"
             onClick={async () => {
-              await fetch(`/api/setgroup/${setGroup.id}`, { method: "DELETE" });
+              await deleteSetGroup({ id: setGroup._id });
               onClose();
             }}
           >

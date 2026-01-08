@@ -1,23 +1,22 @@
 "use client";
 
-import { WorkoutList } from "@/components/workoutSet/WorkoutList";
 import { Container } from "@/components/ui/container";
-import { ListView } from "@/types/constants";
-import type { Units } from "@/actions/getUnits";
-import type { RoutineDayWithRelations } from "@/types/routineDay";
+import { WorkoutList } from "@/components/workoutSet/WorkoutList";
+import { ListView } from "@/lib/convex-types";
+import type { RoutineDayWithData, Units } from "@/lib/convex-types";
 
 export const DayPage = ({
   routineDay,
   units,
 }: {
-  routineDay: RoutineDayWithRelations;
+  routineDay: RoutineDayWithData;
   units: Units;
 }) => {
   return (
     <Container maxWidth="lg" className="p-0">
       <WorkoutList
         view={ListView.EditTemplate}
-        sessionOrDayId={routineDay.id}
+        sessionOrDayId={routineDay._id}
         setGroups={routineDay.setGroups}
         units={units}
       />

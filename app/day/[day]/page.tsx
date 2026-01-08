@@ -1,36 +1,55 @@
-import { getCurrentSession } from "@/actions/getCurrentSession";
-import { getRoutineDay } from "@/actions/getDay";
-import { getUnits } from "@/actions/getUnits";
-import { auth } from "@/auth";
+"use client";
+
+import { AuthGuard } from "@/components/auth/AuthGuard";
 import { DayPage } from "@/components/routines/DayPage";
 import { EditDayMenu } from "@/components/routines/EditDayMenu";
-import { Container } from "@/components/ui/container";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Settings } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Container } from "@/components/ui/container";
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
+import { useQuery } from "convex/react";
 import dayjs from "dayjs";
+import { ArrowLeft, Settings } from "lucide-react";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect } from "react";
 
-export default async function Page({
-  params,
-}: {
-  params: Promise<{ day: string }>;
-}) {
-  const session = await auth();
-  if (!session?.user) {
-    redirect("/signin");
+export default function Page() {
+  return (
+    <AuthGuard>
+      <DayPageContent />
+    </AuthGuard>
+  );
+}
+
+function DayPageContent() {
+  const params = useParams();
+  const router = useRouter();
+  const dayId = params.day as Id<"routineDays">;
+
+  const routineDay = useQuery(api.queries.routineDays.get, { id: dayId });
+  const currentSession = useQuery(api.queries.sessions.getCurrent);
+  const units = useQuery(api.queries.units.list);
+
+  // Redirect if routine day not found
+  useEffect(() => {
+    if (routineDay === null) {
+      router.push("/routines");
+    }
+  }, [routineDay, router]);
+
+  if (routineDay === undefined || units === undefined) {
+    return (
+      <Container maxWidth="lg" className="mt-8">
+        <p className="text-muted-foreground">Loading...</p>
+      </Container>
+    );
   }
 
-  const { day } = await params;
-  const dayId = parseInt(day, 10);
-  const routineDay = await getRoutineDay(dayId);
   if (!routineDay) {
-    redirect("/routines");
+    return null;
   }
-
-  const currentSession = await getCurrentSession();
-  const units = await getUnits();
 
   return (
     <>
@@ -51,9 +70,15 @@ export default async function Page({
         </Button>
       </Container>
 
-      <Container maxWidth="lg" className="my-4 flex flex-wrap items-center gap-2">
+      <Container
+        maxWidth="lg"
+        className="my-4 flex flex-wrap items-center gap-2"
+      >
         {routineDay.weekdays.map((weekday) => (
-          <Badge key={`day-${routineDay.id}-weekday-${weekday}`} variant="secondary">
+          <Badge
+            key={`day-${routineDay._id}-weekday-${weekday}`}
+            variant="secondary"
+          >
             {dayjs().day(weekday).format("dddd")}
           </Badge>
         ))}

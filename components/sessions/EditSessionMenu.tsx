@@ -1,17 +1,17 @@
 "use client";
 
-import { Trash2, Edit, Settings } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
+import { Edit, Settings, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { DeleteSessionModal } from "./DeleteSessionModal";
 import { EditSessionModal } from "./EditSessionModal";
-import type { SessionWithRelations } from "@/types/workoutSession";
+import type { WorkoutSessionWithData } from "@/lib/convex-types";
 
 enum Modal {
   EDIT = "edit",
@@ -21,7 +21,7 @@ enum Modal {
 export const EditSessionMenu = ({
   session,
 }: {
-  session: SessionWithRelations;
+  session: WorkoutSessionWithData;
 }) => {
   const [modal, setModal] = useState<Modal | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -38,7 +38,7 @@ export const EditSessionMenu = ({
       <DeleteSessionModal
         open={modal === Modal.DELETE}
         onClose={handleClose}
-        sessionId={session.id}
+        sessionId={session._id}
       />
 
       <EditSessionModal
@@ -52,7 +52,7 @@ export const EditSessionMenu = ({
           <Button
             variant="ghost"
             size="icon"
-            aria-label={`Edit actions for workout session ${session.id}`}
+            aria-label={`Edit actions for workout session ${session._id}`}
           >
             <Settings className="h-4 w-4" />
           </Button>

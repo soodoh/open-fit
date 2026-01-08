@@ -1,4 +1,5 @@
-import { SessionWithRelations } from "@/types/workoutSession";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -6,16 +7,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import dayjs from "dayjs";
 import Link from "next/link";
 import { EditSessionMenu } from "./EditSessionMenu";
+import type { WorkoutSessionWithData } from "@/lib/convex-types";
 
 export const SessionSummaryCard = ({
   session,
 }: {
-  session: SessionWithRelations;
+  session: WorkoutSessionWithData;
 }) => {
   const durationDate =
     session.startTime && session.endTime
@@ -51,7 +51,7 @@ export const SessionSummaryCard = ({
                 <span
                   key={i}
                   className={`text-sm ${
-                    i < session.impression
+                    i < session.impression!
                       ? "text-yellow-400"
                       : "text-gray-300"
                   }`}
@@ -75,7 +75,7 @@ export const SessionSummaryCard = ({
 
       <CardFooter className="justify-end">
         <Button asChild variant="ghost">
-          <Link href={`/logs/${session.id}`}>View Session</Link>
+          <Link href={`/logs/${session._id}`}>View Session</Link>
         </Button>
       </CardFooter>
     </Card>

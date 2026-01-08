@@ -1,17 +1,23 @@
-import { ListView } from "@/types/constants";
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, MoreVertical } from "lucide-react";
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { api } from "@/convex/_generated/api";
+import {
+  ListView,
+  type SetWithRelations,
+  type Units,
+} from "@/lib/convex-types";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { useMutation } from "convex/react";
+import { GripVertical, MoreVertical } from "lucide-react";
 import { RepUnitMenu } from "./RepUnitMenu";
 import { SetTypeMenu } from "./SetTypeMenu";
 import { WeightUnitMenu } from "./WeightUnitMenu";
 import { WorkoutTimer } from "./WorkoutTimer";
-import type { Units } from "@/actions/getUnits";
-import type { SetWithRelations } from "@/types/workoutSet";
 
 export const WorkoutSetRow = ({
   view,
@@ -29,8 +35,10 @@ export const WorkoutSetRow = ({
   startRestTimer: (seconds: number) => void;
 }) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: set.id });
+    useSortable({ id: set._id });
   const isRowDisabled = set.completed && view === ListView.CurrentSession;
+
+  const updateSet = useMutation(api.mutations.sets.update);
 
   return (
     <div
@@ -62,17 +70,15 @@ export const WorkoutSetRow = ({
       <div className="flex gap-2 flex-1 my-1">
         <div className="relative flex-1">
           <Input
-            key={`reps-${set.id}-${set.reps}`}
+            key={`reps-${set._id}-${set.reps}`}
             type="text"
             disabled={isRowDisabled}
             defaultValue={set.reps}
             className="pr-12"
             onBlur={async (event) => {
-              fetch(`/api/set/${set.id}`, {
-                method: "POST",
-                body: JSON.stringify({
-                  reps: parseInt(event.target.value, 10) || 0,
-                }),
+              updateSet({
+                id: set._id,
+                reps: parseInt(event.target.value, 10) || 0,
               });
             }}
           />
@@ -81,12 +87,12 @@ export const WorkoutSetRow = ({
           </Label>
           <div className="absolute right-1 top-1/2 -translate-y-1/2">
             <RepUnitMenu
-              id={set.id}
+              id={set._id}
               units={units}
               onChange={(repUnit) => {
-                fetch(`/api/set/${set.id}`, {
-                  method: "POST",
-                  body: JSON.stringify({ repetitionUnitId: repUnit.id }),
+                updateSet({
+                  id: set._id,
+                  repetitionUnitId: repUnit._id,
                 });
               }}
             />
@@ -95,17 +101,15 @@ export const WorkoutSetRow = ({
 
         <div className="relative flex-1">
           <Input
-            key={`weight-${set.id}-${set.weight}`}
+            key={`weight-${set._id}-${set.weight}`}
             type="text"
             disabled={isRowDisabled}
             defaultValue={set.weight}
             className="pr-12"
             onBlur={async (event) => {
-              fetch(`/api/set/${set.id}`, {
-                method: "POST",
-                body: JSON.stringify({
-                  weight: parseInt(event.target.value, 10) || 0,
-                }),
+              updateSet({
+                id: set._id,
+                weight: parseInt(event.target.value, 10) || 0,
               });
             }}
           />
@@ -114,12 +118,12 @@ export const WorkoutSetRow = ({
           </Label>
           <div className="absolute right-1 top-1/2 -translate-y-1/2">
             <WeightUnitMenu
-              id={set.id}
+              id={set._id}
               units={units}
               onChange={(weightUnit) => {
-                fetch(`/api/set/${set.id}`, {
-                  method: "POST",
-                  body: JSON.stringify({ weightUnitId: weightUnit.id }),
+                updateSet({
+                  id: set._id,
+                  weightUnitId: weightUnit._id,
                 });
               }}
             />
@@ -131,9 +135,9 @@ export const WorkoutSetRow = ({
             <WorkoutTimer
               set={set}
               onComplete={async () => {
-                fetch(`/api/set/${set.id}`, {
-                  method: "POST",
-                  body: JSON.stringify({ completed: true }),
+                updateSet({
+                  id: set._id,
+                  completed: true,
                 });
                 if (set.restTime) {
                   startRestTimer(set.restTime);
@@ -146,9 +150,9 @@ export const WorkoutSetRow = ({
                 aria-label="Mark as Completed"
                 checked={set.completed}
                 onCheckedChange={(checked: boolean) => {
-                  fetch(`/api/set/${set.id}`, {
-                    method: "POST",
-                    body: JSON.stringify({ completed: checked }),
+                  updateSet({
+                    id: set._id,
+                    completed: checked,
                   });
                   if (set.restTime && checked) {
                     startRestTimer(set.restTime);

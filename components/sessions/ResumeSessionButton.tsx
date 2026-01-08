@@ -1,16 +1,16 @@
-import { Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Play } from "lucide-react";
 import Link from "next/link";
-import type { SessionWithRelations } from "@/types/workoutSession";
+import type { WorkoutSessionWithData } from "@/lib/convex-types";
 
 export const ResumeSessionButton = ({
   session,
 }: {
-  session: SessionWithRelations;
+  session: WorkoutSessionWithData;
 }) => {
   return (
     <Button variant="outline" asChild>
-      <Link href={`/logs/${session.id}`}>
+      <Link href={`/logs/${session._id}`}>
         <Play className="mr-2 h-4 w-4" />
         Resume Current Session
       </Link>

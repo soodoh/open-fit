@@ -1,4 +1,5 @@
-import { ChevronDown } from "lucide-react";
+"use client";
+
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -6,16 +7,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
 import { useState } from "react";
-import type { Units } from "@/actions/getUnits";
-import type { WeightUnit } from "@/prisma/generated/client";
+import type { Units, WeightUnit, WorkoutSetId } from "@/lib/convex-types";
 
 export const WeightUnitMenu = ({
   id,
   onChange,
   units,
 }: {
-  id: string | number;
+  id: WorkoutSetId | string;
   onChange: (weightUnit: WeightUnit) => void;
   units: Units;
 }) => {
@@ -31,7 +32,7 @@ export const WeightUnitMenu = ({
       <DropdownMenuContent>
         {units.weightUnits.map((unit) => (
           <DropdownMenuItem
-            key={`weight-unit-${id}-${unit.id}`}
+            key={`weight-unit-${id}-${unit._id}`}
             onClick={() => {
               onChange(unit);
               setOpen(false);

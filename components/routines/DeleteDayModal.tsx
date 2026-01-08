@@ -1,3 +1,6 @@
+"use client";
+
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -6,7 +9,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { api } from "@/convex/_generated/api";
+import { useMutation } from "convex/react";
+import type { RoutineDayId } from "@/lib/convex-types";
 
 export const DeleteDayModal = ({
   open,
@@ -15,8 +20,10 @@ export const DeleteDayModal = ({
 }: {
   open: boolean;
   onClose: () => void;
-  dayId: number;
+  dayId: RoutineDayId;
 }) => {
+  const deleteDay = useMutation(api.mutations.routineDays.remove);
+
   return (
     <Dialog open={open} onOpenChange={() => onClose()}>
       <DialogContent>
@@ -33,7 +40,7 @@ export const DeleteDayModal = ({
           <Button
             variant="destructive"
             onClick={async () => {
-              await fetch(`/api/day/${dayId}`, { method: "DELETE" });
+              await deleteDay({ id: dayId });
               onClose();
             }}
           >

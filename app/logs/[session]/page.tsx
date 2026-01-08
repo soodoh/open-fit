@@ -1,31 +1,53 @@
-import { getCurrentSession } from "@/actions/getCurrentSession";
-import { getSession } from "@/actions/getSessions";
-import { getUnits } from "@/actions/getUnits";
+"use client";
+
+import { AuthGuard } from "@/components/auth/AuthGuard";
 import { CurrentSessionPage } from "@/components/sessions/CurrentSessionPage";
 import { SessionPage } from "@/components/sessions/SessionPage";
-import { redirect } from "next/navigation";
+import { Container } from "@/components/ui/container";
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
+import { useQuery } from "convex/react";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect } from "react";
 
-export default async function Page({
-  params,
-}: {
-  params: Promise<{ session: string }>;
-}) {
-  const { session: sessionParam } = await params;
-  const sessionId = parseInt(sessionParam, 10);
-  const currentSession = await getCurrentSession();
+export default function Page() {
+  return (
+    <AuthGuard>
+      <SessionPageContent />
+    </AuthGuard>
+  );
+}
 
-  if (Number.isNaN(sessionId)) {
-    redirect("/logs");
+function SessionPageContent() {
+  const params = useParams();
+  const router = useRouter();
+  const sessionId = params.session as Id<"workoutSessions">;
+
+  const session = useQuery(api.queries.sessions.get, { id: sessionId });
+  const currentSession = useQuery(api.queries.sessions.getCurrent);
+  const units = useQuery(api.queries.units.list);
+
+  // Redirect if session not found
+  useEffect(() => {
+    if (session === null) {
+      router.push("/logs");
+    }
+  }, [session, router]);
+
+  if (session === undefined || units === undefined) {
+    return (
+      <Container maxWidth="lg" className="mt-8">
+        <p className="text-muted-foreground">Loading...</p>
+      </Container>
+    );
   }
 
-  const session = await getSession(sessionId);
-  const units = await getUnits();
   if (!session) {
-    redirect("/logs");
+    return null;
   }
 
-  if (session.id === currentSession?.id) {
-    return <CurrentSessionPage session={currentSession} units={units} />;
+  if (session._id === currentSession?._id) {
+    return <CurrentSessionPage session={session} units={units} />;
   }
   return <SessionPage session={session} units={units} />;
 }

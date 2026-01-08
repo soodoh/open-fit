@@ -7,10 +7,19 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { User, Settings, LogOut } from "lucide-react";
-import { signOut } from "next-auth/react";
+import { useAuthActions } from "@convex-dev/auth/react";
+import { LogOut, Settings, User } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export const AccountNavItem = () => {
+  const { signOut } = useAuthActions();
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    await signOut();
+    router.push("/signin");
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -27,7 +36,7 @@ export const AccountNavItem = () => {
           <Settings className="mr-2 h-4 w-4" />
           <span>Profile</span>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => signOut({ redirectTo: "/signin" })}>
+        <DropdownMenuItem onClick={handleSignOut}>
           <LogOut className="mr-2 h-4 w-4" />
           <span>Logout</span>
         </DropdownMenuItem>

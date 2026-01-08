@@ -1,4 +1,5 @@
-import { type Units } from "@/actions/getUnits";
+"use client";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -6,8 +7,15 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { SetType } from "@/prisma/generated/client";
-import { ListView } from "@/types/constants";
+import { api } from "@/convex/_generated/api";
+import {
+  ListView,
+  type SetGroupWithRelations,
+  SetType,
+  type SetWithNumber,
+  type SetWithRelations,
+  type Units,
+} from "@/lib/convex-types";
 import {
   DndContext,
   DragEndEvent,
@@ -24,6 +32,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { useMutation } from "convex/react";
 import {
   AlertCircle,
   GripVertical,
@@ -39,11 +48,6 @@ import {
 } from "react";
 import { EditSetGroupMenu } from "./EditSetGroupMenu";
 import { WorkoutSetRow } from "./WorkoutSetRow";
-import type {
-  SetGroupWithRelations,
-  SetWithNumber,
-  SetWithRelations,
-} from "@/types/workoutSet";
 
 export const WorkoutSetGroup = ({
   view,
@@ -59,7 +63,7 @@ export const WorkoutSetGroup = ({
   startRestTimer: (seconds: number) => void;
 }) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: setGroup.id });
+    useSortable({ id: setGroup._id });
   const [, startTransition] = useTransition();
   const [sets, optimisticUpdateSets] = useOptimistic<
     SetWithRelations[],
@@ -69,6 +73,9 @@ export const WorkoutSetGroup = ({
     view === ListView.CurrentSession && sets.some((set) => !set.completed),
   );
   const [canReorderSets, setReorderSets] = useState(false);
+
+  const createSet = useMutation(api.mutations.sets.create);
+  const reorderSets = useMutation(api.mutations.sets.reorder);
 
   useEffect(() => {
     if (sets.every((set) => set.completed)) {
@@ -94,31 +101,25 @@ export const WorkoutSetGroup = ({
   const sensors = useSensors(mouseSensor, touchSensor, keyboardSensor);
 
   const handleAdd = async () => {
-    await fetch("/api/set", {
-      method: "POST",
-      body: JSON.stringify({
-        setGroupId: setGroup.id,
-        exerciseId: exercise.id,
-      }),
+    await createSet({
+      setGroupId: setGroup._id,
+      exerciseId: exercise._id,
     });
   };
 
   const handleSort = (event: DragEndEvent) => {
-    const dragId = event.active.id;
-    const overId = event.over?.id;
-    if (!Number.isInteger(overId) || dragId === overId) {
+    const dragId = event.active.id as string;
+    const overId = event.over?.id as string;
+    if (!overId || dragId === overId) {
       return;
     }
 
-    const oldIndex = sets.findIndex((set) => set.id === dragId);
-    const newIndex = sets.findIndex((set) => set.id === overId);
+    const oldIndex = sets.findIndex((set) => set._id === dragId);
+    const newIndex = sets.findIndex((set) => set._id === overId);
     const newSets = arrayMove(sets, oldIndex, newIndex);
     startTransition(async () => {
       optimisticUpdateSets(newSets);
-      await fetch("/api/set/reorder", {
-        method: "POST",
-        body: JSON.stringify({ setIds: newSets.map(({ id }) => id) }),
-      });
+      await reorderSets({ setIds: newSets.map(({ _id }) => _id) });
     });
   };
 
@@ -189,41 +190,41 @@ export const WorkoutSetGroup = ({
       </div>
 
       <CollapsibleContent>
-          <div className="pl-4">
-            {setGroup.comment && (
-              <div className="pl-8 py-2 text-sm text-gray-600">
-                {setGroup.comment}
-              </div>
-            )}
-
-            <DndContext id="sets" onDragEnd={handleSort} sensors={sensors}>
-              <SortableContext
-                items={sets}
-                strategy={verticalListSortingStrategy}
-              >
-                {setsWithNumber.map(({ set, setNum }) => {
-                  return (
-                    <WorkoutSetRow
-                      key={`set-row-${set.id}`}
-                      view={view}
-                      set={set}
-                      setNum={setNum}
-                      units={units}
-                      reorder={canReorderSets}
-                      startRestTimer={startRestTimer}
-                    />
-                  );
-                })}
-              </SortableContext>
-            </DndContext>
-
-            <div className="flex gap-2 p-3">
-              <Button onClick={handleAdd} className="flex items-center gap-2">
-                <Plus className="h-4 w-4" />
-                New set
-              </Button>
+        <div className="pl-4">
+          {setGroup.comment && (
+            <div className="pl-8 py-2 text-sm text-gray-600">
+              {setGroup.comment}
             </div>
+          )}
+
+          <DndContext id="sets" onDragEnd={handleSort} sensors={sensors}>
+            <SortableContext
+              items={sets.map((s) => s._id)}
+              strategy={verticalListSortingStrategy}
+            >
+              {setsWithNumber.map(({ set, setNum }) => {
+                return (
+                  <WorkoutSetRow
+                    key={`set-row-${set._id}`}
+                    view={view}
+                    set={set}
+                    setNum={setNum}
+                    units={units}
+                    reorder={canReorderSets}
+                    startRestTimer={startRestTimer}
+                  />
+                );
+              })}
+            </SortableContext>
+          </DndContext>
+
+          <div className="flex gap-2 p-3">
+            <Button onClick={handleAdd} className="flex items-center gap-2">
+              <Plus className="h-4 w-4" />
+              New set
+            </Button>
           </div>
+        </div>
       </CollapsibleContent>
     </Collapsible>
   );

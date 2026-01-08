@@ -1,17 +1,25 @@
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import dayjs from "dayjs";
 import { EditRoutineMenu } from "./EditRoutineMenu";
 import { RoutineDayItem } from "./RoutineDayItem";
-import type { WorkoutSession } from "@/prisma/generated/client";
-import type { RoutineWithRelations } from "@/types/routine";
+import type {
+  RoutineWithDays,
+  WorkoutSessionWithData,
+} from "@/lib/convex-types";
 
-export async function RoutineCard({
+export function RoutineCard({
   routine,
   currentSession,
 }: {
-  routine: RoutineWithRelations;
-  currentSession: WorkoutSession | null;
+  routine: RoutineWithDays;
+  currentSession: WorkoutSessionWithData | null;
 }) {
   return (
     <Card className="flex flex-col h-full">
@@ -37,7 +45,7 @@ export async function RoutineCard({
           {routine.routineDays.map((routineDay) => {
             return (
               <RoutineDayItem
-                key={`${routine.id}-day-${routineDay.id}`}
+                key={`${routine._id}-day-${routineDay._id}`}
                 routineDay={routineDay}
                 currentSession={currentSession}
               />

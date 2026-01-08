@@ -1,4 +1,3 @@
-import { Pause, Play, Timer, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -8,6 +7,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import dayjs from "dayjs";
+import { Pause, Play, Plus, Timer } from "lucide-react";
 import { useTimer } from "react-timer-hook";
 
 export const RestTimer = ({
@@ -39,10 +39,13 @@ export const RestTimer = ({
           <DialogHeader>
             <DialogTitle>Rest Timer</DialogTitle>
           </DialogHeader>
-          
+
           <div className="relative flex justify-center items-center">
             {/* Background circle */}
-            <svg className="w-48 h-48 transform -rotate-90" viewBox="0 0 100 100">
+            <svg
+              className="w-48 h-48 transform -rotate-90"
+              viewBox="0 0 100 100"
+            >
               <circle
                 cx="50"
                 cy="50"
@@ -65,7 +68,7 @@ export const RestTimer = ({
                 strokeLinecap="round"
               />
             </svg>
-            
+
             {/* Timer content */}
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <h2 className="text-3xl font-bold">
@@ -146,7 +149,10 @@ export const RestTimer = ({
           onClick={() => setOpen(!open)}
         >
           <Timer className="h-4 w-4" />
-          <svg className="absolute inset-0 w-12 h-12 transform -rotate-90" viewBox="0 0 24 24">
+          <svg
+            className="absolute inset-0 w-12 h-12 transform -rotate-90"
+            viewBox="0 0 24 24"
+          >
             <circle
               cx="12"
               cy="12"

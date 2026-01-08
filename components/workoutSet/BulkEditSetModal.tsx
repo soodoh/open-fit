@@ -1,21 +1,28 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
+import { DateTimeField } from "@/components/ui/date-time-field";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { DateTimeField } from "@/components/ui/date-time-field";
+import { api } from "@/convex/_generated/api";
+import { useMutation } from "convex/react";
 import dayjs, { Dayjs } from "dayjs";
 import { useState } from "react";
 import { RepUnitMenu } from "./RepUnitMenu";
 import { WeightUnitMenu } from "./WeightUnitMenu";
-import type { Units } from "@/actions/getUnits";
-import type { RepetitionUnit, WeightUnit } from "@/prisma/generated/client";
-import type { SetGroupWithRelations } from "@/types/workoutSet";
+import type {
+  RepetitionUnit,
+  SetGroupWithRelations,
+  Units,
+  WeightUnit,
+} from "@/lib/convex-types";
 
 export const BulkEditSetModal = ({
   open,
@@ -38,6 +45,8 @@ export const BulkEditSetModal = ({
     setGroup.sets[0].weightUnit,
   );
 
+  const bulkEditSetGroup = useMutation(api.mutations.setGroups.bulkEdit);
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
@@ -58,7 +67,7 @@ export const BulkEditSetModal = ({
             </Label>
             <div className="absolute right-1 top-1/2 -translate-y-1/2">
               <RepUnitMenu
-                id={`bulk-rep-${setGroup.id}`}
+                id={`bulk-rep-${setGroup._id}`}
                 units={units}
                 onChange={(repUnit) => setRepUnit(repUnit)}
               />
@@ -78,7 +87,7 @@ export const BulkEditSetModal = ({
             </Label>
             <div className="absolute right-1 top-1/2 -translate-y-1/2">
               <WeightUnitMenu
-                id={`bulk-weight-${setGroup.id}`}
+                id={`bulk-weight-${setGroup._id}`}
                 units={units}
                 onChange={(weightUnit) => setWeightUnit(weightUnit)}
               />
@@ -96,22 +105,22 @@ export const BulkEditSetModal = ({
           />
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
           <Button
             onClick={async () => {
               const totalSeconds =
                 (restTime?.get("minutes") ?? 0) * 60 +
                 (restTime?.get("seconds") ?? 0);
-              await fetch(`/api/setgroup/${setGroup.id}/bulkedit`, {
-                method: "POST",
-                body: JSON.stringify({
-                  // If empty string, leave unchanged (undefined)
-                  reps: reps ? parseInt(reps, 10) : undefined,
-                  weight: weight ? parseInt(weight, 10) : undefined,
-                  repetitionUnitId: repUnit.id,
-                  weightUnitId: weightUnit.id,
-                  restTime: totalSeconds,
-                }),
+              await bulkEditSetGroup({
+                id: setGroup._id,
+                // If empty string, leave unchanged (undefined)
+                reps: reps ? parseInt(reps, 10) : undefined,
+                weight: weight ? parseInt(weight, 10) : undefined,
+                repetitionUnitId: repUnit._id,
+                weightUnitId: weightUnit._id,
+                restTime: totalSeconds,
               });
               onClose();
             }}

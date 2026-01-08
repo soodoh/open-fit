@@ -1,22 +1,55 @@
 "use client";
 
-import { SignUpSchema } from "@/lib/authSchema";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { SignUpSchema } from "@/lib/authSchema";
+import { useAuthActions } from "@convex-dev/auth/react";
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { flattenError } from "zod";
 
 export const LoginForm = ({ register }: { register?: boolean }) => {
+  const router = useRouter();
+  const { signIn } = useAuthActions();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState<string[]>([]);
   const [passwordError, setPasswordError] = useState<string[]>([]);
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setEmailError([]);
+    setPasswordError([]);
+
+    const validation = SignUpSchema.safeParse({ email, password });
+    if (validation.error) {
+      const errors = flattenError(validation.error);
+      setEmailError(errors.fieldErrors.email || []);
+      setPasswordError(errors.fieldErrors.password || []);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const formData = new FormData();
+      formData.set("email", email);
+      formData.set("password", password);
+      formData.set("flow", register ? "signUp" : "signIn");
+
+      await signIn("password", formData);
+      router.push("/");
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Authentication failed";
+      setPasswordError([message]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Container
@@ -25,30 +58,7 @@ export const LoginForm = ({ register }: { register?: boolean }) => {
     >
       <form
         className="flex w-full max-w-sm flex-col gap-4"
-        onSubmit={async (event) => {
-          event.preventDefault();
-          const validation = SignUpSchema.safeParse({ email, password });
-          if (validation.error) {
-            const errors = flattenError(validation.error);
-            setEmailError(errors.fieldErrors.email || []);
-            setPasswordError(errors.fieldErrors.password || []);
-            return;
-          }
-
-          setLoading(true);
-          const response = await signIn("credentials", {
-            email,
-            password,
-            flow: register ? "register" : "login",
-            redirect: false,
-          });
-          if (response.code) {
-            setPasswordError([response.code]);
-          } else {
-            redirect("/");
-          }
-          setLoading(false);
-        }}
+        onSubmit={handleSubmit}
       >
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
@@ -81,7 +91,7 @@ export const LoginForm = ({ register }: { register?: boolean }) => {
         </div>
 
         <Button type="submit" disabled={loading} className="w-full">
-          {register ? "Register" : "Login"}
+          {loading ? "Loading..." : register ? "Register" : "Login"}
         </Button>
 
         {!register && (

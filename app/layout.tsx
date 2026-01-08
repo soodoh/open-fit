@@ -1,4 +1,5 @@
 import { AppWrapper } from "@/components/layout/AppWrapper";
+import { ConvexClientProvider } from "@/components/providers/ConvexClientProvider";
 import type { Metadata } from "next";
 
 import "./globals.css";
@@ -17,7 +18,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <AppWrapper>{children}</AppWrapper>
+        <ConvexClientProvider>
+          <AppWrapper>{children}</AppWrapper>
+        </ConvexClientProvider>
       </body>
     </html>
   );

@@ -1,17 +1,19 @@
-import { SetWithRelations } from "@/types/workoutSet";
-import { Pause, Play, Timer, Plus } from "lucide-react";
+"use client";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import { ProgressCircle } from "@/components/ui/progress-circle";
 import dayjs from "dayjs";
+import { Pause, Play, Plus, Timer } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTimer } from "react-timer-hook";
+import type { SetWithRelations } from "@/lib/convex-types";
 
 export const WorkoutTimer = ({
   set,
@@ -55,11 +57,7 @@ export const WorkoutTimer = ({
             <DialogTitle>Workout Timer</DialogTitle>
           </DialogHeader>
           <div className="flex justify-center p-6">
-            <ProgressCircle
-              value={percentage}
-              size={200}
-              className="relative"
-            >
+            <ProgressCircle value={percentage} size={200} className="relative">
               <div className="flex flex-col items-center gap-4">
                 <div className="text-3xl font-bold">
                   {dayjs.duration(remainingSeconds, "seconds").format("mm:ss")}
@@ -90,7 +88,11 @@ export const WorkoutTimer = ({
                       }
                     }}
                   >
-                    {isRunning ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+                    {isRunning ? (
+                      <Pause className="h-4 w-4" />
+                    ) : (
+                      <Play className="h-4 w-4" />
+                    )}
                   </Button>
                   <Button
                     size="sm"

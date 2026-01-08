@@ -1,20 +1,35 @@
-import { getCurrentSession } from "@/actions/getCurrentSession";
-import { getRoutines } from "@/actions/getRoutines";
-import { auth } from "@/auth";
+"use client";
+
+import { AuthGuard } from "@/components/auth/AuthGuard";
 import { CreateRoutine } from "@/components/routines/CreateRoutine";
 import { RoutineCard } from "@/components/routines/RoutineCard";
 import { ResumeSessionButton } from "@/components/sessions/ResumeSessionButton";
 import { Container } from "@/components/ui/container";
-import { redirect } from "next/navigation";
+import { api } from "@/convex/_generated/api";
+import { useQuery } from "convex/react";
 
-export default async function Routines() {
-  const session = await auth();
-  if (!session?.user) {
-    redirect("/signin");
+export default function Routines() {
+  return (
+    <AuthGuard>
+      <RoutinesContent />
+    </AuthGuard>
+  );
+}
+
+function RoutinesContent() {
+  const routines = useQuery(api.queries.routines.list);
+  const currentSession = useQuery(api.queries.sessions.getCurrent);
+
+  if (routines === undefined) {
+    return (
+      <Container maxWidth="xl" className="my-8">
+        <div className="mb-8 flex items-center justify-between">
+          <h1 className="text-4xl font-bold">Routines</h1>
+        </div>
+        <p className="text-muted-foreground">Loading...</p>
+      </Container>
+    );
   }
-
-  const routines = await getRoutines();
-  const currentSession = await getCurrentSession();
 
   return (
     <Container maxWidth="xl" className="my-8">
@@ -31,7 +46,7 @@ export default async function Routines() {
         )}
         {routines?.map((routine) => (
           <RoutineCard
-            key={`routine-${routine.id}`}
+            key={routine._id}
             routine={routine}
             currentSession={currentSession}
           />

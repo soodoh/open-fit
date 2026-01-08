@@ -1,4 +1,5 @@
-import { ChevronDown } from "lucide-react";
+"use client";
+
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -6,16 +7,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
 import { useState } from "react";
-import type { Units } from "@/actions/getUnits";
-import type { RepetitionUnit } from "@/prisma/generated/client";
+import type { RepetitionUnit, Units, WorkoutSetId } from "@/lib/convex-types";
 
 export const RepUnitMenu = ({
   id,
   onChange,
   units,
 }: {
-  id: string | number;
+  id: WorkoutSetId | string;
   onChange: (repUnit: RepetitionUnit) => void;
   units: Units;
 }) => {
@@ -31,7 +32,7 @@ export const RepUnitMenu = ({
       <DropdownMenuContent>
         {units.repetitionUnits.map((unit) => (
           <DropdownMenuItem
-            key={`rep-unit-${id}-${unit.id}`}
+            key={`rep-unit-${id}-${unit._id}`}
             onClick={() => {
               onChange(unit);
               setOpen(false);

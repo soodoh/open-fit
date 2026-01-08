@@ -7,12 +7,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Trash2, Edit, Play } from "lucide-react";
-import { redirect } from "next/navigation";
+import { api } from "@/convex/_generated/api";
+import { useMutation } from "convex/react";
+import { Edit, Play, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { type ReactNode, useState } from "react";
 import { DeleteDayModal } from "./DeleteDayModal";
 import { EditDayModal } from "./EditDayModal";
-import type { RoutineDay, WorkoutSession } from "@/prisma/generated/client";
+import type { RoutineDay, WorkoutSessionWithData } from "@/lib/convex-types";
 
 enum Modal {
   EDIT = "edit",
@@ -25,11 +27,14 @@ export const EditDayMenu = ({
   icon,
 }: {
   routineDay: RoutineDay;
-  currentSession: WorkoutSession | null;
+  currentSession: WorkoutSessionWithData | null;
   icon: ReactNode;
 }) => {
+  const router = useRouter();
   const [modal, setModal] = useState<Modal | null>(null);
   const handleClose = () => setModal(null);
+
+  const createSession = useMutation(api.mutations.sessions.createFromTemplate);
 
   return (
     <>
@@ -42,7 +47,7 @@ export const EditDayMenu = ({
       <DeleteDayModal
         open={modal === Modal.DELETE}
         onClose={handleClose}
-        dayId={routineDay.id}
+        dayId={routineDay._id}
       />
 
       <DropdownMenu>
@@ -50,7 +55,7 @@ export const EditDayMenu = ({
           <Button
             variant="ghost"
             size="icon"
-            aria-label={`Edit actions for workout day ${routineDay.id}`}
+            aria-label={`Edit actions for workout day ${routineDay._id}`}
           >
             {icon}
           </Button>
@@ -58,15 +63,11 @@ export const EditDayMenu = ({
         <DropdownMenuContent align="end">
           <DropdownMenuItem
             onClick={async () => {
-              const response = await fetch("api/session", {
-                method: "POST",
-                body: JSON.stringify({
-                  templateId: routineDay.id,
-                }),
+              const session = await createSession({
+                templateId: routineDay._id,
               });
-              const session = await response.json();
               if (session) {
-                redirect(`/logs/${session.id}`);
+                router.push(`/logs/${session}`);
               }
             }}
             disabled={!!currentSession}
@@ -76,12 +77,18 @@ export const EditDayMenu = ({
             Start
           </DropdownMenuItem>
 
-          <DropdownMenuItem onClick={() => setModal(Modal.EDIT)} className="cursor-pointer">
+          <DropdownMenuItem
+            onClick={() => setModal(Modal.EDIT)}
+            className="cursor-pointer"
+          >
             <Edit className="mr-2 h-4 w-4" />
             Edit
           </DropdownMenuItem>
 
-          <DropdownMenuItem onClick={() => setModal(Modal.DELETE)} className="cursor-pointer">
+          <DropdownMenuItem
+            onClick={() => setModal(Modal.DELETE)}
+            className="cursor-pointer"
+          >
             <Trash2 className="mr-2 h-4 w-4" />
             Delete
           </DropdownMenuItem>

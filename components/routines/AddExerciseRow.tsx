@@ -1,37 +1,47 @@
+"use client";
+
 import { AutocompleteExercise } from "@/components/exercises/AutocompleteExercise";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { api } from "@/convex/_generated/api";
+import { useMutation } from "convex/react";
 import { Plus } from "lucide-react";
 import { useState } from "react";
-import type { Exercise } from "@/prisma/generated/client";
+import type {
+  Exercise,
+  RoutineDayId,
+  WorkoutSessionId,
+} from "@/lib/convex-types";
 
 export const AddExerciseRow = ({
   sessionOrDayId,
   type,
 }: {
-  sessionOrDayId: number;
+  sessionOrDayId: RoutineDayId | WorkoutSessionId;
   type: "session" | "routineDay";
 }) => {
   const [exercise, setExercise] = useState<Exercise | null>(null);
   const [numSets, setNumSets] = useState<string>("1");
 
-  const handleSubmit = async () => {
+  const createSetGroup = useMutation(api.mutations.setGroups.create);
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
     if (!exercise) {
       return;
     }
-    await fetch("/api/setgroup", {
-      method: "POST",
-      body: JSON.stringify({
-        sessionOrDayId,
-        type,
-        exerciseId: exercise.id,
-        numSets: parseInt(numSets, 10),
-      }),
+    await createSetGroup({
+      sessionOrDayId,
+      type,
+      exerciseId: exercise._id,
+      numSets: parseInt(numSets, 10),
     });
+    setExercise(null);
+    setNumSets("1");
   };
 
   return (
-    <form action={handleSubmit} className="flex items-center gap-4 flex-wrap">
+    <form onSubmit={handleSubmit} className="flex items-center gap-4 flex-wrap">
       <div className="min-w-[150px] max-w-[400px] flex-grow">
         <AutocompleteExercise
           value={exercise}

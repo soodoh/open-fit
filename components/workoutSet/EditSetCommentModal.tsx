@@ -1,15 +1,19 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { api } from "@/convex/_generated/api";
+import { useMutation } from "convex/react";
 import { useState } from "react";
-import type { WorkoutSetGroup } from "@/prisma/generated/client";
+import type { WorkoutSetGroup } from "@/lib/convex-types";
 
 export const EditSetCommentModal = ({
   open,
@@ -21,6 +25,8 @@ export const EditSetCommentModal = ({
   setGroup: WorkoutSetGroup;
 }) => {
   const [comment, setComment] = useState(setGroup.comment ?? "");
+
+  const updateSetGroup = useMutation(api.mutations.setGroups.update);
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -39,12 +45,14 @@ export const EditSetCommentModal = ({
           />
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
           <Button
             onClick={async () => {
-              await fetch(`/api/setgroup/${setGroup.id}`, {
-                method: "POST",
-                body: JSON.stringify({ comment }),
+              await updateSetGroup({
+                id: setGroup._id,
+                comment: comment || undefined,
               });
               onClose();
             }}

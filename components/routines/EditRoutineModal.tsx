@@ -1,3 +1,6 @@
+"use client";
+
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -5,22 +8,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useActionState } from "react";
-import type { Routine } from "@/prisma/generated/client";
-
-type RoutineActionState = {
-  data: {
-    name: string;
-    description?: string;
-  };
-  errors?: {
-    name?: string[];
-    description?: string[];
-  };
-};
+import { api } from "@/convex/_generated/api";
+import { useMutation } from "convex/react";
+import { useState } from "react";
+import type { Routine } from "@/lib/convex-types";
 
 export const EditRoutineModal = ({
   open,
@@ -31,35 +24,50 @@ export const EditRoutineModal = ({
   open: boolean;
   onClose: () => void;
 }) => {
-  // TODO replace with React Query mutations
-  const [state, action, isPending] = useActionState(
-    async (_prevState: RoutineActionState, formData: FormData) => {
-      const nextState = await fetch(
-        routine ? `/api/routine/${routine.id}` : "/api/routine",
-        {
-          method: "POST",
-          body: formData,
-        },
-      ).then((res) => res.json());
-      if (!nextState.errors) {
-        onClose();
-      }
-      return nextState;
-    },
-    {
-      data: {
-        name: routine?.name ?? "",
-        description: routine?.description ?? "",
-      },
-    },
+  const [name, setName] = useState(routine?.name ?? "");
+  const [description, setDescription] = useState(routine?.description ?? "");
+  const [isPending, setIsPending] = useState(false);
+  const [errors, setErrors] = useState<{ name?: string; description?: string }>(
+    {},
   );
+
+  const createRoutine = useMutation(api.mutations.routines.create);
+  const updateRoutine = useMutation(api.mutations.routines.update);
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setIsPending(true);
+    setErrors({});
+
+    try {
+      if (routine) {
+        await updateRoutine({
+          id: routine._id,
+          name,
+          description: description || undefined,
+        });
+      } else {
+        await createRoutine({
+          name,
+          description: description || undefined,
+        });
+      }
+      onClose();
+    } catch (error) {
+      setErrors({ name: "Failed to save routine" });
+    } finally {
+      setIsPending(false);
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={() => onClose()}>
       <DialogContent className="sm:max-w-[425px]">
-        <form action={action}>
+        <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>{routine ? "Edit Routine" : "New Routine"}</DialogTitle>
+            <DialogTitle>
+              {routine ? "Edit Routine" : "New Routine"}
+            </DialogTitle>
           </DialogHeader>
 
           <div className="grid gap-4 py-4">
@@ -70,11 +78,12 @@ export const EditRoutineModal = ({
                 name="name"
                 placeholder="Routine name"
                 required
-                defaultValue={state.data.name}
-                className={state.errors?.name ? "border-red-500" : ""}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className={errors.name ? "border-red-500" : ""}
               />
-              {state.errors?.name && (
-                <p className="text-sm text-red-600">{state.errors.name[0]}</p>
+              {errors.name && (
+                <p className="text-sm text-red-600">{errors.name}</p>
               )}
             </div>
             <div className="grid gap-2">
@@ -84,13 +93,14 @@ export const EditRoutineModal = ({
                 name="description"
                 placeholder="Routine description"
                 rows={4}
-                defaultValue={state.data.description}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
                 className={`flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${
-                  state.errors?.description ? "border-red-500" : ""
+                  errors.description ? "border-red-500" : ""
                 }`}
               />
-              {state.errors?.description && (
-                <p className="text-sm text-red-600">{state.errors.description[0]}</p>
+              {errors.description && (
+                <p className="text-sm text-red-600">{errors.description}</p>
               )}
             </div>
           </div>

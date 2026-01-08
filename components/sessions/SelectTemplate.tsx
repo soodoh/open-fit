@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -13,11 +15,16 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { api } from "@/convex/_generated/api";
+import { Doc, Id } from "@/convex/_generated/dataModel";
 import { cn } from "@/lib/utils";
+import { useQuery } from "convex/react";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { useState } from "react";
-import useSWR from "swr";
-import type { RoutineDayWithRoutine } from "@/types/routine";
+
+type RoutineDayWithRoutine = Doc<"routineDays"> & {
+  routine: Doc<"routines"> | null;
+};
 
 export const SelectTemplate = ({
   value,
@@ -32,17 +39,9 @@ export const SelectTemplate = ({
 }) => {
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const { data: options, isLoading } = useSWR(
-    { searchTerm },
-    ({ searchTerm }) =>
-      fetch(`/api/day/search?searchTerm=${searchTerm}`).then((response) =>
-        response.json(),
-      ),
-    {
-      keepPreviousData: true,
-      fallbackData: value ? [value] : [],
-    },
-  );
+
+  const options = useQuery(api.queries.routineDays.search, { searchTerm });
+  const isLoading = options === undefined;
 
   return (
     <div className="space-y-2">
@@ -61,10 +60,10 @@ export const SelectTemplate = ({
           </Button>
         </PopoverTrigger>
         <PopoverContent
-            className="w-full p-0"
-            onWheel={(e) => e.stopPropagation()}
-            onTouchMove={(e) => e.stopPropagation()}
-          >
+          className="w-full p-0"
+          onWheel={(e) => e.stopPropagation()}
+          onTouchMove={(e) => e.stopPropagation()}
+        >
           <Command shouldFilter={false}>
             <CommandInput
               placeholder="Search workouts..."
@@ -78,19 +77,21 @@ export const SelectTemplate = ({
                 <CommandEmpty>No workouts found.</CommandEmpty>
               ) : (
                 <CommandGroup>
-                  {options?.map((option: RoutineDayWithRoutine) => (
+                  {options?.map((option) => (
                     <CommandItem
-                      key={option.id}
+                      key={option._id}
                       value={option.description}
                       onSelect={() => {
-                        onChange(option.id === value?.id ? null : option);
+                        onChange(option._id === value?._id ? null : option);
                         setOpen(false);
                       }}
                     >
                       <Check
                         className={cn(
                           "mr-2 h-4 w-4",
-                          value?.id === option.id ? "opacity-100" : "opacity-0",
+                          value?._id === option._id
+                            ? "opacity-100"
+                            : "opacity-0",
                         )}
                       />
                       <div className="flex flex-col">

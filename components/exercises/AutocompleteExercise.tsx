@@ -1,3 +1,5 @@
+"use client";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Command,
@@ -13,10 +15,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { api } from "@/convex/_generated/api";
+import { Doc } from "@/convex/_generated/dataModel";
+import { useQuery } from "convex/react";
 import { Image } from "lucide-react";
 import { useState } from "react";
-import useSWR from "swr";
-import type { Exercise } from "@/prisma/generated/client";
+
+type Exercise = Doc<"exercises">;
 
 export const AutocompleteExercise = ({
   value,
@@ -28,18 +33,12 @@ export const AutocompleteExercise = ({
   const [searchTerm, setSearchTerm] = useState("");
   const [open, setOpen] = useState(false);
 
-  const { data: options, isLoading } = useSWR(
-    { searchTerm },
-    ({ searchTerm }) =>
-      fetch(`/api/exercise/search?searchTerm=${searchTerm}`).then((response) =>
-        response.json(),
-      ),
-    {
-      keepPreviousData: true,
-    },
+  const options = useQuery(
+    api.queries.exercises.search,
+    searchTerm ? { searchTerm } : "skip",
   );
+  const isLoading = options === undefined;
 
-  console.log(options);
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild onClick={(e) => e.preventDefault()}>
@@ -68,9 +67,9 @@ export const AutocompleteExercise = ({
               {isLoading ? "Loading exercises..." : "No exercises found"}
             </CommandEmpty>
             <CommandGroup>
-              {options?.map((option: Exercise) => (
+              {options?.map((option) => (
                 <CommandItem
-                  key={`exercise-${option.id}`}
+                  key={option._id}
                   value={option.name}
                   onSelect={() => {
                     onChange(option);
@@ -92,11 +91,12 @@ export const AutocompleteExercise = ({
                   </Avatar>
                   <div className="flex flex-col">
                     <span className="font-medium">{option.name}</span>
-                    {option.primaryMuscles && (
-                      <span className="text-sm text-muted-foreground">
-                        {option.primaryMuscles}
-                      </span>
-                    )}
+                    {option.primaryMuscles &&
+                      option.primaryMuscles.length > 0 && (
+                        <span className="text-sm text-muted-foreground">
+                          {option.primaryMuscles.join(", ")}
+                        </span>
+                      )}
                   </div>
                 </CommandItem>
               ))}

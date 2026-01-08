@@ -1,8 +1,19 @@
-import { Units } from "@/actions/getUnits";
+"use client";
+
 import { AddExerciseRow } from "@/components/routines/AddExerciseRow";
 import { RestTimer } from "@/components/sessions/RestTimer";
-import { ListView } from "@/types/constants";
-import { SetGroupWithRelations } from "@/types/workoutSet";
+import { Container } from "@/components/ui/container";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
+import { api } from "@/convex/_generated/api";
+import {
+  ListView,
+  type RoutineDayId,
+  type SetGroupWithRelations,
+  type Units,
+  type WorkoutSessionId,
+} from "@/lib/convex-types";
 import {
   DndContext,
   type DragEndEvent,
@@ -17,10 +28,7 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { Container } from "@/components/ui/container";
-import { Separator } from "@/components/ui/separator";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import { useMutation } from "convex/react";
 import dayjs from "dayjs";
 import { useOptimistic, useState, useTransition } from "react";
 import { useTimer } from "react-timer-hook";
@@ -35,7 +43,7 @@ export const WorkoutList = ({
   view: ListView;
   setGroups: SetGroupWithRelations[];
   units: Units;
-  sessionOrDayId: number;
+  sessionOrDayId: RoutineDayId | WorkoutSessionId;
 }) => {
   const [, startTransition] = useTransition();
   const [optimisticSetGroups, optimisticUpdateSetGroups] = useOptimistic<
@@ -51,6 +59,8 @@ export const WorkoutList = ({
     autoStart: false,
   });
 
+  const reorderSetGroups = useMutation(api.mutations.setGroups.reorder);
+
   const startRestTimer = (seconds: number) => {
     setTotalSeconds(seconds);
     timer.restart(dayjs().add(seconds, "seconds").toDate(), true);
@@ -63,25 +73,18 @@ export const WorkoutList = ({
   const sensors = useSensors(mouseSensor, touchSensor, keyboardSensor);
 
   const handleSort = (event: DragEndEvent) => {
-    const dragId = event.active.id;
-    const overId = event.over?.id;
-    if (
-      !Number.isInteger(overId) ||
-      dragId === overId ||
-      !optimisticSetGroups.length
-    ) {
+    const dragId = event.active.id as string;
+    const overId = event.over?.id as string;
+    if (!overId || dragId === overId || !optimisticSetGroups.length) {
       return;
     }
-    const oldIndex = optimisticSetGroups.findIndex((set) => set.id === dragId);
-    const newIndex = optimisticSetGroups.findIndex((set) => set.id === overId);
+    const oldIndex = optimisticSetGroups.findIndex((set) => set._id === dragId);
+    const newIndex = optimisticSetGroups.findIndex((set) => set._id === overId);
     const newSetGroups = arrayMove(optimisticSetGroups, oldIndex, newIndex);
     startTransition(async () => {
       optimisticUpdateSetGroups(newSetGroups);
-      await fetch("/api/setgroup/reorder", {
-        method: "POST",
-        body: JSON.stringify({
-          setGroupIds: newSetGroups.map((setGroup) => setGroup.id),
-        }),
+      await reorderSetGroups({
+        setGroupIds: newSetGroups.map((setGroup) => setGroup._id),
       });
     });
   };
@@ -121,14 +124,14 @@ export const WorkoutList = ({
       <div className="space-y-2">
         <DndContext id="set-groups" onDragEnd={handleSort} sensors={sensors}>
           <SortableContext
-            items={optimisticSetGroups}
+            items={optimisticSetGroups.map((sg) => sg._id)}
             strategy={verticalListSortingStrategy}
           >
             {optimisticSetGroups.map((setGroup) => {
               return (
                 <WorkoutSetGroup
                   view={view}
-                  key={`set-${setGroup.id}`}
+                  key={`set-${setGroup._id}`}
                   isReorderActive={isReorderActive}
                   setGroup={setGroup}
                   units={units}

@@ -1,8 +1,6 @@
-import { Units } from "@/actions/getUnits";
+"use client";
+
 import { DeleteSetGroupModal } from "@/components/routines/DeleteSetGroupModal";
-import { ListView } from "@/types/constants";
-import { SetGroupWithRelations } from "@/types/workoutSet";
-import { MessageSquare, Trash2, Edit, MoreHorizontal, ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -10,6 +8,18 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  ListView,
+  type SetGroupWithRelations,
+  type Units,
+} from "@/lib/convex-types";
+import {
+  ArrowUpDown,
+  Edit,
+  MessageSquare,
+  MoreHorizontal,
+  Trash2,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { BulkEditSetModal } from "./BulkEditSetModal";
 import { EditSetCommentModal } from "./EditSetCommentModal";
@@ -67,7 +77,7 @@ export const EditSetGroupMenu = ({
           <Button
             variant="ghost"
             size="icon"
-            aria-label={`Edit actions for set group ${setGroup.id}`}
+            aria-label={`Edit actions for set group ${setGroup._id}`}
           >
             <MoreHorizontal className="h-4 w-4" />
           </Button>
