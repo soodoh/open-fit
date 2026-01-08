@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "author": "Paul DiLoreto <soodohh@pm.me>",
-  "license": "MIT",
+  "license": "GPL-3.0-only",
   "bugs": {
     "url": "https://github.com/soodoh/open-fit/issues"
   },
