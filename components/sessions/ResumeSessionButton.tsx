@@ -10,11 +10,11 @@ export const ResumeSessionButton = ({
 }) => {
   const completedSets = session.setGroups.reduce(
     (acc, group) => acc + group.sets.filter((set) => set.completed).length,
-    0
+    0,
   );
   const totalSets = session.setGroups.reduce(
     (acc, group) => acc + group.sets.length,
-    0
+    0,
   );
 
   return (

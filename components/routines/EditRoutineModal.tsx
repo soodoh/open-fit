@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { api } from "@/convex/_generated/api";
 import { useMutation } from "convex/react";
 import { AlertCircle, Dumbbell, Loader2 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { Routine } from "@/lib/convex-types";
 
 export const EditRoutineModal = ({
@@ -30,7 +30,7 @@ export const EditRoutineModal = ({
   const [description, setDescription] = useState(routine?.description ?? "");
   const [isPending, setIsPending] = useState(false);
   const [errors, setErrors] = useState<{ name?: string; description?: string }>(
-    {}
+    {},
   );
 
   // Reset form when modal opens/closes or routine changes
@@ -159,7 +159,11 @@ export const EditRoutineModal = ({
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isPending} className="min-w-[100px]">
+            <Button
+              type="submit"
+              disabled={isPending}
+              className="min-w-[100px]"
+            >
               {isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -6,7 +6,11 @@ import { useEffect, useState } from "react";
 const getTimestamp = (startTime: Date | number) =>
   dayjs.duration(dayjs().diff(dayjs(startTime))).format("H:mm:ss");
 
-export const CurrentDuration = ({ startTime }: { startTime: Date | number }) => {
+export const CurrentDuration = ({
+  startTime,
+}: {
+  startTime: Date | number;
+}) => {
   const [durationString, setDuration] = useState<string>(
     getTimestamp(startTime),
   );

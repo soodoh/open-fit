@@ -15,7 +15,7 @@ import { api } from "@/convex/_generated/api";
 import { useMutation } from "convex/react";
 import dayjs from "dayjs";
 import { CalendarDays, Loader2 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { RoutineDay, RoutineId } from "@/lib/convex-types";
 
 export const EditDayModal = ({
@@ -30,7 +30,7 @@ export const EditDayModal = ({
   routineDay?: RoutineDay;
 }) => {
   const [selectedWeekdays, setWeekdays] = useState<number[]>(
-    routineDay?.weekdays ?? []
+    routineDay?.weekdays ?? [],
   );
   const [description, setDescription] = useState(routineDay?.description ?? "");
   const [isPending, setIsPending] = useState(false);
@@ -190,7 +190,11 @@ export const EditDayModal = ({
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isPending} className="min-w-[100px]">
+            <Button
+              type="submit"
+              disabled={isPending}
+              className="min-w-[100px]"
+            >
               {isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

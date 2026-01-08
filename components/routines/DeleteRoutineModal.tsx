@@ -65,7 +65,12 @@ export const DeleteRoutineModal = ({
 
         {/* Footer */}
         <DialogFooter className="px-6 py-4 bg-muted/30 border-t border-border/50">
-          <Button type="button" variant="ghost" onClick={onClose} className="mr-2">
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={onClose}
+            className="mr-2"
+          >
             Cancel
           </Button>
           <Button
