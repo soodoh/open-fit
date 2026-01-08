@@ -1,16 +1,4 @@
 services:
-  postgres:
-    image: postgres:latest
-    container_name: postgres
-    restart: always
-    env_file: .env
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres:/var/lib/postgresql/data
-    networks:
-      - openfit-net
-
   openfit:
     build:
       context: ./
@@ -27,13 +15,10 @@ services:
       ADMIN_PASSWORD: $ADMIN_PASSWORD
     ports:
       - "3000:3000"
-    depends_on:
-      - postgres
+    # depends_on:
+    #   - postgres
     networks:
       - openfit-net
-
-volumes:
-  postgres:
 
 networks:
   openfit-net:
