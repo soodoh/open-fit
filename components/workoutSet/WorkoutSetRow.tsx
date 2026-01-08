@@ -83,7 +83,7 @@ export const WorkoutSetRow = ({
             }}
           />
           <Label className="absolute -top-2 left-2 bg-white px-1 text-xs text-gray-500">
-            {set.repetitionUnit.name}
+            {set.repetitionUnit?.name ?? "Reps"}
           </Label>
           <div className="absolute right-1 top-1/2 -translate-y-1/2">
             <RepUnitMenu
@@ -114,7 +114,7 @@ export const WorkoutSetRow = ({
             }}
           />
           <Label className="absolute -top-2 left-2 bg-white px-1 text-xs text-gray-500">
-            {set.weightUnit.name}
+            {set.weightUnit?.name ?? "Weight"}
           </Label>
           <div className="absolute right-1 top-1/2 -translate-y-1/2">
             <WeightUnitMenu
@@ -131,7 +131,7 @@ export const WorkoutSetRow = ({
         </div>
 
         {view === ListView.CurrentSession &&
-          (set.repetitionUnit.name === "Seconds" && !set.completed ? (
+          (set.repetitionUnit?.name === "Seconds" && !set.completed ? (
             <WorkoutTimer
               set={set}
               onComplete={async () => {

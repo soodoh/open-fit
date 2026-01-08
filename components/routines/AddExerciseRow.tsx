@@ -15,10 +15,10 @@ import type {
 
 export const AddExerciseRow = ({
   sessionOrDayId,
-  type,
+  isSession,
 }: {
   sessionOrDayId: RoutineDayId | WorkoutSessionId;
-  type: "session" | "routineDay";
+  isSession: boolean;
 }) => {
   const [exercise, setExercise] = useState<Exercise | null>(null);
   const [numSets, setNumSets] = useState<string>("1");
@@ -32,7 +32,8 @@ export const AddExerciseRow = ({
     }
     await createSetGroup({
       sessionOrDayId,
-      type,
+      isSession,
+      type: "NORMAL",
       exerciseId: exercise._id,
       numSets: parseInt(numSets, 10),
     });

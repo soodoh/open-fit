@@ -6,9 +6,10 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Edit, Plus, Settings, Trash2 } from "lucide-react";
+import { Edit, MoreVertical, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { DeleteRoutineModal } from "./DeleteRoutineModal";
 import { EditDayModal as AddDayModal } from "./EditDayModal";
@@ -48,31 +49,33 @@ export const EditRoutineMenu = ({ routine }: { routine: Routine }) => {
             variant="ghost"
             size="icon"
             aria-label={`Edit routine: ${routine.name}`}
+            className="h-8 w-8 opacity-70 hover:opacity-100 transition-opacity"
           >
-            <Settings className="h-4 w-4" />
+            <MoreVertical className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
+        <DropdownMenuContent align="end" className="w-48">
           <DropdownMenuItem
             onClick={() => setModal(Modal.ADD)}
-            className="cursor-pointer"
+            className="cursor-pointer gap-2"
           >
-            <Plus className="mr-2 h-4 w-4" />
-            Add Day
+            <Plus className="h-4 w-4" />
+            Add Workout Day
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => setModal(Modal.EDIT)}
-            className="cursor-pointer"
+            className="cursor-pointer gap-2"
           >
-            <Edit className="mr-2 h-4 w-4" />
-            Edit
+            <Edit className="h-4 w-4" />
+            Edit Routine
           </DropdownMenuItem>
+          <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={() => setModal(Modal.DELETE)}
-            className="cursor-pointer"
+            className="cursor-pointer gap-2 text-destructive focus:text-destructive"
           >
-            <Trash2 className="mr-2 h-4 w-4" />
-            Delete
+            <Trash2 className="h-4 w-4" />
+            Delete Routine
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

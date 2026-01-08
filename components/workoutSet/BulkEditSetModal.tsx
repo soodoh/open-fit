@@ -35,14 +35,15 @@ export const BulkEditSetModal = ({
   units: Units;
   setGroup: SetGroupWithRelations;
 }) => {
+  const firstSet = setGroup.sets[0];
   const [reps, setReps] = useState<string>("");
   const [restTime, setRestTime] = useState<Dayjs>(dayjs().minute(0).second(0));
-  const [repUnit, setRepUnit] = useState<RepetitionUnit>(
-    setGroup.sets[0].repetitionUnit,
+  const [repUnit, setRepUnit] = useState<RepetitionUnit | null>(
+    firstSet?.repetitionUnit ?? null,
   );
   const [weight, setWeight] = useState<string>("");
-  const [weightUnit, setWeightUnit] = useState<WeightUnit>(
-    setGroup.sets[0].weightUnit,
+  const [weightUnit, setWeightUnit] = useState<WeightUnit | null>(
+    firstSet?.weightUnit ?? null,
   );
 
   const bulkEditSetGroup = useMutation(api.mutations.setGroups.bulkEdit);
@@ -58,12 +59,12 @@ export const BulkEditSetModal = ({
             <Input
               type="text"
               value={reps}
-              placeholder={`${setGroup.sets[0].reps}`}
+              placeholder={`${firstSet?.reps ?? ""}`}
               onChange={(event) => setReps(event.target.value)}
               className="pr-12"
             />
             <Label className="absolute -top-2 left-2 bg-white px-1 text-xs text-gray-500">
-              {repUnit.name}
+              {repUnit?.name ?? "Reps"}
             </Label>
             <div className="absolute right-1 top-1/2 -translate-y-1/2">
               <RepUnitMenu
@@ -78,12 +79,12 @@ export const BulkEditSetModal = ({
             <Input
               type="text"
               value={weight}
-              placeholder={`${setGroup.sets[0].weight}`}
+              placeholder={`${firstSet?.weight ?? ""}`}
               onChange={(event) => setWeight(event.target.value)}
               className="pr-12"
             />
             <Label className="absolute -top-2 left-2 bg-white px-1 text-xs text-gray-500">
-              {weightUnit.name}
+              {weightUnit?.name ?? "Weight"}
             </Label>
             <div className="absolute right-1 top-1/2 -translate-y-1/2">
               <WeightUnitMenu
@@ -118,8 +119,8 @@ export const BulkEditSetModal = ({
                 // If empty string, leave unchanged (undefined)
                 reps: reps ? parseInt(reps, 10) : undefined,
                 weight: weight ? parseInt(weight, 10) : undefined,
-                repetitionUnitId: repUnit._id,
-                weightUnitId: weightUnit._id,
+                repetitionUnitId: repUnit?._id,
+                weightUnitId: weightUnit?._id,
                 restTime: totalSeconds,
               });
               onClose();

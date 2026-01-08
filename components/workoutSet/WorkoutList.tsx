@@ -84,6 +84,8 @@ export const WorkoutList = ({
     startTransition(async () => {
       optimisticUpdateSetGroups(newSetGroups);
       await reorderSetGroups({
+        sessionOrDayId,
+        isSession: view !== ListView.EditTemplate,
         setGroupIds: newSetGroups.map((setGroup) => setGroup._id),
       });
     });
@@ -94,7 +96,7 @@ export const WorkoutList = ({
       <Container maxWidth="lg">
         <AddExerciseRow
           sessionOrDayId={sessionOrDayId}
-          type={view === ListView.EditTemplate ? "routineDay" : "session"}
+          isSession={view !== ListView.EditTemplate}
         />
 
         <div className="my-4 flex items-center gap-4">

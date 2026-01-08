@@ -13,7 +13,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { api } from "@/convex/_generated/api";
 import { useMutation } from "convex/react";
-import dayjs, { type Dayjs } from "dayjs";
 import { useState } from "react";
 import { SelectTemplate } from "./SelectTemplate";
 import type {
@@ -35,11 +34,11 @@ export const EditSessionModal = ({
   const [impression, setImpression] = useState<number | null>(
     session?.impression ?? null,
   );
-  const [startTime, setStartTime] = useState<Dayjs | null>(
-    session?.startTime ? dayjs(session.startTime) : dayjs(),
+  const [startTime, setStartTime] = useState<Date | null>(
+    session?.startTime ? new Date(session.startTime) : new Date(),
   );
-  const [endTime, setEndTime] = useState<Dayjs | null>(
-    session?.endTime ? dayjs(session.endTime) : null,
+  const [endTime, setEndTime] = useState<Date | null>(
+    session?.endTime ? new Date(session.endTime) : null,
   );
   const [workoutTemplate, setWorkoutTemplate] =
     useState<RoutineDayWithRoutine | null>(null);
@@ -50,11 +49,11 @@ export const EditSessionModal = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // Must be null or valid date
-    const isStartValid = startTime === null || startTime.isValid();
-    const isEndValid = endTime === null || endTime.isValid();
+    const isStartValid = startTime === null || !isNaN(startTime.getTime());
+    const isEndValid = endTime === null || !isNaN(endTime.getTime());
     // Prevent negative durations (if both are valid dates)
     const isDurationValid =
-      !startTime || !endTime || startTime.isBefore(endTime);
+      !startTime || !endTime || startTime.getTime() < endTime.getTime();
     if (!isStartValid || !isEndValid || !isDurationValid) {
       return;
     }
@@ -63,8 +62,8 @@ export const EditSessionModal = ({
       await updateSession({
         id: session._id,
         name,
-        startTime: startTime?.valueOf(),
-        endTime: endTime?.valueOf() ?? undefined,
+        startTime: startTime?.getTime(),
+        endTime: endTime?.getTime() ?? undefined,
         notes,
         impression: impression ?? undefined,
       });
@@ -72,8 +71,8 @@ export const EditSessionModal = ({
       await createSession({
         templateId: workoutTemplate?._id,
         name,
-        startTime: startTime?.valueOf() ?? Date.now(),
-        endTime: endTime?.valueOf(),
+        startTime: startTime?.getTime() ?? Date.now(),
+        endTime: endTime?.getTime(),
         notes,
         impression: impression ?? undefined,
       });

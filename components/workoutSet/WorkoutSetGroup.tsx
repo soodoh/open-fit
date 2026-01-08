@@ -101,6 +101,7 @@ export const WorkoutSetGroup = ({
   const sensors = useSensors(mouseSensor, touchSensor, keyboardSensor);
 
   const handleAdd = async () => {
+    if (!exercise) return;
     await createSet({
       setGroupId: setGroup._id,
       exerciseId: exercise._id,
@@ -119,7 +120,10 @@ export const WorkoutSetGroup = ({
     const newSets = arrayMove(sets, oldIndex, newIndex);
     startTransition(async () => {
       optimisticUpdateSets(newSets);
-      await reorderSets({ setIds: newSets.map(({ _id }) => _id) });
+      await reorderSets({
+        setGroupId: setGroup._id,
+        setIds: newSets.map(({ _id }) => _id),
+      });
     });
   };
 

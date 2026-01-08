@@ -163,3 +163,51 @@ export const reorder = mutation({
     return { success: true };
   },
 });
+
+// Bulk edit all sets in a set group
+export const bulkEdit = mutation({
+  args: {
+    id: v.id("workoutSetGroups"),
+    reps: v.optional(v.number()),
+    weight: v.optional(v.number()),
+    repetitionUnitId: v.optional(v.id("repetitionUnits")),
+    weightUnitId: v.optional(v.id("weightUnits")),
+    restTime: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthenticatedUserId(ctx);
+
+    const setGroup = await ctx.db.get(args.id);
+    if (!setGroup) {
+      throw new Error("Set group not found");
+    }
+
+    if (setGroup.userId !== userId) {
+      throw new Error("Unauthorized");
+    }
+
+    // Get all sets in this set group
+    const sets = await ctx.db
+      .query("workoutSets")
+      .withIndex("by_set_group", (q) => q.eq("setGroupId", args.id))
+      .collect();
+
+    // Update each set
+    for (const set of sets) {
+      await ctx.db.patch(set._id, {
+        ...(args.reps !== undefined && { reps: args.reps }),
+        ...(args.weight !== undefined && { weight: args.weight }),
+        ...(args.repetitionUnitId !== undefined && {
+          repetitionUnitId: args.repetitionUnitId,
+        }),
+        ...(args.weightUnitId !== undefined && {
+          weightUnitId: args.weightUnitId,
+        }),
+        ...(args.restTime !== undefined && { restTime: args.restTime }),
+        updatedAt: Date.now(),
+      });
+    }
+
+    return { success: true };
+  },
+});

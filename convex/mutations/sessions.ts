@@ -8,6 +8,8 @@ export const create = mutation({
     name: v.optional(v.string()),
     notes: v.optional(v.string()),
     startTime: v.optional(v.number()),
+    endTime: v.optional(v.number()),
+    impression: v.optional(v.number()),
     templateId: v.optional(v.id("routineDays")),
   },
   handler: async (ctx, args) => {
@@ -28,6 +30,8 @@ export const create = mutation({
       name: args.name || routineDay?.description || "",
       notes: args.notes || "",
       startTime: args.startTime || Date.now(),
+      endTime: args.endTime,
+      impression: args.impression,
       templateId: args.templateId,
     });
 
@@ -99,6 +103,7 @@ export const update = mutation({
     name: v.optional(v.string()),
     notes: v.optional(v.string()),
     impression: v.optional(v.number()),
+    startTime: v.optional(v.number()),
     endTime: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
@@ -117,6 +122,7 @@ export const update = mutation({
       ...(args.name !== undefined && { name: args.name }),
       ...(args.notes !== undefined && { notes: args.notes }),
       ...(args.impression !== undefined && { impression: args.impression }),
+      ...(args.startTime !== undefined && { startTime: args.startTime }),
       ...(args.endTime !== undefined && { endTime: args.endTime }),
     });
 
