@@ -1,6 +1,6 @@
-import { query } from "@/convex/_generated/server";
-import { getAuthenticatedUserId, getOptionalUserId } from "@/convex/lib/auth";
 import { v } from "convex/values";
+import { query } from "../_generated/server";
+import { getAuthenticatedUserId, getOptionalUserId } from "../lib/auth";
 
 // Get a single routine day with all its data
 export const get = query({

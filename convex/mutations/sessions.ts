@@ -1,6 +1,6 @@
-import { mutation } from "@/convex/_generated/server";
-import { getAuthenticatedUserId } from "@/convex/lib/auth";
 import { v } from "convex/values";
+import { mutation } from "../_generated/server";
+import { getAuthenticatedUserId } from "../lib/auth";
 
 // Create a new workout session (optionally from a template)
 export const create = mutation({

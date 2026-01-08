@@ -50,6 +50,13 @@ const eslintConfig = defineConfig([
     },
   },
   prettierRecommended,
+  // Disable no-relative-import-paths for convex folder (uses its own tsconfig)
+  {
+    files: ["convex/**/*.{js,ts,tsx}"],
+    rules: {
+      "no-relative-import-paths/no-relative-import-paths": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;

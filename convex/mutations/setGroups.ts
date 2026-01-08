@@ -1,6 +1,7 @@
-import { mutation } from "@/convex/_generated/server";
-import { getAuthenticatedUserId } from "@/convex/lib/auth";
 import { v } from "convex/values";
+import { Id } from "../_generated/dataModel";
+import { mutation } from "../_generated/server";
+import { getAuthenticatedUserId } from "../lib/auth";
 
 // Create a new set group with sets
 export const create = mutation({
@@ -14,18 +15,24 @@ export const create = mutation({
   handler: async (ctx, args) => {
     const userId = await getAuthenticatedUserId(ctx);
 
+    // Type-safe ID extraction based on isSession flag
+    const sessionId: Id<"workoutSessions"> | undefined = args.isSession
+      ? (args.sessionOrDayId as Id<"workoutSessions">)
+      : undefined;
+    const routineDayId: Id<"routineDays"> | undefined = args.isSession
+      ? undefined
+      : (args.sessionOrDayId as Id<"routineDays">);
+
     // Get the current max order for set groups
-    const existingSetGroups = args.isSession
+    const existingSetGroups = sessionId
       ? await ctx.db
           .query("workoutSetGroups")
-          .withIndex("by_session", (q) =>
-            q.eq("sessionId", args.sessionOrDayId as any),
-          )
+          .withIndex("by_session", (q) => q.eq("sessionId", sessionId))
           .collect()
       : await ctx.db
           .query("workoutSetGroups")
           .withIndex("by_routine_day", (q) =>
-            q.eq("routineDayId", args.sessionOrDayId as any),
+            q.eq("routineDayId", routineDayId),
           )
           .collect();
 
@@ -45,8 +52,8 @@ export const create = mutation({
     // Create the set group
     const setGroupId = await ctx.db.insert("workoutSetGroups", {
       userId,
-      routineDayId: args.isSession ? undefined : (args.sessionOrDayId as any),
-      sessionId: args.isSession ? (args.sessionOrDayId as any) : undefined,
+      routineDayId,
+      sessionId,
       type: args.type,
       order: maxOrder + 1,
       updatedAt: Date.now(),

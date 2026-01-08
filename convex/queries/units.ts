@@ -1,4 +1,4 @@
-import { query } from "@/convex/_generated/server";
+import { query } from "../_generated/server";
 
 // Get all repetition and weight units
 export const list = query({

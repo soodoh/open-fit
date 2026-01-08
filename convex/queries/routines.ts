@@ -1,6 +1,6 @@
-import { query } from "@/convex/_generated/server";
-import { getAuthenticatedUserId } from "@/convex/lib/auth";
 import { v } from "convex/values";
+import { query } from "../_generated/server";
+import { getAuthenticatedUserId } from "../lib/auth";
 
 // List all routines for the current user with routine days
 export const list = query({

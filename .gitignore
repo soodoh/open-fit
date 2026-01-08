@@ -19,7 +19,8 @@
 *.pem
 
 # env files (can opt-in for committing if needed)
-.env*
+.env
+.env.*
 
 # vercel
 .vercel
@@ -27,6 +28,3 @@
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-
-/postgres-data
-/prisma/generated/
