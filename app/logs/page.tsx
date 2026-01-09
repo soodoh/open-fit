@@ -6,8 +6,11 @@ import { ResumeSessionButton } from "@/components/sessions/ResumeSessionButton";
 import { SessionSummaryCard } from "@/components/sessions/SessionSummaryCard";
 import { Container } from "@/components/ui/container";
 import { api } from "@/convex/_generated/api";
-import { useQuery } from "convex/react";
-import { CalendarDays } from "lucide-react";
+import { usePaginatedQuery, useQuery } from "convex/react";
+import { CalendarDays, Loader2 } from "lucide-react";
+import { useEffect, useRef } from "react";
+
+const SESSIONS_PAGE_SIZE = 12;
 
 export default function Sessions() {
   return (
@@ -18,10 +21,44 @@ export default function Sessions() {
 }
 
 function SessionsContent() {
-  const sessions = useQuery(api.queries.sessions.list);
+  const {
+    results: sessions,
+    status,
+    loadMore,
+  } = usePaginatedQuery(
+    api.queries.sessions.listPaginated,
+    {},
+    { initialNumItems: SESSIONS_PAGE_SIZE },
+  );
   const currentSession = useQuery(api.queries.sessions.getCurrent);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
-  const isLoading = sessions === undefined;
+  const isLoading = status === "LoadingFirstPage";
+  const isLoadingMore = status === "LoadingMore";
+  const canLoadMore = status === "CanLoadMore";
+
+  // Intersection observer for infinite scrolling
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && canLoadMore) {
+          loadMore(SESSIONS_PAGE_SIZE);
+        }
+      },
+      { threshold: 0.1 },
+    );
+
+    const currentRef = loadMoreRef.current;
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
+  }, [canLoadMore, loadMore]);
 
   return (
     <div className="min-h-[calc(100vh-4rem)]">
@@ -63,6 +100,15 @@ function SessionsContent() {
             {sessions.map((session) => (
               <SessionSummaryCard key={session._id} session={session} />
             ))}
+          </div>
+        )}
+
+        {/* Infinite scroll sentinel & loading indicator */}
+        {canLoadMore && (
+          <div ref={loadMoreRef} className="flex justify-center py-8">
+            {isLoadingMore && (
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            )}
           </div>
         )}
       </Container>

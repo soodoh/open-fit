@@ -1,6 +1,78 @@
+import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
 import { query } from "../_generated/server";
 import { getAuthenticatedUserId, getOptionalUserId } from "../lib/auth";
+
+// List workout sessions with pagination
+export const listPaginated = query({
+  args: { paginationOpts: paginationOptsValidator },
+  handler: async (ctx, args) => {
+    const userId = await getAuthenticatedUserId(ctx);
+
+    // Get paginated sessions ordered by most recent start time
+    const paginatedSessions = await ctx.db
+      .query("workoutSessions")
+      .withIndex("by_user_start", (q) => q.eq("userId", userId))
+      .order("desc")
+      .paginate(args.paginationOpts);
+
+    // Fetch set groups with sets and exercises for each session
+    const sessionsWithData = await Promise.all(
+      paginatedSessions.page.map(async (session) => {
+        const setGroups = await ctx.db
+          .query("workoutSetGroups")
+          .withIndex("by_session", (q) => q.eq("sessionId", session._id))
+          .collect();
+
+        // Sort by order
+        setGroups.sort((a, b) => a.order - b.order);
+
+        // Fetch sets for each set group
+        const setGroupsWithSets = await Promise.all(
+          setGroups.map(async (group) => {
+            const sets = await ctx.db
+              .query("workoutSets")
+              .withIndex("by_set_group", (q) => q.eq("setGroupId", group._id))
+              .collect();
+
+            sets.sort((a, b) => a.order - b.order);
+
+            // Fetch exercise and units for each set
+            const setsWithData = await Promise.all(
+              sets.map(async (set) => {
+                const exercise = await ctx.db.get(set.exerciseId);
+                const repetitionUnit = await ctx.db.get(set.repetitionUnitId);
+                const weightUnit = await ctx.db.get(set.weightUnitId);
+
+                return {
+                  ...set,
+                  exercise,
+                  repetitionUnit,
+                  weightUnit,
+                };
+              }),
+            );
+
+            return {
+              ...group,
+              sets: setsWithData,
+            };
+          }),
+        );
+
+        return {
+          ...session,
+          setGroups: setGroupsWithSets,
+        };
+      }),
+    );
+
+    return {
+      ...paginatedSessions,
+      page: sessionsWithData,
+    };
+  },
+});
 
 // List all workout sessions for the current user
 export const list = query({
