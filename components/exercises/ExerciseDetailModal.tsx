@@ -1,0 +1,208 @@
+"use client";
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselDots,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Exercise } from "@/lib/convex-types";
+import { Dumbbell, Flame, Gauge, Settings2, Target } from "lucide-react";
+import Image from "next/image";
+
+// Helper to format enum values for display
+function formatEnumValue(value: string): string {
+  return value
+    .split("_")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
+export const ExerciseDetailModal = ({
+  exercise,
+  open,
+  onClose,
+}: {
+  exercise: Exercise;
+  open: boolean;
+  onClose: () => void;
+}) => {
+  return (
+    <Dialog open={open} onOpenChange={() => onClose()}>
+      <DialogContent className="sm:max-w-[560px] p-0 overflow-hidden max-h-[90vh] flex flex-col">
+        {/* Header with gradient */}
+        <DialogHeader className="px-6 pt-6 pb-4 bg-gradient-to-br from-accent/10 via-transparent to-primary/5 flex-shrink-0">
+          <div className="flex items-center gap-3">
+            <Avatar className="w-12 h-12 rounded-xl flex-shrink-0">
+              {exercise.images[0] ? (
+                <AvatarImage
+                  src={`/exercises/${exercise.images[0]}`}
+                  alt={exercise.name}
+                  className="object-cover"
+                />
+              ) : null}
+              <AvatarFallback className="rounded-xl bg-primary/10">
+                <Dumbbell className="h-6 w-6 text-primary" />
+              </AvatarFallback>
+            </Avatar>
+            <div className="min-w-0">
+              <DialogTitle className="text-xl leading-tight">
+                {exercise.name}
+              </DialogTitle>
+              <DialogDescription className="text-sm">
+                {formatEnumValue(exercise.category)}
+              </DialogDescription>
+            </div>
+          </div>
+        </DialogHeader>
+
+        {/* Scrollable Content */}
+        <div className="px-6 py-5 space-y-6 overflow-y-auto flex-1">
+          {/* Image Gallery */}
+          {exercise.images.length > 0 && (
+            <Carousel opts={{ loop: true }} className="w-full">
+              <div className="relative">
+                <CarouselContent className="-ml-0">
+                  {exercise.images.map((image, index) => (
+                    <CarouselItem key={index} className="pl-0">
+                      <div className="relative aspect-video bg-muted rounded-lg overflow-hidden">
+                        <Image
+                          src={`/exercises/${image}`}
+                          alt={`${exercise.name} - image ${index + 1}`}
+                          fill
+                          className="object-contain"
+                        />
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                {exercise.images.length > 1 && (
+                  <>
+                    <CarouselPrevious className="left-2 bg-background/80 hover:bg-background border-0 shadow-md" />
+                    <CarouselNext className="right-2 bg-background/80 hover:bg-background border-0 shadow-md" />
+                  </>
+                )}
+              </div>
+              {exercise.images.length > 1 && <CarouselDots className="mt-3" />}
+            </Carousel>
+          )}
+
+          {/* Quick Info */}
+          <div className="grid grid-cols-2 gap-3">
+            {exercise.level && (
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/50">
+                <Gauge className="h-4 w-4 text-muted-foreground" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Level</p>
+                  <p className="text-sm font-medium">
+                    {formatEnumValue(exercise.level)}
+                  </p>
+                </div>
+              </div>
+            )}
+            {exercise.equipment && (
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/50">
+                <Settings2 className="h-4 w-4 text-muted-foreground" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Equipment</p>
+                  <p className="text-sm font-medium">
+                    {formatEnumValue(exercise.equipment)}
+                  </p>
+                </div>
+              </div>
+            )}
+            {exercise.force && (
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/50">
+                <Flame className="h-4 w-4 text-muted-foreground" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Force</p>
+                  <p className="text-sm font-medium">
+                    {formatEnumValue(exercise.force)}
+                  </p>
+                </div>
+              </div>
+            )}
+            {exercise.mechanic && (
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/50">
+                <Target className="h-4 w-4 text-muted-foreground" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Mechanic</p>
+                  <p className="text-sm font-medium">
+                    {formatEnumValue(exercise.mechanic)}
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Muscles */}
+          <div className="space-y-4">
+            {exercise.primaryMuscles.length > 0 && (
+              <div>
+                <h4 className="text-sm font-medium mb-2">Primary Muscles</h4>
+                <div className="flex flex-wrap gap-2">
+                  {exercise.primaryMuscles.map((muscle) => (
+                    <Badge key={muscle} variant="default" className="text-xs">
+                      {formatEnumValue(muscle)}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+            {exercise.secondaryMuscles.length > 0 && (
+              <div>
+                <h4 className="text-sm font-medium mb-2">Secondary Muscles</h4>
+                <div className="flex flex-wrap gap-2">
+                  {exercise.secondaryMuscles.map((muscle) => (
+                    <Badge key={muscle} variant="secondary" className="text-xs">
+                      {formatEnumValue(muscle)}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Instructions */}
+          {exercise.instructions.length > 0 && (
+            <div>
+              <h4 className="text-sm font-medium mb-3">Instructions</h4>
+              <ol className="space-y-2">
+                {exercise.instructions.map((instruction, index) => (
+                  <li key={index} className="flex gap-3 text-sm">
+                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-medium flex items-center justify-center">
+                      {index + 1}
+                    </span>
+                    <span className="text-muted-foreground pt-0.5">
+                      {instruction}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <DialogFooter className="px-6 py-4 bg-muted/30 border-t border-border/50 flex-shrink-0">
+          <Button variant="ghost" onClick={onClose}>
+            Close
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
