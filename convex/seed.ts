@@ -40,6 +40,7 @@ export const mockUserData = action({
     routineDays: number;
     setGroups: number;
     sets: number;
+    workoutSessions: number;
   }> => {
     // Find user by email
     const userId = await ctx.runMutation(internal.seed.findUserByEmail, {
@@ -152,6 +153,7 @@ export const seedDatabase = internalAction({
 const NUM_ROUTINES = 50;
 const NUM_SET_GROUPS = 10;
 const NUM_SETS = 4;
+const NUM_WORKOUT_SESSIONS = 100;
 
 export const seedMockData = internalAction({
   args: { userId: v.id("users") },
@@ -176,6 +178,8 @@ export const seedMockData = internalAction({
 
     console.log(`Creating ${NUM_ROUTINES} routines...`);
 
+    let firstRoutineDayId: any = null;
+
     for (let i = 1; i <= NUM_ROUTINES; i++) {
       // Create routine
       const routineId = await ctx.runMutation(internal.seed.createRoutine, {
@@ -191,6 +195,11 @@ export const seedMockData = internalAction({
         description: `Day 1 of Routine ${i}`,
         weekdays: [1, 3],
       });
+
+      // Store the first routine day ID for workout sessions
+      if (i === 1) {
+        firstRoutineDayId = day1Id;
+      }
 
       const day2Id = await ctx.runMutation(internal.seed.createRoutineDay, {
         userId,
@@ -234,6 +243,74 @@ export const seedMockData = internalAction({
       }
     }
 
+    // Get the template (first routine day) set groups and sets
+    const templateSetGroups = await ctx.runMutation(
+      internal.seed.getSetGroupsWithSets,
+      { routineDayId: firstRoutineDayId },
+    );
+
+    // Create workout sessions based on the first routine day template
+    console.log(`Creating ${NUM_WORKOUT_SESSIONS} workout sessions...`);
+    const now = Date.now();
+    const oneDay = 24 * 60 * 60 * 1000;
+
+    for (let i = 1; i <= NUM_WORKOUT_SESSIONS; i++) {
+      // Create session with dates spread over the past 100 days
+      const startTime = now - (NUM_WORKOUT_SESSIONS - i) * oneDay;
+      const endTime = startTime + 60 * 60 * 1000; // 1 hour workout
+
+      const sessionId = await ctx.runMutation(
+        internal.seed.createWorkoutSession,
+        {
+          userId,
+          name: `Workout Session ${i}`,
+          notes: `Notes for workout session ${i}`,
+          impression: Math.floor(Math.random() * 5) + 1, // Random 1-5
+          startTime,
+          endTime,
+          templateId: firstRoutineDayId,
+        },
+      );
+
+      // Create set groups and sets for this session based on template
+      for (const templateGroup of templateSetGroups) {
+        const sessionSetGroupId = await ctx.runMutation(
+          internal.seed.createSessionSetGroup,
+          {
+            userId,
+            sessionId,
+            type: templateGroup.type,
+            order: templateGroup.order,
+          },
+        );
+
+        // Create sets with mock weight and rep values
+        for (const templateSet of templateGroup.sets) {
+          // Generate realistic mock values
+          const mockWeight = Math.floor(Math.random() * 200) + 20; // 20-220 lbs
+          const mockReps = Math.floor(Math.random() * 10) + 5; // 5-15 reps
+
+          await ctx.runMutation(internal.seed.createSessionSet, {
+            userId,
+            setGroupId: sessionSetGroupId,
+            exerciseId: templateSet.exerciseId,
+            type: templateSet.type,
+            order: templateSet.order,
+            reps: mockReps,
+            repetitionUnitId: units.repUnitId,
+            weight: mockWeight,
+            weightUnitId: units.weightUnitId,
+            restTime: 90, // 90 seconds rest
+            completed: true,
+          });
+        }
+      }
+
+      if (i % 10 === 0) {
+        console.log(`Created ${i} workout sessions...`);
+      }
+    }
+
     const totalSetGroups = NUM_ROUTINES * 2 * NUM_SET_GROUPS;
     const totalSets = totalSetGroups * NUM_SETS;
 
@@ -242,6 +319,7 @@ export const seedMockData = internalAction({
     console.log(`- ${NUM_ROUTINES * 2} routine days`);
     console.log(`- ${totalSetGroups} set groups`);
     console.log(`- ${totalSets} sets`);
+    console.log(`- ${NUM_WORKOUT_SESSIONS} workout sessions`);
 
     return {
       success: true,
@@ -249,6 +327,7 @@ export const seedMockData = internalAction({
       routineDays: NUM_ROUTINES * 2,
       setGroups: totalSetGroups,
       sets: totalSets,
+      workoutSessions: NUM_WORKOUT_SESSIONS,
     };
   },
 });
@@ -459,6 +538,113 @@ export const createSet = internalMutation({
       weightUnitId: args.weightUnitId,
       restTime: 0,
       completed: false,
+      updatedAt: Date.now(),
+    });
+  },
+});
+
+export const getSetGroupsWithSets = internalMutation({
+  args: { routineDayId: v.id("routineDays") },
+  handler: async (ctx, { routineDayId }) => {
+    const setGroups = await ctx.db
+      .query("workoutSetGroups")
+      .withIndex("by_routine_day", (q) => q.eq("routineDayId", routineDayId))
+      .collect();
+
+    const result = [];
+    for (const group of setGroups) {
+      const sets = await ctx.db
+        .query("workoutSets")
+        .withIndex("by_set_group", (q) => q.eq("setGroupId", group._id))
+        .collect();
+
+      result.push({
+        ...group,
+        sets: sets.map((s) => ({
+          exerciseId: s.exerciseId,
+          type: s.type,
+          order: s.order,
+        })),
+      });
+    }
+
+    return result;
+  },
+});
+
+export const createWorkoutSession = internalMutation({
+  args: {
+    userId: v.id("users"),
+    name: v.string(),
+    notes: v.string(),
+    impression: v.optional(v.number()),
+    startTime: v.number(),
+    endTime: v.optional(v.number()),
+    templateId: v.optional(v.id("routineDays")),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.insert("workoutSessions", {
+      userId: args.userId,
+      name: args.name,
+      notes: args.notes,
+      impression: args.impression,
+      startTime: args.startTime,
+      endTime: args.endTime,
+      templateId: args.templateId,
+    });
+  },
+});
+
+export const createSessionSetGroup = internalMutation({
+  args: {
+    userId: v.id("users"),
+    sessionId: v.id("workoutSessions"),
+    type: v.union(v.literal("NORMAL"), v.literal("SUPERSET")),
+    order: v.number(),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.insert("workoutSetGroups", {
+      userId: args.userId,
+      sessionId: args.sessionId,
+      type: args.type,
+      order: args.order,
+      updatedAt: Date.now(),
+    });
+  },
+});
+
+export const createSessionSet = internalMutation({
+  args: {
+    userId: v.id("users"),
+    setGroupId: v.id("workoutSetGroups"),
+    exerciseId: v.id("exercises"),
+    type: v.union(
+      v.literal("NORMAL"),
+      v.literal("WARMUP"),
+      v.literal("DROPSET"),
+      v.literal("FAILURE"),
+    ),
+    order: v.number(),
+    reps: v.number(),
+    repetitionUnitId: v.id("repetitionUnits"),
+    weight: v.number(),
+    weightUnitId: v.id("weightUnits"),
+    restTime: v.number(),
+    completed: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.insert("workoutSets", {
+      userId: args.userId,
+      setGroupId: args.setGroupId,
+      exerciseId: args.exerciseId,
+      type: args.type,
+      order: args.order,
+      reps: args.reps,
+      repetitionUnitId: args.repetitionUnitId,
+      weight: args.weight,
+      weightUnitId: args.weightUnitId,
+      restTime: args.restTime,
+      completed: args.completed,
       updatedAt: Date.now(),
     });
   },
