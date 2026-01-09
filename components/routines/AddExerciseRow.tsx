@@ -42,25 +42,34 @@ export const AddExerciseRow = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex items-center gap-4 flex-wrap">
-      <div className="min-w-[150px] max-w-[400px] flex-grow">
+    <form onSubmit={handleSubmit} className="flex items-center gap-3">
+      <div className="flex-1 min-w-0">
         <AutocompleteExercise
           value={exercise}
           onChange={(newExercise) => setExercise(newExercise)}
         />
       </div>
-      <div className="min-w-[50px] max-w-[75px]">
-        <Input
-          type="number"
-          placeholder="Sets"
-          value={numSets}
-          onChange={(event) => setNumSets(event.target.value)}
-          min={1}
-        />
+      <div className="flex items-center gap-2">
+        <div className="w-16">
+          <Input
+            type="number"
+            placeholder="Sets"
+            value={numSets}
+            onChange={(event) => setNumSets(event.target.value)}
+            min={1}
+            className="h-9 text-center"
+          />
+        </div>
+        <Button
+          type="submit"
+          size="sm"
+          disabled={!exercise}
+          className="gap-1.5"
+        >
+          <Plus className="h-4 w-4" />
+          <span className="hidden sm:inline">Add</span>
+        </Button>
       </div>
-      <Button type="submit" size="icon" variant="ghost">
-        <Plus className="h-4 w-4" />
-      </Button>
     </form>
   );
 };

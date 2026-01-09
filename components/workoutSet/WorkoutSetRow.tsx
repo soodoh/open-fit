@@ -44,13 +44,15 @@ export const WorkoutSetRow = ({
     <div
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
-      className="flex items-center gap-3 p-3 border-b border-gray-100 min-h-[60px]"
+      className={`flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3 min-h-[56px] transition-colors ${
+        isRowDisabled ? "bg-muted/40" : "hover:bg-muted/20"
+      }`}
     >
       {(reorder || view !== ListView.CurrentSession) && (
         <Button
           variant="ghost"
           size="icon"
-          className="touch-manipulation"
+          className="touch-manipulation h-8 w-8 text-muted-foreground hover:text-foreground flex-shrink-0"
           {...attributes}
           {...listeners}
         >
@@ -59,22 +61,25 @@ export const WorkoutSetRow = ({
       )}
 
       {(!reorder || view !== ListView.CurrentSession) && (
-        // TODO add delete & setRestTimer
-        <Button variant="ghost" size="icon">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 text-muted-foreground hover:text-foreground flex-shrink-0"
+        >
           <MoreVertical className="h-4 w-4" />
         </Button>
       )}
 
       <SetTypeMenu set={set} setNum={setNum} />
 
-      <div className="flex gap-2 flex-1 my-1">
-        <div className="relative flex-1">
+      <div className="flex gap-2 flex-1 items-center">
+        <div className="relative flex-1 min-w-0">
           <Input
             key={`reps-${set._id}-${set.reps}`}
             type="text"
             disabled={isRowDisabled}
             defaultValue={set.reps}
-            className="pr-12"
+            className="pr-10 h-9 text-sm bg-background"
             onBlur={async (event) => {
               updateSet({
                 id: set._id,
@@ -82,10 +87,10 @@ export const WorkoutSetRow = ({
               });
             }}
           />
-          <Label className="absolute -top-2 left-2 bg-white px-1 text-xs text-gray-500">
+          <Label className="absolute -top-2 left-2 bg-background px-1 text-[10px] text-muted-foreground">
             {set.repetitionUnit?.name ?? "Reps"}
           </Label>
-          <div className="absolute right-1 top-1/2 -translate-y-1/2">
+          <div className="absolute right-0.5 top-1/2 -translate-y-1/2">
             <RepUnitMenu
               id={set._id}
               units={units}
@@ -99,13 +104,13 @@ export const WorkoutSetRow = ({
           </div>
         </div>
 
-        <div className="relative flex-1">
+        <div className="relative flex-1 min-w-0">
           <Input
             key={`weight-${set._id}-${set.weight}`}
             type="text"
             disabled={isRowDisabled}
             defaultValue={set.weight}
-            className="pr-12"
+            className="pr-10 h-9 text-sm bg-background"
             onBlur={async (event) => {
               updateSet({
                 id: set._id,
@@ -113,10 +118,10 @@ export const WorkoutSetRow = ({
               });
             }}
           />
-          <Label className="absolute -top-2 left-2 bg-white px-1 text-xs text-gray-500">
+          <Label className="absolute -top-2 left-2 bg-background px-1 text-[10px] text-muted-foreground">
             {set.weightUnit?.name ?? "Weight"}
           </Label>
-          <div className="absolute right-1 top-1/2 -translate-y-1/2">
+          <div className="absolute right-0.5 top-1/2 -translate-y-1/2">
             <WeightUnitMenu
               id={set._id}
               units={units}
@@ -145,10 +150,11 @@ export const WorkoutSetRow = ({
               }}
             />
           ) : (
-            <div className="flex items-center">
+            <div className="flex items-center justify-center w-8 flex-shrink-0">
               <Checkbox
                 aria-label="Mark as Completed"
                 checked={set.completed}
+                className="h-5 w-5 data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
                 onCheckedChange={(checked: boolean) => {
                   updateSet({
                     id: set._id,

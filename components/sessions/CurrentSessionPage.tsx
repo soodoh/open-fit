@@ -1,6 +1,5 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { WorkoutList } from "@/components/workoutSet/WorkoutList";
@@ -10,7 +9,7 @@ import {
   type WorkoutSessionWithData,
 } from "@/lib/convex-types";
 import dayjs from "dayjs";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Calendar, Clock, MessageSquare, Play } from "lucide-react";
 import Link from "next/link";
 import { CurrentDuration } from "./CurrentDuration";
 import { EditSessionMenu } from "./EditSessionMenu";
@@ -22,49 +21,98 @@ export const CurrentSessionPage = ({
   session: WorkoutSessionWithData;
   units: Units;
 }) => {
+  const completedSets = session.setGroups.reduce(
+    (acc, group) => acc + group.sets.filter((set) => set.completed).length,
+    0
+  );
+  const totalSets = session.setGroups.reduce(
+    (acc, group) => acc + group.sets.length,
+    0
+  );
+
   return (
-    <>
-      <Container maxWidth="lg">
-        <div className="my-6 flex justify-between items-center">
-          <Badge variant="outline">
-            {dayjs(session.startTime).format("MM/DD/YYYY")}
-          </Badge>
+    <div className="min-h-[calc(100vh-4rem)]">
+      {/* Header Section */}
+      <div className="border-b border-border/50 bg-gradient-to-b from-accent/5 to-transparent">
+        <Container maxWidth="lg" className="py-6">
+          <div className="flex items-center justify-between mb-4">
+            <Button variant="ghost" size="sm" asChild className="gap-2">
+              <Link href="/logs">
+                <ArrowLeft className="h-4 w-4" />
+                Back to Logs
+              </Link>
+            </Button>
+            <EditSessionMenu session={session} />
+          </div>
 
-          <Button asChild>
-            <Link href="/logs">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Logs
-            </Link>
-          </Button>
-        </div>
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <Play className="h-6 w-6 text-primary" fill="currentColor" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
+                <Calendar className="h-3.5 w-3.5" />
+                <span>{dayjs(session.startTime).format("MMMM D, YYYY")}</span>
+                <span className="px-2 py-0.5 rounded-full bg-green-500/10 text-green-600 text-xs font-medium">
+                  In Progress
+                </span>
+              </div>
+              <h1 className="text-2xl font-bold tracking-tight truncate">
+                {session.name || "Workout Session"}
+              </h1>
+            </div>
+          </div>
+        </Container>
+      </div>
 
-        <div className="flex gap-2 items-center">
-          <h1 className="text-3xl font-bold">{session.name}</h1>
-          <EditSessionMenu session={session} />
-        </div>
-      </Container>
+      {/* Stats Cards */}
+      <Container maxWidth="lg" className="py-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {/* Duration Card */}
+          <div className="flex items-center gap-3 p-4 rounded-xl bg-card border">
+            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Clock className="h-5 w-5 text-primary" />
+            </div>
+            <CurrentDuration startTime={session.startTime} />
+          </div>
 
-      <Container maxWidth="lg">
-        <div className="my-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <CurrentDuration startTime={session.startTime} />
-
-          {session.notes && (
+          {/* Progress Card */}
+          <div className="flex items-center gap-3 p-4 rounded-xl bg-card border">
+            <div className="w-10 h-10 rounded-lg bg-accent/20 flex items-center justify-center">
+              <span className="text-sm font-bold text-accent-foreground">
+                {totalSets > 0 ? Math.round((completedSets / totalSets) * 100) : 0}%
+              </span>
+            </div>
             <div>
-              <h3 className="text-sm font-medium">Notes</h3>
-              <p className="text-sm text-muted-foreground">{session.notes}</p>
+              <p className="text-xs text-muted-foreground">Progress</p>
+              <p className="text-sm font-semibold">
+                {completedSets} / {totalSets} sets
+              </p>
+            </div>
+          </div>
+
+          {/* Notes Card */}
+          {session.notes && (
+            <div className="col-span-2 sm:col-span-1 flex items-start gap-3 p-4 rounded-xl bg-card border">
+              <div className="w-10 h-10 rounded-lg bg-muted/50 flex items-center justify-center flex-shrink-0">
+                <MessageSquare className="h-5 w-5 text-muted-foreground" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs text-muted-foreground">Notes</p>
+                <p className="text-sm line-clamp-2">{session.notes}</p>
+              </div>
             </div>
           )}
         </div>
       </Container>
 
-      <Container maxWidth="lg" className="px-0">
-        <WorkoutList
-          view={ListView.CurrentSession}
-          sessionOrDayId={session._id}
-          setGroups={session.setGroups}
-          units={units}
-        />
-      </Container>
-    </>
+      {/* Workout List */}
+      <WorkoutList
+        view={ListView.CurrentSession}
+        sessionOrDayId={session._id}
+        setGroups={session.setGroups}
+        units={units}
+      />
+    </div>
   );
 };

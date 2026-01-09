@@ -127,12 +127,14 @@ export const WorkoutSetGroup = ({
     });
   };
 
+  const isCompleted = setGroup.sets.every((set) => set.completed);
+
   return (
     <Collapsible open={!isReorderActive && expanded} className="w-full">
       <div
         ref={setNodeRef}
         style={{ transform: CSS.Transform.toString(transform), transition }}
-        className="flex items-center justify-between p-3 border-b border-gray-200 hover:bg-gray-50"
+        className="flex items-center justify-between p-4 hover:bg-muted/30 transition-colors"
       >
         <CollapsibleTrigger
           onClick={() => setExpanded(!expanded)}
@@ -142,7 +144,7 @@ export const WorkoutSetGroup = ({
             <Button
               variant="ghost"
               size="icon"
-              className="touch-manipulation"
+              className="touch-manipulation h-8 w-8 text-muted-foreground hover:text-foreground"
               {...attributes}
               {...listeners}
             >
@@ -150,35 +152,45 @@ export const WorkoutSetGroup = ({
             </Button>
           )}
 
-          <Avatar className="h-8 w-8">
+          <Avatar className="h-10 w-10 rounded-lg">
             {exercise ? (
               <>
                 <AvatarImage
                   src={`/exercises/${exercise.images[0]}`}
                   alt={`${exercise.name} set item`}
+                  className="object-cover"
                 />
-                <AvatarFallback>
-                  <ImageIcon className="h-4 w-4" />
+                <AvatarFallback className="rounded-lg bg-muted">
+                  <ImageIcon className="h-4 w-4 text-muted-foreground" />
                 </AvatarFallback>
               </>
             ) : (
-              <AvatarFallback>
-                <AlertCircle className="h-4 w-4" />
+              <AvatarFallback className="rounded-lg bg-destructive/10">
+                <AlertCircle className="h-4 w-4 text-destructive" />
               </AvatarFallback>
             )}
           </Avatar>
 
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             <div
-              className={`font-medium ${
-                setGroup.sets.every((set) => set.completed)
-                  ? "line-through text-gray-500"
-                  : "text-gray-900"
+              className={`font-medium text-sm truncate ${
+                isCompleted
+                  ? "line-through text-muted-foreground"
+                  : "text-foreground"
               }`}
             >
               {exercise?.name ?? "Unknown exercise"}
             </div>
-            <div className="text-sm text-gray-500">{sets.length} sets</div>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <span>
+                {sets.length} {sets.length === 1 ? "set" : "sets"}
+              </span>
+              {isCompleted && (
+                <span className="px-1.5 py-0.5 rounded bg-green-500/10 text-green-600 text-[10px] font-medium">
+                  Done
+                </span>
+              )}
+            </div>
           </div>
         </CollapsibleTrigger>
 
@@ -194,38 +206,46 @@ export const WorkoutSetGroup = ({
       </div>
 
       <CollapsibleContent>
-        <div className="pl-4">
+        <div className="bg-muted/20">
           {setGroup.comment && (
-            <div className="pl-8 py-2 text-sm text-gray-600">
+            <div className="px-4 py-3 text-sm text-muted-foreground border-b border-border/50 bg-muted/30">
+              <span className="font-medium text-foreground/80">Note:</span>{" "}
               {setGroup.comment}
             </div>
           )}
 
-          <DndContext id="sets" onDragEnd={handleSort} sensors={sensors}>
-            <SortableContext
-              items={sets.map((s) => s._id)}
-              strategy={verticalListSortingStrategy}
-            >
-              {setsWithNumber.map(({ set, setNum }) => {
-                return (
-                  <WorkoutSetRow
-                    key={`set-row-${set._id}`}
-                    view={view}
-                    set={set}
-                    setNum={setNum}
-                    units={units}
-                    reorder={canReorderSets}
-                    startRestTimer={startRestTimer}
-                  />
-                );
-              })}
-            </SortableContext>
-          </DndContext>
+          <div className="divide-y divide-border/50">
+            <DndContext id="sets" onDragEnd={handleSort} sensors={sensors}>
+              <SortableContext
+                items={sets.map((s) => s._id)}
+                strategy={verticalListSortingStrategy}
+              >
+                {setsWithNumber.map(({ set, setNum }) => {
+                  return (
+                    <WorkoutSetRow
+                      key={`set-row-${set._id}`}
+                      view={view}
+                      set={set}
+                      setNum={setNum}
+                      units={units}
+                      reorder={canReorderSets}
+                      startRestTimer={startRestTimer}
+                    />
+                  );
+                })}
+              </SortableContext>
+            </DndContext>
+          </div>
 
-          <div className="flex gap-2 p-3">
-            <Button onClick={handleAdd} className="flex items-center gap-2">
-              <Plus className="h-4 w-4" />
-              New set
+          <div className="p-3 border-t border-border/50">
+            <Button
+              onClick={handleAdd}
+              variant="ghost"
+              size="sm"
+              className="w-full text-muted-foreground hover:text-foreground"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Set
             </Button>
           </div>
         </div>

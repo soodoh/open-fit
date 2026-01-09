@@ -24,8 +24,8 @@ export const CurrentDuration = ({
 
   return (
     <div>
-      <h3 className="text-sm font-medium">Duration</h3>
-      <p className="text-sm text-muted-foreground">{durationString}</p>
+      <p className="text-xs text-muted-foreground">Duration</p>
+      <p className="text-sm font-semibold tabular-nums">{durationString}</p>
     </div>
   );
 };

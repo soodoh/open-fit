@@ -4,7 +4,6 @@ import { AddExerciseRow } from "@/components/routines/AddExerciseRow";
 import { RestTimer } from "@/components/sessions/RestTimer";
 import { Container } from "@/components/ui/container";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { api } from "@/convex/_generated/api";
 import {
@@ -30,6 +29,7 @@ import {
 } from "@dnd-kit/sortable";
 import { useMutation } from "convex/react";
 import dayjs from "dayjs";
+import { ArrowUpDown, Dumbbell } from "lucide-react";
 import { useOptimistic, useState, useTransition } from "react";
 import { useTimer } from "react-timer-hook";
 import { WorkoutSetGroup } from "./WorkoutSetGroup";
@@ -92,21 +92,46 @@ export const WorkoutList = ({
   };
 
   return (
-    <>
-      <Container maxWidth="lg">
-        <AddExerciseRow
-          sessionOrDayId={sessionOrDayId}
-          isSession={view !== ListView.EditTemplate}
-        />
+    <div className="pb-8">
+      {/* Add Exercise Section */}
+      <Container maxWidth="lg" className="py-4">
+        <div className="rounded-xl border bg-card p-4">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Dumbbell className="h-4 w-4 text-primary" />
+            </div>
+            <div>
+              <h3 className="font-medium text-sm">Add Exercise</h3>
+              <p className="text-xs text-muted-foreground">
+                Search and add exercises to your workout
+              </p>
+            </div>
+          </div>
+          <AddExerciseRow
+            sessionOrDayId={sessionOrDayId}
+            isSession={view !== ListView.EditTemplate}
+          />
+        </div>
+      </Container>
 
-        <div className="my-4 flex items-center gap-4">
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="reorder-switch"
-              checked={isReorderActive}
-              onCheckedChange={setReorderActive}
-            />
-            <Label htmlFor="reorder-switch">Reorder Sets</Label>
+      {/* Controls Section */}
+      <Container maxWidth="lg" className="py-2">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3 px-1">
+            <div className="flex items-center gap-2">
+              <Switch
+                id="reorder-switch"
+                checked={isReorderActive}
+                onCheckedChange={setReorderActive}
+              />
+              <Label
+                htmlFor="reorder-switch"
+                className="text-sm text-muted-foreground flex items-center gap-1.5 cursor-pointer"
+              >
+                <ArrowUpDown className="h-3.5 w-3.5" />
+                Reorder
+              </Label>
+            </div>
           </div>
 
           {view === ListView.CurrentSession && (
@@ -121,29 +146,46 @@ export const WorkoutList = ({
         </div>
       </Container>
 
-      <Separator className="my-4" />
-
-      <div className="space-y-2">
-        <DndContext id="set-groups" onDragEnd={handleSort} sensors={sensors}>
-          <SortableContext
-            items={optimisticSetGroups.map((sg) => sg._id)}
-            strategy={verticalListSortingStrategy}
-          >
-            {optimisticSetGroups.map((setGroup) => {
-              return (
-                <WorkoutSetGroup
-                  view={view}
-                  key={`set-${setGroup._id}`}
-                  isReorderActive={isReorderActive}
-                  setGroup={setGroup}
-                  units={units}
-                  startRestTimer={startRestTimer}
-                />
-              );
-            })}
-          </SortableContext>
-        </DndContext>
-      </div>
-    </>
+      {/* Exercise List */}
+      {optimisticSetGroups.length > 0 ? (
+        <Container maxWidth="lg" className="py-4">
+          <div className="rounded-xl border bg-card overflow-hidden divide-y divide-border">
+            <DndContext id="set-groups" onDragEnd={handleSort} sensors={sensors}>
+              <SortableContext
+                items={optimisticSetGroups.map((sg) => sg._id)}
+                strategy={verticalListSortingStrategy}
+              >
+                {optimisticSetGroups.map((setGroup) => {
+                  return (
+                    <WorkoutSetGroup
+                      view={view}
+                      key={`set-${setGroup._id}`}
+                      isReorderActive={isReorderActive}
+                      setGroup={setGroup}
+                      units={units}
+                      startRestTimer={startRestTimer}
+                    />
+                  );
+                })}
+              </SortableContext>
+            </DndContext>
+          </div>
+        </Container>
+      ) : (
+        <Container maxWidth="lg" className="py-8">
+          <div className="text-center py-12 rounded-xl border border-dashed bg-muted/20">
+            <div className="w-12 h-12 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
+              <Dumbbell className="h-6 w-6 text-muted-foreground" />
+            </div>
+            <h3 className="font-medium text-muted-foreground mb-1">
+              No exercises yet
+            </h3>
+            <p className="text-sm text-muted-foreground/70">
+              Add your first exercise using the form above
+            </p>
+          </div>
+        </Container>
+      )}
+    </div>
   );
 };
