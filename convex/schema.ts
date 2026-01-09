@@ -84,8 +84,8 @@ export default defineSchema({
   userProfiles: defineTable({
     userId: v.id("users"), // References Convex Auth users table
     role: RoleEnum,
-    defaultRepetitionUnitId: v.optional(v.id("repetitionUnits")),
-    defaultWeightUnitId: v.optional(v.id("weightUnits")),
+    defaultRepetitionUnitId: v.id("repetitionUnits"),
+    defaultWeightUnitId: v.id("weightUnits"),
   }).index("by_user", ["userId"]),
 
   repetitionUnits: defineTable({

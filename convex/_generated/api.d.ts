@@ -16,11 +16,13 @@ import type * as mutations_routines from "../mutations/routines.js";
 import type * as mutations_sessions from "../mutations/sessions.js";
 import type * as mutations_setGroups from "../mutations/setGroups.js";
 import type * as mutations_sets from "../mutations/sets.js";
+import type * as mutations_userProfiles from "../mutations/userProfiles.js";
 import type * as queries_exercises from "../queries/exercises.js";
 import type * as queries_routineDays from "../queries/routineDays.js";
 import type * as queries_routines from "../queries/routines.js";
 import type * as queries_sessions from "../queries/sessions.js";
 import type * as queries_units from "../queries/units.js";
+import type * as queries_userProfiles from "../queries/userProfiles.js";
 import type * as seed from "../seed.js";
 import type * as seedData_exercises from "../seedData/exercises.js";
 
@@ -39,11 +41,13 @@ declare const fullApi: ApiFromModules<{
   "mutations/sessions": typeof mutations_sessions;
   "mutations/setGroups": typeof mutations_setGroups;
   "mutations/sets": typeof mutations_sets;
+  "mutations/userProfiles": typeof mutations_userProfiles;
   "queries/exercises": typeof queries_exercises;
   "queries/routineDays": typeof queries_routineDays;
   "queries/routines": typeof queries_routines;
   "queries/sessions": typeof queries_sessions;
   "queries/units": typeof queries_units;
+  "queries/userProfiles": typeof queries_userProfiles;
   seed: typeof seed;
   "seedData/exercises": typeof seedData_exercises;
 }>;

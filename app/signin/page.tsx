@@ -12,7 +12,7 @@ export default function SignInPage() {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      router.push("/");
+      router.replace("/");
     }
   }, [isLoading, isAuthenticated, router]);
 

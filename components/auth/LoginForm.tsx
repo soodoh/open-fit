@@ -7,12 +7,10 @@ import { Label } from "@/components/ui/label";
 import { SignUpSchema } from "@/lib/authSchema";
 import { useAuthActions } from "@convex-dev/auth/react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { flattenError } from "zod";
 
 export const LoginForm = ({ register }: { register?: boolean }) => {
-  const router = useRouter();
   const { signIn } = useAuthActions();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
@@ -41,7 +39,6 @@ export const LoginForm = ({ register }: { register?: boolean }) => {
       formData.set("flow", register ? "signUp" : "signIn");
 
       await signIn("password", formData);
-      router.push("/");
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Authentication failed";
