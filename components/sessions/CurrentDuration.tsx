@@ -12,7 +12,7 @@ export const CurrentDuration = ({
   startTime: Date | number;
 }) => {
   const [durationString, setDuration] = useState<string>(
-    getTimestamp(startTime)
+    getTimestamp(startTime),
   );
   const [isBlinking, setIsBlinking] = useState(true);
 
@@ -38,7 +38,9 @@ export const CurrentDuration = ({
       <p className="text-base font-bold tabular-nums tracking-tight">
         {parts.map((part, i) => (
           <span key={i}>
-            {i > 0 && <span className="text-muted-foreground/60 mx-0.5">:</span>}
+            {i > 0 && (
+              <span className="text-muted-foreground/60 mx-0.5">:</span>
+            )}
             <span>{part}</span>
           </span>
         ))}

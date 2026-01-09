@@ -150,7 +150,11 @@ export const WorkoutList = ({
       {optimisticSetGroups.length > 0 ? (
         <Container maxWidth="lg" className="py-4">
           <div className="rounded-xl border bg-card overflow-hidden divide-y divide-border">
-            <DndContext id="set-groups" onDragEnd={handleSort} sensors={sensors}>
+            <DndContext
+              id="set-groups"
+              onDragEnd={handleSort}
+              sensors={sensors}
+            >
               <SortableContext
                 items={optimisticSetGroups.map((sg) => sg._id)}
                 strategy={verticalListSortingStrategy}

@@ -54,10 +54,14 @@ function EmptyState() {
 }
 
 function RoutinesContent() {
-  const { results: routines, status, loadMore } = usePaginatedQuery(
+  const {
+    results: routines,
+    status,
+    loadMore,
+  } = usePaginatedQuery(
     api.queries.routines.list,
     {},
-    { initialNumItems: ROUTINES_PAGE_SIZE }
+    { initialNumItems: ROUTINES_PAGE_SIZE },
   );
   const currentSession = useQuery(api.queries.sessions.getCurrent);
   const [searchQuery, setSearchQuery] = useState("");
@@ -71,7 +75,7 @@ function RoutinesContent() {
           loadMore(ROUTINES_PAGE_SIZE);
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.1 },
     );
 
     const currentRef = loadMoreRef.current;
@@ -91,7 +95,7 @@ function RoutinesContent() {
     if (!searchQuery.trim()) return routines;
     const query = searchQuery.toLowerCase().trim();
     return routines.filter((routine) =>
-      routine.name.toLowerCase().includes(query)
+      routine.name.toLowerCase().includes(query),
     );
   }, [routines, searchQuery]);
 
@@ -146,19 +150,22 @@ function RoutinesContent() {
         {!isLoading && routines && routines.length === 0 && <EmptyState />}
 
         {/* No Search Results */}
-        {filteredRoutines && filteredRoutines.length === 0 && routines && routines.length > 0 && (
-          <div className="flex flex-col items-center justify-center py-16 px-4">
-            <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mb-4">
-              <Search className="w-8 h-8 text-muted-foreground/60" />
+        {filteredRoutines &&
+          filteredRoutines.length === 0 &&
+          routines &&
+          routines.length > 0 && (
+            <div className="flex flex-col items-center justify-center py-16 px-4">
+              <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mb-4">
+                <Search className="w-8 h-8 text-muted-foreground/60" />
+              </div>
+              <h3 className="text-lg font-medium text-foreground mb-1">
+                No routines found
+              </h3>
+              <p className="text-muted-foreground text-center text-sm">
+                No routines match "{searchQuery}"
+              </p>
             </div>
-            <h3 className="text-lg font-medium text-foreground mb-1">
-              No routines found
-            </h3>
-            <p className="text-muted-foreground text-center text-sm">
-              No routines match "{searchQuery}"
-            </p>
-          </div>
-        )}
+          )}
 
         {/* Routines Grid */}
         {filteredRoutines && filteredRoutines.length > 0 && (

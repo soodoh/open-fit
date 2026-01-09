@@ -59,7 +59,7 @@ function DayPageContent() {
   const totalExercises = routineDay.setGroups.length;
   const totalSets = routineDay.setGroups.reduce(
     (acc, group) => acc + group.sets.length,
-    0
+    0,
   );
 
   return (
@@ -124,7 +124,8 @@ function DayPageContent() {
             <div className="flex items-center gap-1.5">
               <ListChecks className="h-4 w-4" />
               <span>
-                {totalExercises} {totalExercises === 1 ? "exercise" : "exercises"}
+                {totalExercises}{" "}
+                {totalExercises === 1 ? "exercise" : "exercises"}
               </span>
             </div>
             <span>•</span>

@@ -24,14 +24,11 @@ export const SessionSummaryCard = ({
 
   const totalSets = session.setGroups.reduce(
     (acc, group) => acc + group.sets.length,
-    0
+    0,
   );
 
   return (
-    <Link
-      href={`/logs/${session._id}`}
-      className="group block"
-    >
+    <Link href={`/logs/${session._id}`} className="group block">
       <div className="relative h-full rounded-xl border bg-card p-5 transition-all duration-200 hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5">
         {/* Header */}
         <div className="flex items-start justify-between mb-4">

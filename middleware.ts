@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const publicRoutes = ["/signin", "/register"];
+// const publicRoutes = ["/signin", "/register"];
 
-export function middleware(request: NextRequest) {
+export function middleware(_request: NextRequest) {
   // For now, skip middleware auth checks since we're using client-side auth
   // The client will handle redirects based on auth state
   return NextResponse.next();

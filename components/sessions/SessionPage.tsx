@@ -42,7 +42,7 @@ export const SessionPage = ({
 
   const totalSets = session.setGroups.reduce(
     (acc, group) => acc + group.sets.length,
-    0
+    0,
   );
 
   return (

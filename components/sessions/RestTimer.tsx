@@ -96,7 +96,7 @@ export const RestTimer = ({
                     dayjs()
                       .add(Math.max(0, remainingSeconds - 10), "seconds")
                       .toDate(),
-                    isRunning
+                    isRunning,
                   );
                 }}
               >
@@ -131,7 +131,7 @@ export const RestTimer = ({
                     dayjs()
                       .add(remainingSeconds + 10, "seconds")
                       .toDate(),
-                    isRunning
+                    isRunning,
                   );
                 }}
               >

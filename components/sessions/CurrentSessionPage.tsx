@@ -23,11 +23,11 @@ export const CurrentSessionPage = ({
 }) => {
   const completedSets = session.setGroups.reduce(
     (acc, group) => acc + group.sets.filter((set) => set.completed).length,
-    0
+    0,
   );
   const totalSets = session.setGroups.reduce(
     (acc, group) => acc + group.sets.length,
-    0
+    0,
   );
 
   return (
@@ -80,7 +80,10 @@ export const CurrentSessionPage = ({
           <div className="flex items-center gap-3 p-4 rounded-xl bg-card border">
             <div className="w-10 h-10 rounded-lg bg-accent/20 flex items-center justify-center">
               <span className="text-sm font-bold text-accent-foreground">
-                {totalSets > 0 ? Math.round((completedSets / totalSets) * 100) : 0}%
+                {totalSets > 0
+                  ? Math.round((completedSets / totalSets) * 100)
+                  : 0}
+                %
               </span>
             </div>
             <div>

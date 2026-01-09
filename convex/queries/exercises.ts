@@ -39,15 +39,19 @@ export const search = query({
     }
 
     // Get the page of results
-    const pageResults = allResults.slice(startIndex, startIndex + args.numItems);
+    const pageResults = allResults.slice(
+      startIndex,
+      startIndex + args.numItems,
+    );
     const hasMore = startIndex + args.numItems < allResults.length;
 
     return {
       page: pageResults,
       isDone: !hasMore,
-      continueCursor: hasMore && pageResults.length > 0
-        ? pageResults[pageResults.length - 1]._id
-        : null,
+      continueCursor:
+        hasMore && pageResults.length > 0
+          ? pageResults[pageResults.length - 1]._id
+          : null,
       totalCount: allResults.length,
     };
   },
