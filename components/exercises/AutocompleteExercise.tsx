@@ -34,7 +34,7 @@ export const AutocompleteExercise = ({
   const [open, setOpen] = useState(false);
 
   const options = useQuery(
-    api.queries.exercises.search,
+    api.queries.exercises.searchSimple,
     searchTerm ? { searchTerm } : "skip",
   );
   const isLoading = options === undefined;

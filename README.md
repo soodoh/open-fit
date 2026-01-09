@@ -140,8 +140,6 @@ Replace `your@email.com` with the email you registered with.
 
 ## TODO
 
-- Pagination & infinite scroll on /exercises page
-
 - Implement profile/settings modal to update user settings
 
 - Convex to handle image uploads
