@@ -140,43 +140,92 @@ Replace `your@email.com` with the email you registered with.
 
 ## TODO
 
-- Convex to handle image uploads
-  - Update seedDatabase script to upload exercise images to Convex
-  - Consume Convex stored images with next/image
+- Fix WorkoutList improvements
+    - SetRow
+        - Add option to delete set (swipe left on mobile?)
+        - Better drag reorder handler (should work on the whole row)
+    - SetGroup
+        - Adding a set to a completed workout should automatically be marked as completed
+        - Should be able to drag the whole row
+        - Remove reorder mode, just work?
+        - Add "info" button that opens ExerciseDetail modal
 
-- Admin view/route
-  - Manage exercises
-  - Only allow deleting if not used by any records
-  - Handle image uploading/deleting for exercises
-  - Manage global values: muscle group, category, equipment, rep units, weight units
-  - Manage users: update their user role and other profile settings
+- Update Routine search to use full text search query & pagination
 
-- Add "isPublic" property to routines that only admins can set. These routines will be seen by all users.
-  - Ensure that non-public routines are only shown to the user that created it.
+- Update Exercise search to filter by muscle group, equipment, and difficulty
 
-- Add "gyms"
-  - Users can create their own gyms (in profile settings). It should have a name and a list of equipment.
-  - Autocomplete equipment selection when adding to gyms.
-  - In profile settings, user can choose which gyms they are affiliated with
-  - In day/session page & active session views, searching should exercises should only show if selected gym has equipment for that exercise.
+- Update Logs search to filter by date (greater than or less than), or exercises used in the session
+
+- Ability to favorite routines?
+
+- Fix nested button warning when enabling "reorder" mode for set groups in WorkoutList
 
 - Implement dark mode theme
-  - Add dark/light/use system as a setting
+    - Add dark/light/use system as a setting
+
+- Update Routines page design
+    - Does not show routine days in the card
+    - Clicking the card opens a modal allowing you to view/start a workout from the day selected
+    - Remove dropdown from routine card, instead show edit/delete buttons
+    - Remove day page route, instead clicking an edit button in the routine card opens a modal
+    - The edit modal should have multiple tabs: Routine info, tab for each day
+        - Button at the bottom to add a new day
+    - In edit routine day section, provide same UI as the routine day page, but also allow for editing day of the week
+        - Button for deleting the day
+
+- Convex to handle image uploads
+    - Update seedDatabase script to upload exercise images to Convex
+    - Consume Convex stored images with next/image
+
+- Admin view/route
+    - Manage exercises
+    - Only allow deleting if not used by any records
+    - Handle image uploading/deleting for exercises
+    - Manage global values: muscle group, category, equipment, rep units, weight units
+    - Manage users: update their user role and other profile settings
+
+- Add "isPublic" property to routines that only admins can set. These routines will be seen by all users.
+    - Ensure that non-public routines are only shown to the user that created it.
+
+- Add "gyms"
+    - Users can create their own gyms (in profile settings). It should have a name and a list of equipment.
+    - Autocomplete equipment selection when adding to gyms.
+    - In profile settings, user can choose which gyms they are affiliated with
+    - In day/session page & active session views, searching should exercises should only show if selected gym has equipment for that exercise.
+
+- Add seed script for common, real workouts
+    - Weight lifting: 2,3,4,5 day splits
+    - Circuit training?
+    - Cardio?
+    - HAL-like marathon training routine
+    - Stretching routine
+        - Add missing stretches if needed, should match my old stretching routine
+
+- Home Page
+    - Show workout in progress (if there is one)
+    - Show recently used routines
+    - Show next routine day from last used routine?
+    - Show popular routines?
+    - Show PRs, progress graphs
+
+- Logs page
+    - Section for PRs
+    - Section to view visualizations on progress (choose a exercise with history)
+    - Calendar history of workouts logged (like github activity view?)
+
+- Replace with similar exercise option (button on the SetGroup)
+    - Allow to replace with *any* exercise, but have a toggle that filters to "recommended" exercises
+    - Warn that it modifies existing sets in that group?
 
 ## Planned
 
 - [ ] Dev experience
     - [ ] GitHub Actions w/ changeset flow
     - [ ] Documentation website
-- [ ] Dark mode, retheme
 - [ ] PWA
     - [ ] Add manifest, icons, metadata
     - [ ] Use service workers
     - [ ] Offline support & syncing
-- [ ] Home page
-    - [ ] Show recommended routines / templates
-    - [ ] Show recent templates
-    - [ ] Show PRs, progress graphs
 - [ ] Workout page
     - [ ] Suggest alternate exercises based on muscle group
     - [ ] Filter exercises based on available equipment
