@@ -5,10 +5,9 @@ import { ExerciseCard } from "@/components/exercises/ExerciseCard";
 import { Container } from "@/components/ui/container";
 import { Input } from "@/components/ui/input";
 import { api } from "@/convex/_generated/api";
-import { Exercise } from "@/lib/convex-types";
 import { usePaginatedQuery, useQuery } from "convex/react";
 import { Dumbbell, Loader2, Search } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const EXERCISES_PAGE_SIZE = 24;
 
@@ -20,118 +19,63 @@ export default function Exercises() {
   );
 }
 
-type SearchState = {
-  cursor: string | undefined;
-  results: Exercise[];
-  isDone: boolean;
-  totalCount: number | undefined;
-  lastProcessedCursor: string | undefined;
-};
-
-const initialSearchState: SearchState = {
-  cursor: undefined,
-  results: [],
-  isDone: false,
-  totalCount: undefined,
-  lastProcessedCursor: undefined,
-};
-
 function ExercisesContent() {
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
-  // Search pagination state - combined to avoid cascading renders
-  const [searchState, setSearchState] =
-    useState<SearchState>(initialSearchState);
-
-  // Debounce search query and reset search pagination
+  // Debounce search query
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(searchQuery);
-      // Reset search pagination when search term changes
-      setSearchState(initialSearchState);
     }, 300);
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // Get total count of exercises
+  const isSearching = debouncedSearch.trim().length > 0;
+
+  // Get total count of exercises (for browse mode)
   const totalCount = useQuery(api.queries.exercises.count);
 
-  // Use paginated query for listing exercises
+  // Get count of search results (for search mode)
+  const searchCount = useQuery(
+    api.queries.exercises.searchCount,
+    isSearching ? { searchTerm: debouncedSearch } : "skip",
+  );
+
+  // Paginated list for browse mode
   const {
     results: exercises,
-    status,
-    loadMore,
+    status: browseStatus,
+    loadMore: loadMoreBrowse,
   } = usePaginatedQuery(
     api.queries.exercises.list,
     {},
     { initialNumItems: EXERCISES_PAGE_SIZE },
   );
 
-  // Search query with manual cursor-based pagination
-  const searchResponse = useQuery(
+  // Paginated search results
+  const {
+    results: searchResults,
+    status: searchStatus,
+    loadMore: loadMoreSearch,
+  } = usePaginatedQuery(
     api.queries.exercises.search,
-    debouncedSearch.trim()
-      ? {
-          searchTerm: debouncedSearch,
-          cursor: searchState.cursor,
-          numItems: EXERCISES_PAGE_SIZE,
-        }
-      : "skip",
+    isSearching ? { searchTerm: debouncedSearch } : "skip",
+    { initialNumItems: EXERCISES_PAGE_SIZE },
   );
 
-  // Accumulate search results when new page arrives
-  // Track the last processed cursor to detect new pages
-  const lastProcessedCursorRef = useRef<string | undefined | null>(null);
-
-  useEffect(() => {
-    if (!searchResponse) return;
-
-    // Check if this is a new response we haven't processed yet
-    const currentCursor = searchState.cursor;
-    if (lastProcessedCursorRef.current === currentCursor) return;
-
-    lastProcessedCursorRef.current = currentCursor;
-    const isFirstPage = currentCursor === undefined;
-
-    setSearchState((prev) => ({
-      ...prev,
-      results: isFirstPage
-        ? searchResponse.page
-        : [...prev.results, ...searchResponse.page],
-      isDone: searchResponse.isDone,
-      totalCount: isFirstPage ? searchResponse.totalCount : prev.totalCount,
-    }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- Intentionally only run when searchResponse changes
-  }, [searchResponse]);
-
-  // Load more search results
-  const loadMoreSearch = useCallback(() => {
-    if (searchResponse?.continueCursor && !searchState.isDone) {
-      setSearchState((prev) => ({
-        ...prev,
-        cursor: searchResponse.continueCursor ?? undefined,
-      }));
-    }
-  }, [searchResponse, searchState.isDone]);
+  // Determine which data to use based on search state
+  const displayExercises = isSearching ? searchResults : exercises;
+  const status = isSearching ? searchStatus : browseStatus;
+  const loadMore = isSearching ? loadMoreSearch : loadMoreBrowse;
 
   // Intersection observer for infinite scrolling
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting) {
-          if (debouncedSearch.trim()) {
-            // Search mode - load more search results
-            if (!searchState.isDone && searchResponse?.continueCursor) {
-              loadMoreSearch();
-            }
-          } else {
-            // Browse mode - load more from list
-            if (status === "CanLoadMore") {
-              loadMore(EXERCISES_PAGE_SIZE);
-            }
-          }
+        if (entries[0].isIntersecting && status === "CanLoadMore") {
+          loadMore(EXERCISES_PAGE_SIZE);
         }
       },
       { threshold: 0.1 },
@@ -147,50 +91,11 @@ function ExercisesContent() {
         observer.unobserve(currentRef);
       }
     };
-  }, [
-    status,
-    loadMore,
-    debouncedSearch,
-    searchState.isDone,
-    searchResponse?.continueCursor,
-    loadMoreSearch,
-  ]);
+  }, [status, loadMore]);
 
-  // Filter exercises client-side for muscle/category search (since search index only covers name)
-  const displayExercises = useMemo(() => {
-    if (debouncedSearch.trim()) {
-      // When searching, use search results and also filter by muscle/category client-side
-      if (searchState.results.length === 0 && searchResponse === undefined)
-        return undefined;
-      const query = debouncedSearch.toLowerCase().trim();
-
-      // Also check if any loaded exercises match by muscle/category
-      const muscleMatches =
-        exercises?.filter(
-          (exercise) =>
-            !searchState.results.some((r) => r._id === exercise._id) &&
-            (exercise.primaryMuscles.some((muscle) =>
-              muscle.toLowerCase().includes(query),
-            ) ||
-              exercise.category.toLowerCase().includes(query)),
-        ) || [];
-
-      return [...searchState.results, ...muscleMatches];
-    }
-    return exercises;
-  }, [exercises, searchState.results, debouncedSearch, searchResponse]);
-
-  const isLoading = debouncedSearch.trim()
-    ? searchResponse === undefined && searchState.results.length === 0
-    : status === "LoadingFirstPage";
-
-  const isLoadingMore = debouncedSearch.trim()
-    ? searchState.cursor !== undefined && searchResponse === undefined
-    : status === "LoadingMore";
-
-  const canLoadMore = debouncedSearch.trim()
-    ? !searchState.isDone
-    : status === "CanLoadMore";
+  const isLoading = status === "LoadingFirstPage";
+  const isLoadingMore = status === "LoadingMore";
+  const canLoadMore = status === "CanLoadMore";
 
   return (
     <div className="min-h-[calc(100vh-4rem)]">
@@ -213,7 +118,7 @@ function ExercisesContent() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="text"
-              placeholder="Search by name, muscle, or category..."
+              placeholder="Search exercises by name..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -228,16 +133,15 @@ function ExercisesContent() {
         {isLoading && <LoadingSkeleton />}
 
         {/* Empty State */}
-        {!isLoading &&
-          exercises &&
-          exercises.length === 0 &&
-          !debouncedSearch && <EmptyState />}
+        {!isLoading && exercises && exercises.length === 0 && !isSearching && (
+          <EmptyState />
+        )}
 
         {/* No Search Results */}
         {!isLoading &&
-          displayExercises &&
-          displayExercises.length === 0 &&
-          debouncedSearch.trim() && (
+          searchResults &&
+          searchResults.length === 0 &&
+          isSearching && (
             <div className="flex flex-col items-center justify-center py-16 px-4">
               <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mb-4">
                 <Search className="w-8 h-8 text-muted-foreground/60" />
@@ -254,11 +158,10 @@ function ExercisesContent() {
         {/* Results Count */}
         {displayExercises && displayExercises.length > 0 && (
           <p className="text-sm text-muted-foreground mb-6">
-            {debouncedSearch ? (
+            {isSearching ? (
               <>
-                {searchState.totalCount !== undefined
-                  ? `${searchState.totalCount} ${searchState.totalCount === 1 ? "exercise" : "exercises"} found`
-                  : `${displayExercises.length} ${displayExercises.length === 1 ? "exercise" : "exercises"} found`}
+                {searchCount} {searchCount === 1 ? "exercise" : "exercises"}{" "}
+                found
               </>
             ) : (
               <>

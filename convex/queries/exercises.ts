@@ -2,68 +2,61 @@ import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
 import { query } from "../_generated/server";
 
-// Search exercises by name with cursor-based pagination
-// Note: Convex search indexes don't support .paginate(), so we implement manual cursor pagination
+// Search exercises by name with pagination
 export const search = query({
   args: {
     searchTerm: v.string(),
-    cursor: v.optional(v.string()),
-    numItems: v.number(),
+    paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
     if (!args.searchTerm.trim()) {
       return {
         page: [],
         isDone: true,
-        continueCursor: null as string | null,
-        totalCount: 0,
+        continueCursor: "",
       };
     }
 
-    // Fetch more results than needed to determine if there are more pages
-    const maxResults = 500;
-    const allResults = await ctx.db
+    const paginatedExercises = await ctx.db
       .query("exercises")
       .withSearchIndex("search_exercise", (q) =>
         q.search("name", args.searchTerm),
       )
-      .take(maxResults);
+      .paginate(args.paginationOpts);
 
-    // If we have a cursor, find the starting position
-    let startIndex = 0;
-    if (args.cursor) {
-      const cursorIndex = allResults.findIndex((r) => r._id === args.cursor);
-      if (cursorIndex !== -1) {
-        startIndex = cursorIndex + 1;
-      }
-    }
-
-    // Get the page of results
-    const pageResults = allResults.slice(
-      startIndex,
-      startIndex + args.numItems,
-    );
-    const hasMore = startIndex + args.numItems < allResults.length;
-
-    return {
-      page: pageResults,
-      isDone: !hasMore,
-      continueCursor:
-        hasMore && pageResults.length > 0
-          ? pageResults[pageResults.length - 1]._id
-          : null,
-      totalCount: allResults.length,
-    };
+    return paginatedExercises;
   },
 });
 
-// List exercises with pagination
+// Get count of exercises matching search term
+export const searchCount = query({
+  args: {
+    searchTerm: v.string(),
+  },
+  handler: async (ctx, args) => {
+    if (!args.searchTerm.trim()) {
+      return 0;
+    }
+
+    const results = await ctx.db
+      .query("exercises")
+      .withSearchIndex("search_exercise", (q) =>
+        q.search("name", args.searchTerm),
+      )
+      .collect();
+
+    return results.length;
+  },
+});
+
+// List exercises with pagination (sorted by name descending)
 export const list = query({
   args: { paginationOpts: paginationOptsValidator },
   handler: async (ctx, args) => {
     const paginatedExercises = await ctx.db
       .query("exercises")
       .withIndex("by_name")
+      .order("asc")
       .paginate(args.paginationOpts);
 
     return paginatedExercises;
