@@ -1,13 +1,5 @@
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import dayjs from "dayjs";
+import { ArrowRight, Calendar, Clock, MessageSquare, Star } from "lucide-react";
 import Link from "next/link";
 import { EditSessionMenu } from "./EditSessionMenu";
 import type { WorkoutSessionWithData } from "@/lib/convex-types";
@@ -21,63 +13,90 @@ export const SessionSummaryCard = ({
     session.startTime && session.endTime
       ? dayjs.duration(dayjs(session.endTime).diff(dayjs(session.startTime)))
       : null;
-  const durationString = durationDate
-    ? `${durationDate.hours()} hours, ${durationDate.minutes()} mins`
-    : "Not entered";
+
+  const formatDuration = () => {
+    if (!durationDate) return null;
+    const hours = durationDate.hours();
+    const mins = durationDate.minutes();
+    if (hours > 0) return `${hours}h ${mins}m`;
+    return `${mins} min`;
+  };
+
+  const totalSets = session.setGroups.reduce(
+    (acc, group) => acc + group.sets.length,
+    0
+  );
 
   return (
-    <Card className="min-w-[300px] flex flex-col">
-      <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
-        <div className="space-y-2">
-          <CardTitle className="text-lg">{session.name}</CardTitle>
-          <Badge variant="outline">
-            {dayjs(session.startTime).format("MM/DD/YYYY")}
-          </Badge>
-        </div>
-        <EditSessionMenu session={session} />
-      </CardHeader>
-
-      <CardContent className="flex-grow space-y-4">
-        <div className="space-y-1">
-          <p className="text-sm font-medium">Duration</p>
-          <p className="text-sm text-muted-foreground">{durationString}</p>
-        </div>
-
-        <div className="space-y-1">
-          <p className="text-sm font-medium">General Impression</p>
-          {session.impression ? (
-            <div className="flex">
-              {Array.from({ length: 5 }, (_, i) => (
-                <span
-                  key={i}
-                  className={`text-sm ${
-                    i < session.impression!
-                      ? "text-yellow-400"
-                      : "text-gray-300"
-                  }`}
-                >
-                  ★
-                </span>
-              ))}
+    <Link
+      href={`/logs/${session._id}`}
+      className="group block"
+    >
+      <div className="relative h-full rounded-xl border bg-card p-5 transition-all duration-200 hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5">
+        {/* Header */}
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex-1 min-w-0 pr-2">
+            <h3 className="font-semibold text-base truncate group-hover:text-primary transition-colors">
+              {session.name}
+            </h3>
+            <div className="flex items-center gap-1.5 mt-1.5 text-muted-foreground">
+              <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
+              <span className="text-sm">
+                {dayjs(session.startTime).format("MMM D, YYYY")}
+              </span>
             </div>
-          ) : (
-            <p className="text-sm text-muted-foreground">Not rated</p>
+          </div>
+          <div onClick={(e) => e.preventDefault()}>
+            <EditSessionMenu session={session} />
+          </div>
+        </div>
+
+        {/* Stats Row */}
+        <div className="flex items-center gap-4 mb-4">
+          {formatDuration() && (
+            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+              <Clock className="w-3.5 h-3.5" />
+              <span>{formatDuration()}</span>
+            </div>
+          )}
+          {totalSets > 0 && (
+            <div className="text-sm text-muted-foreground">
+              {totalSets} {totalSets === 1 ? "set" : "sets"}
+            </div>
           )}
         </div>
 
-        {session.notes && (
-          <div className="space-y-1">
-            <p className="text-sm font-medium">Notes</p>
-            <p className="text-sm text-muted-foreground">{session.notes}</p>
+        {/* Rating */}
+        {session.impression && (
+          <div className="flex items-center gap-1 mb-3">
+            {Array.from({ length: 5 }, (_, i) => (
+              <Star
+                key={i}
+                className={`w-4 h-4 ${
+                  i < session.impression!
+                    ? "text-amber-400 fill-amber-400"
+                    : "text-muted/40"
+                }`}
+              />
+            ))}
           </div>
         )}
-      </CardContent>
 
-      <CardFooter className="justify-end">
-        <Button asChild variant="ghost">
-          <Link href={`/logs/${session._id}`}>View Session</Link>
-        </Button>
-      </CardFooter>
-    </Card>
+        {/* Notes Preview */}
+        {session.notes && (
+          <div className="flex items-start gap-2 pt-3 border-t border-border/50">
+            <MessageSquare className="w-3.5 h-3.5 text-muted-foreground mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-muted-foreground line-clamp-2">
+              {session.notes}
+            </p>
+          </div>
+        )}
+
+        {/* Hover Arrow */}
+        <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+          <ArrowRight className="w-4 h-4 text-primary" />
+        </div>
+      </div>
+    </Link>
   );
 };

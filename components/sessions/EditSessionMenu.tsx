@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Edit, Settings, Trash2 } from "lucide-react";
+import { Edit, MoreVertical, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { DeleteSessionModal } from "./DeleteSessionModal";
 import { EditSessionModal } from "./EditSessionModal";
@@ -52,9 +52,10 @@ export const EditSessionMenu = ({
           <Button
             variant="ghost"
             size="icon"
+            className="h-8 w-8 text-muted-foreground hover:text-foreground"
             aria-label={`Edit actions for workout session ${session._id}`}
           >
-            <Settings className="h-4 w-4" />
+            <MoreVertical className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">

@@ -12,9 +12,12 @@ export const CreateSessionButton = () => {
     <>
       <NewSessionModal open={open} onClose={() => setOpen(false)} />
 
-      <Button onClick={() => setOpen(true)}>
-        <Plus className="mr-2 h-4 w-4" />
-        Create
+      <Button
+        onClick={() => setOpen(true)}
+        className="gap-2 shadow-sm hover:shadow-md transition-shadow"
+      >
+        <Plus className="h-4 w-4" />
+        New Session
       </Button>
     </>
   );
