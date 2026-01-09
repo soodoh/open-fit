@@ -138,6 +138,35 @@ Replace `your@email.com` with the email you registered with.
 
 # Roadmap
 
+## TODO
+
+- Pagination & infinite scroll on /exercises page
+
+- Implement profile/settings modal to update user settings
+
+- Convex to handle image uploads
+  - Update seedDatabase script to upload exercise images to Convex
+  - Consume Convex stored images with next/image
+
+- Admin view/route
+  - Manage exercises
+  - Only allow deleting if not used by any records
+  - Handle image uploading/deleting for exercises
+  - Manage global values: muscle group, category, equipment, rep units, weight units
+  - Manage users: update their user role and other profile settings
+
+- Add "isPublic" property to routines that only admins can set. These routines will be seen by all users.
+  - Ensure that non-public routines are only shown to the user that created it.
+
+- Add "gyms"
+  - Users can create their own gyms (in profile settings). It should have a name and a list of equipment.
+  - Autocomplete equipment selection when adding to gyms.
+  - In profile settings, user can choose which gyms they are affiliated with
+  - In day/session page & active session views, searching should exercises should only show if selected gym has equipment for that exercise.
+
+- Implement dark mode theme
+  - Add dark/light/use system as a setting
+
 ## Planned
 
 - [ ] Dev experience
