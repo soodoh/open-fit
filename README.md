@@ -140,8 +140,6 @@ Replace `your@email.com` with the email you registered with.
 
 ## TODO
 
-- Implement profile/settings modal to update user settings
-
 - Convex to handle image uploads
   - Update seedDatabase script to upload exercise images to Convex
   - Consume Convex stored images with next/image

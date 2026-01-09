@@ -130,7 +130,11 @@ export default defineSchema({
   })
     .index("by_user", ["userId"])
     .index("by_user_start", ["userId", "startTime"])
-    .index("by_template", ["templateId"]),
+    .index("by_template", ["templateId"])
+    .searchIndex("search_name", {
+      searchField: "name",
+      filterFields: ["userId"],
+    }),
 
   workoutSetGroups: defineTable({
     userId: v.id("users"),
