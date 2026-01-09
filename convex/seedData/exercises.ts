@@ -17,7 +17,7 @@ type Muscle =
   | "traps"
   | "triceps";
 
-type RawExercise = {
+export type RawExercise = {
   name: string;
   force: "pull" | "push" | "static" | null;
   level: "beginner" | "intermediate" | "expert";

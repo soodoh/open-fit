@@ -1,7 +1,11 @@
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import { action, internalAction, internalMutation } from "./_generated/server";
-import { exercises as rawExercises } from "./seedData/exercises";
+import {
+  type RawExercise,
+  exercises as rawExercises,
+} from "./seedData/exercises";
+import type { Id } from "./_generated/dataModel";
 
 // ============================================================================
 // Public Actions (run from CLI)
@@ -59,9 +63,44 @@ export const mockUserData = action({
 // Internal Actions
 // ============================================================================
 
+// MuscleGroup type for transformed muscles (matching schema)
+type MuscleGroup =
+  | "abdominals"
+  | "chest"
+  | "quadriceps"
+  | "hamstrings"
+  | "glutes"
+  | "adductors"
+  | "abductors"
+  | "calves"
+  | "forearms"
+  | "shoulders"
+  | "biceps"
+  | "triceps"
+  | "traps"
+  | "lats"
+  | "middle_back"
+  | "lower_back"
+  | "neck";
+
+// Equipment type matching schema
+type Equipment =
+  | "body_only"
+  | "machine"
+  | "cable"
+  | "foam_roll"
+  | "dumbbell"
+  | "barbell"
+  | "ez_curl_bar"
+  | "kettlebells"
+  | "medicine_ball"
+  | "exercise_ball"
+  | "bands"
+  | "other";
+
 // Helper function to transform exercise data to match schema
-function transformExercise(exercise: any) {
-  const equipmentMap: Record<string, string> = {
+function transformExercise(exercise: RawExercise) {
+  const equipmentMap: Record<string, Equipment> = {
     "body only": "body_only",
     "e-z curl bar": "ez_curl_bar",
     "medicine ball": "medicine_ball",
@@ -69,13 +108,19 @@ function transformExercise(exercise: any) {
     "foam roll": "foam_roll",
   };
 
-  const transformMuscle = (muscle: string) => muscle.replace(" ", "_") as any;
+  const transformMuscle = (muscle: string): MuscleGroup =>
+    muscle.replace(" ", "_") as MuscleGroup;
+
+  const transformEquipment = (
+    equipment: RawExercise["equipment"],
+  ): Equipment | undefined => {
+    if (!equipment) return undefined;
+    return equipmentMap[equipment] ?? (equipment as Equipment);
+  };
 
   return {
     name: exercise.name,
-    equipment: exercise.equipment
-      ? equipmentMap[exercise.equipment] || exercise.equipment
-      : undefined,
+    equipment: transformEquipment(exercise.equipment),
     force: exercise.force || undefined,
     level: exercise.level,
     mechanic: exercise.mechanic || undefined,
@@ -84,7 +129,7 @@ function transformExercise(exercise: any) {
     instructions: exercise.instructions,
     category:
       exercise.category === "olympic weightlifting"
-        ? "olympic_weightlifting"
+        ? ("olympic_weightlifting" as const)
         : exercise.category,
     images: exercise.images,
   };
@@ -178,7 +223,7 @@ export const seedMockData = internalAction({
 
     console.log(`Creating ${NUM_ROUTINES} routines...`);
 
-    let firstRoutineDayId: any = null;
+    let firstRoutineDayId: Id<"routineDays"> | null = null;
 
     for (let i = 1; i <= NUM_ROUTINES; i++) {
       // Create routine
@@ -244,6 +289,10 @@ export const seedMockData = internalAction({
     }
 
     // Get the template (first routine day) set groups and sets
+    if (!firstRoutineDayId) {
+      throw new Error("firstRoutineDayId should have been set in the loop");
+    }
+
     const templateSetGroups = await ctx.runMutation(
       internal.seed.getSetGroupsWithSets,
       { routineDayId: firstRoutineDayId },
@@ -437,8 +486,48 @@ export const createExercise = internalMutation({
     mechanic: v.optional(
       v.union(v.literal("compound"), v.literal("isolation")),
     ),
-    primaryMuscles: v.array(v.any()),
-    secondaryMuscles: v.array(v.any()),
+    primaryMuscles: v.array(
+      v.union(
+        v.literal("abdominals"),
+        v.literal("chest"),
+        v.literal("quadriceps"),
+        v.literal("hamstrings"),
+        v.literal("glutes"),
+        v.literal("adductors"),
+        v.literal("abductors"),
+        v.literal("calves"),
+        v.literal("forearms"),
+        v.literal("shoulders"),
+        v.literal("biceps"),
+        v.literal("triceps"),
+        v.literal("traps"),
+        v.literal("lats"),
+        v.literal("middle_back"),
+        v.literal("lower_back"),
+        v.literal("neck"),
+      ),
+    ),
+    secondaryMuscles: v.array(
+      v.union(
+        v.literal("abdominals"),
+        v.literal("chest"),
+        v.literal("quadriceps"),
+        v.literal("hamstrings"),
+        v.literal("glutes"),
+        v.literal("adductors"),
+        v.literal("abductors"),
+        v.literal("calves"),
+        v.literal("forearms"),
+        v.literal("shoulders"),
+        v.literal("biceps"),
+        v.literal("triceps"),
+        v.literal("traps"),
+        v.literal("lats"),
+        v.literal("middle_back"),
+        v.literal("lower_back"),
+        v.literal("neck"),
+      ),
+    ),
     instructions: v.array(v.string()),
     category: v.union(
       v.literal("strength"),
