@@ -5,9 +5,11 @@ import { CreateRoutine } from "@/components/routines/CreateRoutine";
 import { RoutineCard } from "@/components/routines/RoutineCard";
 import { ResumeSessionButton } from "@/components/sessions/ResumeSessionButton";
 import { Container } from "@/components/ui/container";
+import { Input } from "@/components/ui/input";
 import { api } from "@/convex/_generated/api";
 import { useQuery } from "convex/react";
-import { Dumbbell } from "lucide-react";
+import { Dumbbell, Search } from "lucide-react";
+import { useMemo, useState } from "react";
 
 export default function Routines() {
   return (
@@ -51,6 +53,16 @@ function EmptyState() {
 function RoutinesContent() {
   const routines = useQuery(api.queries.routines.list);
   const currentSession = useQuery(api.queries.sessions.getCurrent);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredRoutines = useMemo(() => {
+    if (!routines) return undefined;
+    if (!searchQuery.trim()) return routines;
+    const query = searchQuery.toLowerCase().trim();
+    return routines.filter((routine) =>
+      routine.name.toLowerCase().includes(query)
+    );
+  }, [routines, searchQuery]);
 
   return (
     <div className="min-h-[calc(100vh-4rem)]">
@@ -68,6 +80,20 @@ function RoutinesContent() {
             </div>
             {routines && routines.length > 0 && <CreateRoutine />}
           </div>
+
+          {/* Search Bar */}
+          {routines && routines.length > 0 && (
+            <div className="relative mt-6 max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search routines..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          )}
         </Container>
       </div>
 
@@ -86,10 +112,25 @@ function RoutinesContent() {
         {/* Empty State */}
         {routines && routines.length === 0 && <EmptyState />}
 
+        {/* No Search Results */}
+        {filteredRoutines && filteredRoutines.length === 0 && routines && routines.length > 0 && (
+          <div className="flex flex-col items-center justify-center py-16 px-4">
+            <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mb-4">
+              <Search className="w-8 h-8 text-muted-foreground/60" />
+            </div>
+            <h3 className="text-lg font-medium text-foreground mb-1">
+              No routines found
+            </h3>
+            <p className="text-muted-foreground text-center text-sm">
+              No routines match "{searchQuery}"
+            </p>
+          </div>
+        )}
+
         {/* Routines Grid */}
-        {routines && routines.length > 0 && (
+        {filteredRoutines && filteredRoutines.length > 0 && (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {routines.map((routine) => (
+            {filteredRoutines.map((routine) => (
               <RoutineCard
                 key={routine._id}
                 routine={routine}

@@ -18,7 +18,7 @@ import {
 import { api } from "@/convex/_generated/api";
 import { Doc } from "@/convex/_generated/dataModel";
 import { useQuery } from "convex/react";
-import { Image } from "lucide-react";
+import { Image as FallbackImage } from "lucide-react";
 import { useState } from "react";
 
 type Exercise = Doc<"exercises">;
@@ -86,7 +86,7 @@ export const AutocompleteExercise = ({
                       />
                     ) : null}
                     <AvatarFallback className="flex items-center justify-center">
-                      <Image className="h-4 w-4" />
+                      <FallbackImage className="h-4 w-4" />
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col">
