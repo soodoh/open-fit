@@ -7,9 +7,12 @@ import { ResumeSessionButton } from "@/components/sessions/ResumeSessionButton";
 import { Container } from "@/components/ui/container";
 import { Input } from "@/components/ui/input";
 import { api } from "@/convex/_generated/api";
-import { useQuery } from "convex/react";
-import { Dumbbell, Search } from "lucide-react";
-import { useMemo, useState } from "react";
+import { usePaginatedQuery, useQuery } from "convex/react";
+import { Dumbbell, Loader2, Search } from "lucide-react";
+import { useEffect, useMemo, useRef } from "react";
+import { useState } from "react";
+
+const ROUTINES_PAGE_SIZE = 12;
 
 export default function Routines() {
   return (
@@ -51,9 +54,37 @@ function EmptyState() {
 }
 
 function RoutinesContent() {
-  const routines = useQuery(api.queries.routines.list);
+  const { results: routines, status, loadMore } = usePaginatedQuery(
+    api.queries.routines.list,
+    {},
+    { initialNumItems: ROUTINES_PAGE_SIZE }
+  );
   const currentSession = useQuery(api.queries.sessions.getCurrent);
   const [searchQuery, setSearchQuery] = useState("");
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  // Intersection observer for infinite scrolling
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && status === "CanLoadMore") {
+          loadMore(ROUTINES_PAGE_SIZE);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    const currentRef = loadMoreRef.current;
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
+  }, [status, loadMore]);
 
   const filteredRoutines = useMemo(() => {
     if (!routines) return undefined;
@@ -63,6 +94,8 @@ function RoutinesContent() {
       routine.name.toLowerCase().includes(query)
     );
   }, [routines, searchQuery]);
+
+  const isLoading = status === "LoadingFirstPage";
 
   return (
     <div className="min-h-[calc(100vh-4rem)]">
@@ -107,10 +140,10 @@ function RoutinesContent() {
         )}
 
         {/* Loading State */}
-        {routines === undefined && <RoutinesSkeleton />}
+        {isLoading && <RoutinesSkeleton />}
 
         {/* Empty State */}
-        {routines && routines.length === 0 && <EmptyState />}
+        {!isLoading && routines && routines.length === 0 && <EmptyState />}
 
         {/* No Search Results */}
         {filteredRoutines && filteredRoutines.length === 0 && routines && routines.length > 0 && (
@@ -137,6 +170,15 @@ function RoutinesContent() {
                 currentSession={currentSession}
               />
             ))}
+          </div>
+        )}
+
+        {/* Infinite scroll sentinel & loading indicator */}
+        {!searchQuery.trim() && (
+          <div ref={loadMoreRef} className="flex justify-center py-8">
+            {status === "LoadingMore" && (
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            )}
           </div>
         )}
       </Container>

@@ -1,23 +1,24 @@
+import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
 import { query } from "../_generated/server";
 import { getAuthenticatedUserId } from "../lib/auth";
 
-// List all routines for the current user with routine days
+// List routines for the current user with pagination
 export const list = query({
-  args: {},
-  handler: async (ctx) => {
+  args: { paginationOpts: paginationOptsValidator },
+  handler: async (ctx, args) => {
     const userId = await getAuthenticatedUserId(ctx);
 
-    // Get routines ordered by most recently updated
-    const routines = await ctx.db
+    // Get routines ordered by most recently updated with pagination
+    const paginatedRoutines = await ctx.db
       .query("routines")
       .withIndex("by_user_updated", (q) => q.eq("userId", userId))
       .order("desc")
-      .collect();
+      .paginate(args.paginationOpts);
 
-    // Fetch related routine days for each routine
+    // Fetch related routine days for each routine in the page
     const routinesWithDays = await Promise.all(
-      routines.map(async (routine) => {
+      paginatedRoutines.page.map(async (routine) => {
         const routineDays = await ctx.db
           .query("routineDays")
           .withIndex("by_routine", (q) => q.eq("routineId", routine._id))
@@ -30,7 +31,10 @@ export const list = query({
       }),
     );
 
-    return routinesWithDays;
+    return {
+      ...paginatedRoutines,
+      page: routinesWithDays,
+    };
   },
 });
 
