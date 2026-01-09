@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { api } from "@/convex/_generated/api";
 import {
   ListView,
@@ -73,13 +72,13 @@ export const WorkoutSetRow = ({
       <SetTypeMenu set={set} setNum={setNum} />
 
       <div className="flex gap-2 flex-1 items-center">
-        <div className="relative flex-1 min-w-0">
+        <div className="flex items-center gap-0.5 flex-1 min-w-0">
           <Input
             key={`reps-${set._id}-${set.reps}`}
             type="text"
             disabled={isRowDisabled}
             defaultValue={set.reps}
-            className="pr-10 h-9 text-sm bg-background"
+            className="h-9 text-sm text-center font-medium flex-1 min-w-0"
             onBlur={async (event) => {
               updateSet({
                 id: set._id,
@@ -87,30 +86,26 @@ export const WorkoutSetRow = ({
               });
             }}
           />
-          <Label className="absolute -top-2 left-2 bg-background px-1 text-[10px] text-muted-foreground">
-            {set.repetitionUnit?.name ?? "Reps"}
-          </Label>
-          <div className="absolute right-0.5 top-1/2 -translate-y-1/2">
-            <RepUnitMenu
-              id={set._id}
-              units={units}
-              onChange={(repUnit) => {
-                updateSet({
-                  id: set._id,
-                  repetitionUnitId: repUnit._id,
-                });
-              }}
-            />
-          </div>
+          <RepUnitMenu
+            id={set._id}
+            label={set.repetitionUnit?.name ?? "reps"}
+            units={units}
+            onChange={(repUnit) => {
+              updateSet({
+                id: set._id,
+                repetitionUnitId: repUnit._id,
+              });
+            }}
+          />
         </div>
 
-        <div className="relative flex-1 min-w-0">
+        <div className="flex items-center gap-0.5 flex-1 min-w-0">
           <Input
             key={`weight-${set._id}-${set.weight}`}
             type="text"
             disabled={isRowDisabled}
             defaultValue={set.weight}
-            className="pr-10 h-9 text-sm bg-background"
+            className="h-9 text-sm text-center font-medium flex-1 min-w-0"
             onBlur={async (event) => {
               updateSet({
                 id: set._id,
@@ -118,21 +113,17 @@ export const WorkoutSetRow = ({
               });
             }}
           />
-          <Label className="absolute -top-2 left-2 bg-background px-1 text-[10px] text-muted-foreground">
-            {set.weightUnit?.name ?? "Weight"}
-          </Label>
-          <div className="absolute right-0.5 top-1/2 -translate-y-1/2">
-            <WeightUnitMenu
-              id={set._id}
-              units={units}
-              onChange={(weightUnit) => {
-                updateSet({
-                  id: set._id,
-                  weightUnitId: weightUnit._id,
-                });
-              }}
-            />
-          </div>
+          <WeightUnitMenu
+            id={set._id}
+            label={set.weightUnit?.name ?? "lbs"}
+            units={units}
+            onChange={(weightUnit) => {
+              updateSet({
+                id: set._id,
+                weightUnitId: weightUnit._id,
+              });
+            }}
+          />
         </div>
 
         {view === ListView.CurrentSession &&

@@ -1,22 +1,22 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 import type { Units, WeightUnit, WorkoutSetId } from "@/lib/convex-types";
 
 export const WeightUnitMenu = ({
   id,
+  label,
   onChange,
   units,
 }: {
   id: WorkoutSetId | string;
+  label: string;
   onChange: (weightUnit: WeightUnit) => void;
   units: Units;
 }) => {
@@ -25,9 +25,12 @@ export const WeightUnitMenu = ({
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-8 w-8">
-          <ChevronDown className="h-4 w-4" />
-        </Button>
+        <button
+          type="button"
+          className="h-8 px-2 text-xs text-muted-foreground hover:text-foreground flex-shrink-0 underline decoration-dashed decoration-muted-foreground/50 underline-offset-2 hover:decoration-foreground/50 transition-colors"
+        >
+          {label}
+        </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         {units.weightUnits.map((unit) => (
