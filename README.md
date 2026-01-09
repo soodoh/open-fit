@@ -71,8 +71,8 @@ Convex auth requires `JWT_PRIVATE_KEY` and `JWKS` to be in the environment for C
 node ./scripts/generateKeys.mjs
 
 # Paste the corresponding output here
-npx convex env set --admin-key "paste from .env.local" -- JWT_PRIVATE_KEY "paste from previous command"
-npx convex env set --admin-key "paste from .env.local" -- JWKS "paste from previous command"
+npx convex env set -- JWT_PRIVATE_KEY "paste from previous command"
+npx convex env set -- JWKS "paste from previous command"
 ```
 
 ### 7. Seed the Database
