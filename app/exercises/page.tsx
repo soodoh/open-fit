@@ -2,12 +2,77 @@
 
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import { ExerciseCard } from "@/components/exercises/ExerciseCard";
+import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { api } from "@/convex/_generated/api";
 import { usePaginatedQuery, useQuery } from "convex/react";
-import { Dumbbell, Loader2, Search } from "lucide-react";
+import { Dumbbell, Loader2, Search, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+
+// Filter options
+const EQUIPMENT_OPTIONS = [
+  { value: "body_only", label: "Body Only" },
+  { value: "machine", label: "Machine" },
+  { value: "cable", label: "Cable" },
+  { value: "foam_roll", label: "Foam Roll" },
+  { value: "dumbbell", label: "Dumbbell" },
+  { value: "barbell", label: "Barbell" },
+  { value: "ez_curl_bar", label: "EZ Curl Bar" },
+  { value: "kettlebells", label: "Kettlebells" },
+  { value: "medicine_ball", label: "Medicine Ball" },
+  { value: "exercise_ball", label: "Exercise Ball" },
+  { value: "bands", label: "Bands" },
+  { value: "other", label: "Other" },
+] as const;
+
+const LEVEL_OPTIONS = [
+  { value: "beginner", label: "Beginner" },
+  { value: "intermediate", label: "Intermediate" },
+  { value: "expert", label: "Expert" },
+] as const;
+
+const CATEGORY_OPTIONS = [
+  { value: "strength", label: "Strength" },
+  { value: "cardio", label: "Cardio" },
+  { value: "stretching", label: "Stretching" },
+  { value: "plyometrics", label: "Plyometrics" },
+  { value: "powerlifting", label: "Powerlifting" },
+  { value: "strongman", label: "Strongman" },
+  { value: "olympic_weightlifting", label: "Olympic Weightlifting" },
+] as const;
+
+const MUSCLE_OPTIONS = [
+  { value: "abdominals", label: "Abdominals" },
+  { value: "chest", label: "Chest" },
+  { value: "quadriceps", label: "Quadriceps" },
+  { value: "hamstrings", label: "Hamstrings" },
+  { value: "glutes", label: "Glutes" },
+  { value: "adductors", label: "Adductors" },
+  { value: "abductors", label: "Abductors" },
+  { value: "calves", label: "Calves" },
+  { value: "forearms", label: "Forearms" },
+  { value: "shoulders", label: "Shoulders" },
+  { value: "biceps", label: "Biceps" },
+  { value: "triceps", label: "Triceps" },
+  { value: "traps", label: "Traps" },
+  { value: "lats", label: "Lats" },
+  { value: "middle_back", label: "Middle Back" },
+  { value: "lower_back", label: "Lower Back" },
+  { value: "neck", label: "Neck" },
+] as const;
+
+type Equipment = (typeof EQUIPMENT_OPTIONS)[number]["value"];
+type Level = (typeof LEVEL_OPTIONS)[number]["value"];
+type Category = (typeof CATEGORY_OPTIONS)[number]["value"];
+type Muscle = (typeof MUSCLE_OPTIONS)[number]["value"];
 
 const EXERCISES_PAGE_SIZE = 24;
 
@@ -24,6 +89,21 @@ function ExercisesContent() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
+  // Filter state
+  const [equipment, setEquipment] = useState<Equipment | undefined>(undefined);
+  const [level, setLevel] = useState<Level | undefined>(undefined);
+  const [category, setCategory] = useState<Category | undefined>(undefined);
+  const [primaryMuscle, setPrimaryMuscle] = useState<Muscle | undefined>(undefined);
+
+  const hasFilters = equipment !== undefined || level !== undefined || category !== undefined || primaryMuscle !== undefined;
+
+  const clearFilters = () => {
+    setEquipment(undefined);
+    setLevel(undefined);
+    setCategory(undefined);
+    setPrimaryMuscle(undefined);
+  };
+
   // Debounce search query
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -33,6 +113,14 @@ function ExercisesContent() {
   }, [searchQuery]);
 
   const isSearching = debouncedSearch.trim().length > 0;
+
+  // Build filter args for queries
+  const filterArgs = {
+    equipment,
+    level,
+    category,
+    primaryMuscle,
+  };
 
   // Get total count of exercises (for browse mode)
   const totalCount = useQuery(api.queries.exercises.count);
@@ -50,7 +138,7 @@ function ExercisesContent() {
     loadMore: loadMoreBrowse,
   } = usePaginatedQuery(
     api.queries.exercises.list,
-    {},
+    filterArgs,
     { initialNumItems: EXERCISES_PAGE_SIZE },
   );
 
@@ -61,7 +149,7 @@ function ExercisesContent() {
     loadMore: loadMoreSearch,
   } = usePaginatedQuery(
     api.queries.exercises.search,
-    isSearching ? { searchTerm: debouncedSearch } : "skip",
+    isSearching ? { searchTerm: debouncedSearch, ...filterArgs } : "skip",
     { initialNumItems: EXERCISES_PAGE_SIZE },
   );
 
@@ -124,6 +212,85 @@ function ExercisesContent() {
               className="pl-10"
             />
           </div>
+
+          {/* Filters */}
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <Select
+              value={equipment ?? ""}
+              onValueChange={(value) => setEquipment(value === "" ? undefined : (value as Equipment))}
+            >
+              <SelectTrigger className="w-[150px]">
+                <SelectValue placeholder="Equipment" />
+              </SelectTrigger>
+              <SelectContent>
+                {EQUIPMENT_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select
+              value={level ?? ""}
+              onValueChange={(value) => setLevel(value === "" ? undefined : (value as Level))}
+            >
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="Level" />
+              </SelectTrigger>
+              <SelectContent>
+                {LEVEL_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select
+              value={category ?? ""}
+              onValueChange={(value) => setCategory(value === "" ? undefined : (value as Category))}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Category" />
+              </SelectTrigger>
+              <SelectContent>
+                {CATEGORY_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select
+              value={primaryMuscle ?? ""}
+              onValueChange={(value) => setPrimaryMuscle(value === "" ? undefined : (value as Muscle))}
+            >
+              <SelectTrigger className="w-[150px]">
+                <SelectValue placeholder="Muscle" />
+              </SelectTrigger>
+              <SelectContent>
+                {MUSCLE_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {hasFilters && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={clearFilters}
+                className="h-10 px-3 text-muted-foreground hover:text-foreground"
+              >
+                <X className="h-4 w-4 mr-1" />
+                Clear filters
+              </Button>
+            )}
+          </div>
         </Container>
       </div>
 
@@ -133,8 +300,26 @@ function ExercisesContent() {
         {isLoading && <LoadingSkeleton />}
 
         {/* Empty State */}
-        {!isLoading && exercises && exercises.length === 0 && !isSearching && (
+        {!isLoading && exercises && exercises.length === 0 && !isSearching && !hasFilters && (
           <EmptyState />
+        )}
+
+        {/* No Results with Filters */}
+        {!isLoading && displayExercises && displayExercises.length === 0 && hasFilters && !isSearching && (
+          <div className="flex flex-col items-center justify-center py-16 px-4">
+            <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mb-4">
+              <Search className="w-8 h-8 text-muted-foreground/60" />
+            </div>
+            <h3 className="text-lg font-medium text-foreground mb-1">
+              No exercises found
+            </h3>
+            <p className="text-muted-foreground text-center text-sm mb-4">
+              No exercises match your selected filters
+            </p>
+            <Button variant="outline" size="sm" onClick={clearFilters}>
+              Clear filters
+            </Button>
+          </div>
         )}
 
         {/* No Search Results */}
@@ -151,7 +336,13 @@ function ExercisesContent() {
               </h3>
               <p className="text-muted-foreground text-center text-sm">
                 No exercises match &quot;{debouncedSearch}&quot;
+                {hasFilters && " with the selected filters"}
               </p>
+              {hasFilters && (
+                <Button variant="outline" size="sm" onClick={clearFilters} className="mt-4">
+                  Clear filters
+                </Button>
+              )}
             </div>
           )}
 

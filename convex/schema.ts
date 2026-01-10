@@ -186,5 +186,6 @@ export default defineSchema({
     .index("by_name", ["name"])
     .searchIndex("search_exercise", {
       searchField: "name",
+      filterFields: ["equipment", "level", "category"],
     }),
 });
