@@ -30,7 +30,7 @@ export const ExerciseCard = ({ exercise }: { exercise: Exercise }) => {
         onClick={() => setShowDetail(true)}
         className="group text-left w-full"
       >
-        <div className="relative h-full rounded-xl border bg-card p-4 transition-all duration-200 hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5">
+        <div className="relative h-full rounded-xl border bg-card p-4 transition-all duration-200 hover:shadow-lg hover:border-foreground/20 hover:-translate-y-0.5">
           {/* Header with image and name */}
           <div className="flex items-start gap-3 mb-3">
             <Avatar className="h-12 w-12 rounded-lg flex-shrink-0">
@@ -46,7 +46,7 @@ export const ExerciseCard = ({ exercise }: { exercise: Exercise }) => {
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-sm leading-tight line-clamp-2 group-hover:text-primary transition-colors">
+              <h3 className="font-semibold text-sm leading-tight line-clamp-2 group-hover:text-primary dark:group-hover:text-white transition-colors">
                 {exercise.name}
               </h3>
               <p className="text-xs text-muted-foreground mt-1">

@@ -61,8 +61,8 @@ export const SessionPage = ({
           </div>
 
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-              <CheckCircle2 className="h-6 w-6 text-primary" />
+            <div className="w-12 h-12 rounded-xl bg-primary/10 dark:bg-foreground/10 flex items-center justify-center flex-shrink-0">
+              <CheckCircle2 className="h-6 w-6 text-primary dark:text-foreground" />
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
@@ -82,8 +82,8 @@ export const SessionPage = ({
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {/* Duration Card */}
           <div className="flex items-center gap-3 p-4 rounded-xl bg-card border">
-            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-              <Clock className="h-5 w-5 text-primary" />
+            <div className="w-10 h-10 rounded-lg bg-primary/10 dark:bg-foreground/10 flex items-center justify-center">
+              <Clock className="h-5 w-5 text-primary dark:text-foreground" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Duration</p>

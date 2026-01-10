@@ -17,8 +17,8 @@ export const RoutineDayItem = ({
   return (
     <div className="group/item flex items-center gap-3 p-4 hover:bg-accent/30 transition-colors">
       {/* Day Number Indicator */}
-      <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-        <span className="text-sm font-semibold text-primary">{index + 1}</span>
+      <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-primary/10 dark:bg-foreground/10 flex items-center justify-center">
+        <span className="text-sm font-semibold text-primary dark:text-foreground">{index + 1}</span>
       </div>
 
       {/* Main Content */}

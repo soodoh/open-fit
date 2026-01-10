@@ -1,6 +1,13 @@
 import { query } from "../_generated/server";
 import { getAuthenticatedUserId } from "../lib/auth";
 
+// Theme options for the settings dropdown
+const THEME_OPTIONS = [
+  { value: "light", label: "Light" },
+  { value: "dark", label: "Dark" },
+  { value: "system", label: "System" },
+] as const;
+
 // Get the current user's profile with units data
 export const getCurrent = query({
   args: {},
@@ -21,6 +28,7 @@ export const getCurrent = query({
       profile,
       repetitionUnits,
       weightUnits,
+      themeOptions: THEME_OPTIONS,
     };
   },
 });

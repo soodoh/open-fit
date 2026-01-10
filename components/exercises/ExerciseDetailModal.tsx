@@ -54,8 +54,8 @@ export const ExerciseDetailModal = ({
                   className="object-cover"
                 />
               ) : null}
-              <AvatarFallback className="rounded-xl bg-primary/10">
-                <Dumbbell className="h-6 w-6 text-primary" />
+              <AvatarFallback className="rounded-xl bg-primary/10 dark:bg-foreground/10">
+                <Dumbbell className="h-6 w-6 text-primary dark:text-foreground" />
               </AvatarFallback>
             </Avatar>
             <div className="min-w-0">
@@ -183,7 +183,7 @@ export const ExerciseDetailModal = ({
               <ol className="space-y-2">
                 {exercise.instructions.map((instruction, index) => (
                   <li key={index} className="flex gap-3 text-sm">
-                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-medium flex items-center justify-center">
+                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 dark:bg-foreground/10 text-primary dark:text-foreground text-xs font-medium flex items-center justify-center">
                       {index + 1}
                     </span>
                     <span className="text-muted-foreground pt-0.5">

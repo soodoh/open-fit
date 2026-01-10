@@ -97,8 +97,8 @@ export const WorkoutList = ({
       <Container maxWidth="lg" className="py-4">
         <div className="rounded-xl border bg-card p-4">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-              <Dumbbell className="h-4 w-4 text-primary" />
+            <div className="w-8 h-8 rounded-lg bg-primary/10 dark:bg-foreground/10 flex items-center justify-center">
+              <Dumbbell className="h-4 w-4 text-primary dark:text-foreground" />
             </div>
             <div>
               <h3 className="font-medium text-sm">Add Exercise</h3>

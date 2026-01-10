@@ -21,7 +21,10 @@ import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
 import { AlertCircle, Loader2, User } from "lucide-react";
+import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+
+type Theme = "light" | "dark" | "system";
 
 export const ProfileModal = ({
   open,
@@ -32,9 +35,11 @@ export const ProfileModal = ({
 }) => {
   const profileData = useQuery(api.queries.userProfiles.getCurrent);
   const updateProfile = useMutation(api.mutations.userProfiles.update);
+  const { setTheme } = useTheme();
 
   const [defaultRepUnitId, setDefaultRepUnitId] = useState<string>("");
   const [defaultWeightUnitId, setDefaultWeightUnitId] = useState<string>("");
+  const [selectedTheme, setSelectedTheme] = useState<Theme>("system");
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -53,9 +58,11 @@ export const ProfileModal = ({
         profileData.weightUnits.find((u) => u.name === "lb")?._id ??
         profileData.weightUnits[0]?._id ??
         "";
+      const theme = profileData.profile?.theme ?? "system";
 
       setDefaultRepUnitId(repUnitId);
       setDefaultWeightUnitId(weightUnitId);
+      setSelectedTheme(theme);
       setError(null);
     }
   }, [open, profileData]);
@@ -75,7 +82,10 @@ export const ProfileModal = ({
       await updateProfile({
         defaultRepetitionUnitId: defaultRepUnitId as Id<"repetitionUnits">,
         defaultWeightUnitId: defaultWeightUnitId as Id<"weightUnits">,
+        theme: selectedTheme,
       });
+      // Apply theme change immediately
+      setTheme(selectedTheme);
       onClose();
     } catch {
       setError("Failed to save profile settings");
@@ -93,8 +103,8 @@ export const ProfileModal = ({
           {/* Header with gradient */}
           <DialogHeader className="px-6 pt-6 pb-4 bg-gradient-to-br from-accent/10 via-transparent to-primary/5">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                <User className="h-5 w-5 text-primary" />
+              <div className="w-10 h-10 rounded-xl bg-primary/10 dark:bg-foreground/10 flex items-center justify-center">
+                <User className="h-5 w-5 text-primary dark:text-foreground" />
               </div>
               <div>
                 <DialogTitle className="text-xl">Profile Settings</DialogTitle>
@@ -161,6 +171,30 @@ export const ProfileModal = ({
                       {profileData?.weightUnits.map((unit) => (
                         <SelectItem key={unit._id} value={unit._id}>
                           {unit.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="theme" className="text-sm font-medium">
+                    Theme
+                  </Label>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Choose your preferred color theme
+                  </p>
+                  <Select
+                    value={selectedTheme}
+                    onValueChange={(value) => setSelectedTheme(value as Theme)}
+                  >
+                    <SelectTrigger id="theme" className="h-11">
+                      <SelectValue placeholder="Select theme" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {profileData?.themeOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
                         </SelectItem>
                       ))}
                     </SelectContent>

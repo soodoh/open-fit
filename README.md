@@ -150,16 +150,11 @@ Replace `your@email.com` with the email you registered with.
         - Remove reorder mode, just work?
         - Add "info" button that opens ExerciseDetail modal
 
-- Update Exercise search to filter by muscle group, equipment, and difficulty
-
 - Update Logs search to filter by date (greater than or less than), or exercises used in the session
 
 - Ability to favorite routines?
 
 - Fix nested button warning when enabling "reorder" mode for set groups in WorkoutList
-
-- Implement dark mode theme
-    - Add dark/light/use system as a setting
 
 - Update Routines page design
     - Does not show routine days in the card

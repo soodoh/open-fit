@@ -2,11 +2,18 @@ import { v } from "convex/values";
 import { internalMutation, mutation } from "../_generated/server";
 import { getAuthenticatedUserId } from "../lib/auth";
 
+const ThemeEnum = v.union(
+  v.literal("light"),
+  v.literal("dark"),
+  v.literal("system"),
+);
+
 // Update user profile settings
 export const update = mutation({
   args: {
     defaultRepetitionUnitId: v.id("repetitionUnits"),
     defaultWeightUnitId: v.id("weightUnits"),
+    theme: ThemeEnum,
   },
   handler: async (ctx, args) => {
     const userId = await getAuthenticatedUserId(ctx);
@@ -22,6 +29,7 @@ export const update = mutation({
       await ctx.db.patch(existingProfile._id, {
         defaultRepetitionUnitId: args.defaultRepetitionUnitId,
         defaultWeightUnitId: args.defaultWeightUnitId,
+        theme: args.theme,
       });
       return existingProfile._id;
     } else {
@@ -31,6 +39,7 @@ export const update = mutation({
         role: "USER",
         defaultRepetitionUnitId: args.defaultRepetitionUnitId,
         defaultWeightUnitId: args.defaultWeightUnitId,
+        theme: args.theme,
       });
       return profileId;
     }
@@ -76,6 +85,7 @@ export const createForNewUser = internalMutation({
       role: "USER",
       defaultRepetitionUnitId: defaultRepUnit._id,
       defaultWeightUnitId: defaultWeightUnit._id,
+      theme: "system",
     });
 
     return profileId;

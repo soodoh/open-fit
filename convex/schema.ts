@@ -76,6 +76,12 @@ const EquipmentEnum = v.union(
   v.literal("other"),
 );
 
+const ThemeEnum = v.union(
+  v.literal("light"),
+  v.literal("dark"),
+  v.literal("system"),
+);
+
 export default defineSchema({
   // Include Convex Auth tables
   ...authTables,
@@ -86,6 +92,7 @@ export default defineSchema({
     role: RoleEnum,
     defaultRepetitionUnitId: v.id("repetitionUnits"),
     defaultWeightUnitId: v.id("weightUnits"),
+    theme: ThemeEnum,
   }).index("by_user", ["userId"]),
 
   repetitionUnits: defineTable({

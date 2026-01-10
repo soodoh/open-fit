@@ -29,11 +29,11 @@ export const SessionSummaryCard = ({
 
   return (
     <Link href={`/logs/${session._id}`} className="group block">
-      <div className="relative h-full rounded-xl border bg-card p-5 transition-all duration-200 hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5">
+      <div className="relative h-full rounded-xl border bg-card p-5 transition-all duration-200 hover:shadow-lg hover:border-foreground/20 hover:-translate-y-0.5">
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1 min-w-0 pr-2">
-            <h3 className="font-semibold text-base truncate group-hover:text-primary transition-colors">
+            <h3 className="font-semibold text-base truncate group-hover:text-primary dark:group-hover:text-white transition-colors">
               {session.name}
             </h3>
             <div className="flex items-center gap-1.5 mt-1.5 text-muted-foreground">
@@ -91,7 +91,7 @@ export const SessionSummaryCard = ({
 
         {/* Hover Arrow */}
         <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-          <ArrowRight className="w-4 h-4 text-primary" />
+          <ArrowRight className="w-4 h-4 text-primary dark:text-white" />
         </div>
       </div>
     </Link>

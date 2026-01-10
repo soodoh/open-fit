@@ -1,5 +1,6 @@
 "use client";
 
+import { ThemeSync } from "@/components/providers/ThemeSync";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import { Roboto } from "next/font/google";
@@ -18,6 +19,7 @@ dayjs.extend(duration);
 export const AppWrapper = ({ children }: Readonly<{ children: ReactNode }>) => {
   return (
     <div className={roboto.variable}>
+      <ThemeSync />
       <Header />
       {children}
     </div>
