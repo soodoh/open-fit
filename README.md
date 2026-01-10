@@ -150,8 +150,6 @@ Replace `your@email.com` with the email you registered with.
         - Remove reorder mode, just work?
         - Add "info" button that opens ExerciseDetail modal
 
-- Update Routine search to use full text search query & pagination
-
 - Update Exercise search to filter by muscle group, equipment, and difficulty
 
 - Update Logs search to filter by date (greater than or less than), or exercises used in the session

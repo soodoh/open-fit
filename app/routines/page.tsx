@@ -9,8 +9,7 @@ import { Input } from "@/components/ui/input";
 import { api } from "@/convex/_generated/api";
 import { usePaginatedQuery, useQuery } from "convex/react";
 import { Dumbbell, Loader2, Search } from "lucide-react";
-import { useEffect, useMemo, useRef } from "react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const ROUTINES_PAGE_SIZE = 12;
 
@@ -54,18 +53,57 @@ function EmptyState() {
 }
 
 function RoutinesContent() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  // Debounce search query
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const isSearching = debouncedSearch.trim().length > 0;
+
+  // Get total count of routines (for browse mode)
+  const totalCount = useQuery(api.queries.routines.count);
+
+  // Get count of search results (for search mode)
+  const searchCount = useQuery(
+    api.queries.routines.searchCount,
+    isSearching ? { searchTerm: debouncedSearch } : "skip",
+  );
+
+  // Paginated list for browse mode
   const {
     results: routines,
-    status,
-    loadMore,
+    status: browseStatus,
+    loadMore: loadMoreBrowse,
   } = usePaginatedQuery(
     api.queries.routines.list,
     {},
     { initialNumItems: ROUTINES_PAGE_SIZE },
   );
+
+  // Paginated search results
+  const {
+    results: searchResults,
+    status: searchStatus,
+    loadMore: loadMoreSearch,
+  } = usePaginatedQuery(
+    api.queries.routines.search,
+    isSearching ? { searchTerm: debouncedSearch } : "skip",
+    { initialNumItems: ROUTINES_PAGE_SIZE },
+  );
+
+  // Determine which data to use based on search state
+  const displayRoutines = isSearching ? searchResults : routines;
+  const status = isSearching ? searchStatus : browseStatus;
+  const loadMore = isSearching ? loadMoreSearch : loadMoreBrowse;
+
   const currentSession = useQuery(api.queries.sessions.getCurrent);
-  const [searchQuery, setSearchQuery] = useState("");
-  const loadMoreRef = useRef<HTMLDivElement>(null);
 
   // Intersection observer for infinite scrolling
   useEffect(() => {
@@ -90,16 +128,9 @@ function RoutinesContent() {
     };
   }, [status, loadMore]);
 
-  const filteredRoutines = useMemo(() => {
-    if (!routines) return undefined;
-    if (!searchQuery.trim()) return routines;
-    const query = searchQuery.toLowerCase().trim();
-    return routines.filter((routine) =>
-      routine.name.toLowerCase().includes(query),
-    );
-  }, [routines, searchQuery]);
-
   const isLoading = status === "LoadingFirstPage";
+  const isLoadingMore = status === "LoadingMore";
+  const canLoadMore = status === "CanLoadMore";
 
   return (
     <div className="min-h-[calc(100vh-4rem)]">
@@ -147,13 +178,15 @@ function RoutinesContent() {
         {isLoading && <RoutinesSkeleton />}
 
         {/* Empty State */}
-        {!isLoading && routines && routines.length === 0 && <EmptyState />}
+        {!isLoading && routines && routines.length === 0 && !isSearching && (
+          <EmptyState />
+        )}
 
         {/* No Search Results */}
-        {filteredRoutines &&
-          filteredRoutines.length === 0 &&
-          routines &&
-          routines.length > 0 && (
+        {!isLoading &&
+          searchResults &&
+          searchResults.length === 0 &&
+          isSearching && (
             <div className="flex flex-col items-center justify-center py-16 px-4">
               <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mb-4">
                 <Search className="w-8 h-8 text-muted-foreground/60" />
@@ -162,15 +195,30 @@ function RoutinesContent() {
                 No routines found
               </h3>
               <p className="text-muted-foreground text-center text-sm">
-                No routines match "{searchQuery}"
+                No routines match &quot;{debouncedSearch}&quot;
               </p>
             </div>
           )}
 
+        {/* Results Count */}
+        {displayRoutines && displayRoutines.length > 0 && (
+          <p className="text-sm text-muted-foreground mb-6">
+            {isSearching ? (
+              <>
+                {searchCount} {searchCount === 1 ? "routine" : "routines"} found
+              </>
+            ) : (
+              <>
+                {totalCount} {totalCount === 1 ? "routine" : "routines"} total
+              </>
+            )}
+          </p>
+        )}
+
         {/* Routines Grid */}
-        {filteredRoutines && filteredRoutines.length > 0 && (
+        {displayRoutines && displayRoutines.length > 0 && (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredRoutines.map((routine) => (
+            {displayRoutines.map((routine) => (
               <RoutineCard
                 key={routine._id}
                 routine={routine}
@@ -181,9 +229,9 @@ function RoutinesContent() {
         )}
 
         {/* Infinite scroll sentinel & loading indicator */}
-        {!searchQuery.trim() && (
+        {canLoadMore && (
           <div ref={loadMoreRef} className="flex justify-center py-8">
-            {status === "LoadingMore" && (
+            {isLoadingMore && (
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
             )}
           </div>
