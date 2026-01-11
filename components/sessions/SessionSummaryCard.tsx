@@ -1,13 +1,22 @@
 import dayjs from "dayjs";
-import { ArrowRight, Calendar, Clock, MessageSquare, Star } from "lucide-react";
+import {
+  ArrowRight,
+  Calendar,
+  Clock,
+  MessageSquare,
+  Play,
+  Star,
+} from "lucide-react";
 import Link from "next/link";
 import { EditSessionMenu } from "./EditSessionMenu";
 import type { WorkoutSessionWithData } from "@/lib/convex-types";
 
 export const SessionSummaryCard = ({
   session,
+  isActive = false,
 }: {
   session: WorkoutSessionWithData;
+  isActive?: boolean;
 }) => {
   const durationDate =
     session.startTime && session.endTime
@@ -29,7 +38,17 @@ export const SessionSummaryCard = ({
 
   return (
     <Link href={`/logs/${session._id}`} className="group block">
-      <div className="relative h-full rounded-xl border bg-card p-5 transition-all duration-200 hover:shadow-lg hover:border-foreground/20 hover:-translate-y-0.5">
+      <div
+        className={`relative h-full rounded-xl border bg-card p-5 transition-all duration-200 hover:shadow-lg hover:border-foreground/20 hover:-translate-y-0.5 ${isActive ? "ring-2 ring-primary/50 border-primary/30" : ""}`}
+      >
+        {/* Active Session Indicator */}
+        {isActive && (
+          <div className="absolute -top-2 -right-2 flex items-center gap-1 px-2 py-0.5 bg-primary text-primary-foreground text-xs font-medium rounded-full shadow-sm">
+            <Play className="w-3 h-3 fill-current" />
+            <span>In Progress</span>
+          </div>
+        )}
+
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1 min-w-0 pr-2">
