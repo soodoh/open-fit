@@ -141,7 +141,6 @@ Replace `your@email.com` with the email you registered with.
 ## TODO
 
 - Bugs
-    - Save for edit session modal not working
     - Updating exercise filter with empty search not showing number of exercises found
 
 - Fix WorkoutList improvements

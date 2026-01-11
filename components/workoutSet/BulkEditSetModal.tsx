@@ -1,5 +1,3 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import { DateTimeField } from "@/components/ui/date-time-field";
 import {
@@ -10,7 +8,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { api } from "@/convex/_generated/api";
 import { useMutation } from "convex/react";
 import dayjs, { Dayjs } from "dayjs";
@@ -63,12 +60,10 @@ export const BulkEditSetModal = ({
               onChange={(event) => setReps(event.target.value)}
               className="pr-12"
             />
-            <Label className="absolute -top-2 left-2 bg-white px-1 text-xs text-gray-500">
-              {repUnit?.name ?? "Reps"}
-            </Label>
             <div className="absolute right-1 top-1/2 -translate-y-1/2">
               <RepUnitMenu
                 id={`bulk-rep-${setGroup._id}`}
+                label={repUnit?.name ?? "Repetitions"}
                 units={units}
                 onChange={(repUnit) => setRepUnit(repUnit)}
               />
@@ -83,12 +78,10 @@ export const BulkEditSetModal = ({
               onChange={(event) => setWeight(event.target.value)}
               className="pr-12"
             />
-            <Label className="absolute -top-2 left-2 bg-white px-1 text-xs text-gray-500">
-              {weightUnit?.name ?? "Weight"}
-            </Label>
             <div className="absolute right-1 top-1/2 -translate-y-1/2">
               <WeightUnitMenu
                 id={`bulk-weight-${setGroup._id}`}
+                label={weightUnit?.name ?? "lbs"}
                 units={units}
                 onChange={(weightUnit) => setWeightUnit(weightUnit)}
               />
