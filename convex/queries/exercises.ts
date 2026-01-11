@@ -107,10 +107,14 @@ export const search = query({
   },
 });
 
-// Get count of exercises matching search term
+// Get count of exercises matching search term with optional filters
 export const searchCount = query({
   args: {
     searchTerm: v.string(),
+    equipment: v.optional(EquipmentEnum),
+    level: v.optional(ExerciseLevelEnum),
+    category: v.optional(ExerciseCategoryEnum),
+    primaryMuscle: v.optional(MuscleGroupEnum),
   },
   handler: async (ctx, args) => {
     if (!args.searchTerm.trim()) {
@@ -119,10 +123,29 @@ export const searchCount = query({
 
     const results = await ctx.db
       .query("exercises")
-      .withSearchIndex("search_exercise", (q) =>
-        q.search("name", args.searchTerm),
-      )
+      .withSearchIndex("search_exercise", (q) => {
+        let searchQuery = q.search("name", args.searchTerm);
+
+        if (args.equipment !== undefined) {
+          searchQuery = searchQuery.eq("equipment", args.equipment);
+        }
+        if (args.level !== undefined) {
+          searchQuery = searchQuery.eq("level", args.level);
+        }
+        if (args.category !== undefined) {
+          searchQuery = searchQuery.eq("category", args.category);
+        }
+
+        return searchQuery;
+      })
       .collect();
+
+    // Apply client-side filtering for primaryMuscle (array field)
+    if (args.primaryMuscle !== undefined) {
+      return results.filter((exercise) =>
+        exercise.primaryMuscles.includes(args.primaryMuscle!),
+      ).length;
+    }
 
     return results.length;
   },
@@ -202,6 +225,47 @@ export const count = query({
   handler: async (ctx) => {
     const exercises = await ctx.db.query("exercises").collect();
     return exercises.length;
+  },
+});
+
+// Get count of exercises with filters applied (for browse mode)
+export const listCount = query({
+  args: {
+    equipment: v.optional(EquipmentEnum),
+    level: v.optional(ExerciseLevelEnum),
+    category: v.optional(ExerciseCategoryEnum),
+    primaryMuscle: v.optional(MuscleGroupEnum),
+  },
+  handler: async (ctx, args) => {
+    const exercises = await ctx.db.query("exercises").collect();
+
+    const hasFilters =
+      args.equipment !== undefined ||
+      args.level !== undefined ||
+      args.category !== undefined ||
+      args.primaryMuscle !== undefined;
+
+    if (!hasFilters) {
+      return exercises.length;
+    }
+
+    const filtered = exercises.filter((exercise) => {
+      if (args.equipment !== undefined && exercise.equipment !== args.equipment) {
+        return false;
+      }
+      if (args.level !== undefined && exercise.level !== args.level) {
+        return false;
+      }
+      if (args.category !== undefined && exercise.category !== args.category) {
+        return false;
+      }
+      if (args.primaryMuscle !== undefined && !exercise.primaryMuscles.includes(args.primaryMuscle)) {
+        return false;
+      }
+      return true;
+    });
+
+    return filtered.length;
   },
 });
 

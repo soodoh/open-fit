@@ -122,13 +122,13 @@ function ExercisesContent() {
     primaryMuscle,
   };
 
-  // Get total count of exercises (for browse mode)
-  const totalCount = useQuery(api.queries.exercises.count);
+  // Get count of exercises with filters applied (for browse mode)
+  const listCount = useQuery(api.queries.exercises.listCount, filterArgs);
 
-  // Get count of search results (for search mode)
+  // Get count of search results with filters applied (for search mode)
   const searchCount = useQuery(
     api.queries.exercises.searchCount,
-    isSearching ? { searchTerm: debouncedSearch } : "skip",
+    isSearching ? { searchTerm: debouncedSearch, ...filterArgs } : "skip",
   );
 
   // Paginated list for browse mode
@@ -356,7 +356,8 @@ function ExercisesContent() {
               </>
             ) : (
               <>
-                {totalCount} {totalCount === 1 ? "exercise" : "exercises"} total
+                {listCount} {listCount === 1 ? "exercise" : "exercises"}{" "}
+                {hasFilters ? "found" : "total"}
               </>
             )}
           </p>
