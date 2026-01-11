@@ -59,16 +59,6 @@ export const WorkoutSetRow = ({
         </Button>
       )}
 
-      {(!reorder || view !== ListView.CurrentSession) && (
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 text-muted-foreground hover:text-foreground flex-shrink-0"
-        >
-          <MoreVertical className="h-4 w-4" />
-        </Button>
-      )}
-
       <SetTypeMenu set={set} setNum={setNum} />
 
       <div className="flex gap-2 flex-1 items-center">

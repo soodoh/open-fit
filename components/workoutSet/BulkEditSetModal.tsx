@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { DateTimeField } from "@/components/ui/date-time-field";
 import {
   Dialog,
   DialogContent,
@@ -7,10 +6,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DurationInput,
+  parseDurationToSeconds,
+} from "@/components/ui/duration-input";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { api } from "@/convex/_generated/api";
 import { useMutation } from "convex/react";
-import dayjs, { Dayjs } from "dayjs";
 import { useState } from "react";
 import { RepUnitMenu } from "./RepUnitMenu";
 import { WeightUnitMenu } from "./WeightUnitMenu";
@@ -34,7 +37,7 @@ export const BulkEditSetModal = ({
 }) => {
   const firstSet = setGroup.sets[0];
   const [reps, setReps] = useState<string>("");
-  const [restTime, setRestTime] = useState<Dayjs>(dayjs().minute(0).second(0));
+  const [restTime, setRestTime] = useState<string>("");
   const [repUnit, setRepUnit] = useState<RepetitionUnit | null>(
     firstSet?.repetitionUnit ?? null,
   );
@@ -88,15 +91,15 @@ export const BulkEditSetModal = ({
             </div>
           </div>
 
-          <DateTimeField
-            label="Rest Timer"
-            value={restTime?.toDate() || null}
-            onChange={(newTime) => {
-              if (newTime) {
-                setRestTime(dayjs(newTime));
-              }
-            }}
-          />
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="rest-timer">Rest Timer (MM:ss)</Label>
+            <DurationInput
+              id="rest-timer"
+              value={restTime}
+              placeholder="1:30"
+              onChange={setRestTime}
+            />
+          </div>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
@@ -104,9 +107,6 @@ export const BulkEditSetModal = ({
           </Button>
           <Button
             onClick={async () => {
-              const totalSeconds =
-                (restTime?.get("minutes") ?? 0) * 60 +
-                (restTime?.get("seconds") ?? 0);
               await bulkEditSetGroup({
                 id: setGroup._id,
                 // If empty string, leave unchanged (undefined)
@@ -114,7 +114,7 @@ export const BulkEditSetModal = ({
                 weight: weight ? parseInt(weight, 10) : undefined,
                 repetitionUnitId: repUnit?._id,
                 weightUnitId: weightUnit?._id,
-                restTime: totalSeconds,
+                restTime: parseDurationToSeconds(restTime),
               });
               onClose();
             }}
