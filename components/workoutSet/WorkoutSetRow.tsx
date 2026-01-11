@@ -12,7 +12,7 @@ import {
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useMutation } from "convex/react";
-import { GripVertical, MoreVertical } from "lucide-react";
+import { GripVertical, Trash2 } from "lucide-react";
 import { RepUnitMenu } from "./RepUnitMenu";
 import { SetTypeMenu } from "./SetTypeMenu";
 import { WeightUnitMenu } from "./WeightUnitMenu";
@@ -38,6 +38,7 @@ export const WorkoutSetRow = ({
   const isRowDisabled = set.completed && view === ListView.CurrentSession;
 
   const updateSet = useMutation(api.mutations.sets.update);
+  const deleteSet = useMutation(api.mutations.sets.remove);
 
   return (
     <div
@@ -149,6 +150,16 @@ export const WorkoutSetRow = ({
             </div>
           ))}
       </div>
+
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-8 w-8 text-muted-foreground hover:text-destructive flex-shrink-0"
+        onClick={() => deleteSet({ id: set._id })}
+        aria-label="Delete set"
+      >
+        <Trash2 className="h-4 w-4" />
+      </Button>
     </div>
   );
 };
