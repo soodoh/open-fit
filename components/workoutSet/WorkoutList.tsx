@@ -2,7 +2,6 @@
 
 import { AddExerciseRow } from "@/components/routines/AddExerciseRow";
 import { RestTimer } from "@/components/sessions/RestTimer";
-import { Container } from "@/components/ui/container";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { api } from "@/convex/_generated/api";
@@ -94,7 +93,7 @@ export const WorkoutList = ({
   return (
     <div className="pb-8">
       {/* Add Exercise Section */}
-      <Container maxWidth="lg" className="py-4">
+      <div className="mx-auto w-full px-4 sm:px-6 lg:px-8 max-w-screen-lg py-4">
         <div className="rounded-xl border bg-card p-4">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-8 h-8 rounded-lg bg-primary/10 dark:bg-foreground/10 flex items-center justify-center">
@@ -112,10 +111,10 @@ export const WorkoutList = ({
             isSession={view !== ListView.EditTemplate}
           />
         </div>
-      </Container>
+      </div>
 
       {/* Controls Section */}
-      <Container maxWidth="lg" className="py-2">
+      <div className="mx-auto w-full px-4 sm:px-6 lg:px-8 max-w-screen-lg py-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3 px-1">
             <div className="flex items-center gap-2">
@@ -144,11 +143,11 @@ export const WorkoutList = ({
             />
           )}
         </div>
-      </Container>
+      </div>
 
       {/* Exercise List */}
       {optimisticSetGroups.length > 0 ? (
-        <Container maxWidth="lg" className="py-4">
+        <div className="mx-auto w-full px-4 sm:px-6 lg:px-8 max-w-screen-lg py-4">
           <div className="rounded-xl border bg-card overflow-hidden divide-y divide-border">
             <DndContext
               id="set-groups"
@@ -174,9 +173,9 @@ export const WorkoutList = ({
               </SortableContext>
             </DndContext>
           </div>
-        </Container>
+        </div>
       ) : (
-        <Container maxWidth="lg" className="py-8">
+        <div className="mx-auto w-full px-4 sm:px-6 lg:px-8 max-w-screen-lg py-8">
           <div className="text-center py-12 rounded-xl border border-dashed bg-muted/20">
             <div className="w-12 h-12 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
               <Dumbbell className="h-6 w-6 text-muted-foreground" />
@@ -188,7 +187,7 @@ export const WorkoutList = ({
               Add your first exercise using the form above
             </p>
           </div>
-        </Container>
+        </div>
       )}
     </div>
   );

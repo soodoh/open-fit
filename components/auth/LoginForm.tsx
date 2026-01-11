@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Container } from "@/components/ui/container";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SignUpSchema } from "@/lib/authSchema";
@@ -49,10 +48,7 @@ export const LoginForm = ({ register }: { register?: boolean }) => {
   };
 
   return (
-    <Container
-      maxWidth="sm"
-      className="flex flex-1 flex-col items-center justify-center gap-4"
-    >
+    <div className="mx-auto w-full px-4 sm:px-6 lg:px-8 max-w-screen-sm flex flex-1 flex-col items-center justify-center gap-4">
       <form
         className="flex w-full max-w-sm flex-col gap-4"
         onSubmit={handleSubmit}
@@ -101,6 +97,6 @@ export const LoginForm = ({ register }: { register?: boolean }) => {
           </Button>
         )}
       </form>
-    </Container>
+    </div>
   );
 };

@@ -1,14 +1,13 @@
 "use client";
 
 import { AuthGuard } from "@/components/auth/AuthGuard";
-import { Container } from "@/components/ui/container";
 
 export default function Home() {
   return (
     <AuthGuard>
-      <Container maxWidth="xl" className="mt-8">
+      <div className="mx-auto w-full px-4 sm:px-6 lg:px-8 max-w-screen-xl mt-8">
         TODO home page dashboard
-      </Container>
+      </div>
     </AuthGuard>
   );
 }

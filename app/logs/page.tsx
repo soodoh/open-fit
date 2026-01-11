@@ -4,7 +4,6 @@ import { AuthGuard } from "@/components/auth/AuthGuard";
 import { CreateSessionButton } from "@/components/sessions/CreateSession";
 import { ResumeSessionButton } from "@/components/sessions/ResumeSessionButton";
 import { SessionSummaryCard } from "@/components/sessions/SessionSummaryCard";
-import { Container } from "@/components/ui/container";
 import { Input } from "@/components/ui/input";
 import { api } from "@/convex/_generated/api";
 import { usePaginatedQuery, useQuery } from "convex/react";
@@ -105,7 +104,7 @@ function SessionsContent() {
     <div className="min-h-[calc(100vh-4rem)]">
       {/* Header Section */}
       <div className="border-b border-border/50 bg-gradient-to-b from-accent/5 to-transparent">
-        <Container maxWidth="xl" className="py-8">
+        <div className="mx-auto w-full px-4 sm:px-6 lg:px-8 max-w-screen-xl py-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <h1 className="text-3xl font-bold tracking-tight text-foreground">
@@ -129,11 +128,11 @@ function SessionsContent() {
               className="pl-10"
             />
           </div>
-        </Container>
+        </div>
       </div>
 
       {/* Main Content */}
-      <Container maxWidth="xl" className="py-8">
+      <div className="mx-auto w-full px-4 sm:px-6 lg:px-8 max-w-screen-xl py-8">
         {/* Resume Session Banner */}
         {currentSession && !isSearching && (
           <div className="mb-8">
@@ -203,7 +202,7 @@ function SessionsContent() {
             )}
           </div>
         )}
-      </Container>
+      </div>
     </div>
   );
 }

@@ -1,4 +1,3 @@
-import { Container } from "@/components/ui/container";
 import Image from "next/image";
 import Link from "next/link";
 import { AccountNavItem } from "./AccountNavItem";
@@ -6,7 +5,7 @@ import { AccountNavItem } from "./AccountNavItem";
 export const Header = () => {
   return (
     <header className="bg-primary text-primary-foreground">
-      <Container maxWidth="xl">
+      <div className="mx-auto w-full px-4 sm:px-6 lg:px-8 max-w-screen-xl">
         <nav className="flex items-center py-4">
           <Link href="/">
             <Image
@@ -39,7 +38,7 @@ export const Header = () => {
           </div>
           <AccountNavItem />
         </nav>
-      </Container>
+      </div>
     </header>
   );
 };

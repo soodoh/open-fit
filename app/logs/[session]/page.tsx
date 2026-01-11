@@ -3,7 +3,6 @@
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import { CurrentSessionPage } from "@/components/sessions/CurrentSessionPage";
 import { SessionPage } from "@/components/sessions/SessionPage";
-import { Container } from "@/components/ui/container";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useQuery } from "convex/react";
@@ -36,9 +35,9 @@ function SessionPageContent() {
 
   if (session === undefined || units === undefined) {
     return (
-      <Container maxWidth="lg" className="mt-8">
+      <div className="mx-auto w-full px-4 sm:px-6 lg:px-8 max-w-screen-lg mt-8">
         <p className="text-muted-foreground">Loading...</p>
-      </Container>
+      </div>
     );
   }
 

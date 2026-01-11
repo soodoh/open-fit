@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Container } from "@/components/ui/container";
 import { WorkoutList } from "@/components/workoutSet/WorkoutList";
 import {
   ListView,
@@ -49,7 +48,7 @@ export const SessionPage = ({
     <div className="min-h-[calc(100vh-4rem)]">
       {/* Header Section */}
       <div className="border-b border-border/50 bg-gradient-to-b from-accent/5 to-transparent">
-        <Container maxWidth="lg" className="py-6">
+        <div className="mx-auto w-full px-4 sm:px-6 lg:px-8 max-w-screen-lg py-6">
           <div className="flex items-center justify-between mb-4">
             <Button variant="ghost" size="sm" asChild className="gap-2">
               <Link href="/logs">
@@ -74,11 +73,11 @@ export const SessionPage = ({
               </h1>
             </div>
           </div>
-        </Container>
+        </div>
       </div>
 
       {/* Stats Cards */}
-      <Container maxWidth="lg" className="py-6">
+      <div className="mx-auto w-full px-4 sm:px-6 lg:px-8 max-w-screen-lg py-6">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {/* Duration Card */}
           <div className="flex items-center gap-3 p-4 rounded-xl bg-card border">
@@ -153,7 +152,7 @@ export const SessionPage = ({
             </div>
           )}
         </div>
-      </Container>
+      </div>
 
       {/* Workout List */}
       <WorkoutList

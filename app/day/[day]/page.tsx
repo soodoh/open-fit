@@ -1,13 +1,13 @@
 "use client";
 
 import { AuthGuard } from "@/components/auth/AuthGuard";
-import { DayPage } from "@/components/routines/DayPage";
 import { EditDayMenu } from "@/components/routines/EditDayMenu";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Container } from "@/components/ui/container";
+import { WorkoutList } from "@/components/workoutSet/WorkoutList";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
+import { ListView } from "@/lib/convex-types";
 import { useQuery } from "convex/react";
 import dayjs from "dayjs";
 import { ArrowLeft, Calendar, Dumbbell, ListChecks } from "lucide-react";
@@ -43,10 +43,10 @@ function DayPageContent() {
     return (
       <div className="min-h-[calc(100vh-4rem)]">
         <div className="border-b border-border/50 bg-gradient-to-b from-accent/5 to-transparent">
-          <Container maxWidth="lg" className="py-6">
+          <div className="mx-auto w-full px-4 sm:px-6 lg:px-8 max-w-screen-lg py-6">
             <div className="h-8 w-32 bg-muted/50 rounded animate-pulse mb-4" />
             <div className="h-10 w-64 bg-muted/50 rounded animate-pulse" />
-          </Container>
+          </div>
         </div>
       </div>
     );
@@ -66,7 +66,7 @@ function DayPageContent() {
     <div className="min-h-[calc(100vh-4rem)]">
       {/* Header Section */}
       <div className="border-b border-border/50 bg-gradient-to-b from-accent/5 to-transparent">
-        <Container maxWidth="lg" className="py-6">
+        <div className="mx-auto w-full px-4 sm:px-6 lg:px-8 max-w-screen-lg py-6">
           <div className="flex items-center justify-between mb-4">
             <Button variant="ghost" size="sm" asChild className="gap-2">
               <Link href="/routines">
@@ -95,11 +95,11 @@ function DayPageContent() {
               </h1>
             </div>
           </div>
-        </Container>
+        </div>
       </div>
 
       {/* Stats Section */}
-      <Container maxWidth="lg" className="py-6">
+      <div className="mx-auto w-full px-4 sm:px-6 lg:px-8 max-w-screen-lg py-6">
         <div className="flex flex-wrap items-center gap-3 mb-6">
           {/* Schedule badges */}
           {routineDay.weekdays.length > 0 && (
@@ -134,10 +134,16 @@ function DayPageContent() {
             </span>
           </div>
         </div>
-      </Container>
+      </div>
 
-      {/* Workout List */}
-      <DayPage routineDay={routineDay} units={units} />
+      <div className="mx-auto w-full px-4 sm:px-6 lg:px-8 max-w-screen-lg p-0">
+        <WorkoutList
+          view={ListView.EditTemplate}
+          sessionOrDayId={routineDay._id}
+          setGroups={routineDay.setGroups}
+          units={units}
+        />
+      </div>
     </div>
   );
 }
