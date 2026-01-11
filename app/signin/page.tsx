@@ -1,7 +1,6 @@
 "use client";
 
 import { LoginForm } from "@/components/auth/LoginForm";
-import { Container } from "@/components/ui/container";
 import { useConvexAuth } from "convex/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -18,12 +17,9 @@ export default function SignInPage() {
 
   if (isLoading) {
     return (
-      <Container
-        maxWidth="sm"
-        className="flex flex-1 items-center justify-center"
-      >
+      <div className="flex flex-1 items-center justify-center">
         <p className="text-muted-foreground">Loading...</p>
-      </Container>
+      </div>
     );
   }
 
@@ -31,5 +27,9 @@ export default function SignInPage() {
     return null;
   }
 
-  return <LoginForm />;
+  return (
+    <div className="flex flex-1">
+      <LoginForm />
+    </div>
+  );
 }

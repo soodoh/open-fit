@@ -18,7 +18,7 @@ dayjs.extend(duration);
 
 export const AppWrapper = ({ children }: Readonly<{ children: ReactNode }>) => {
   return (
-    <div className={roboto.variable}>
+    <div className={`${roboto.variable} flex min-h-dvh flex-col`}>
       <ThemeSync />
       <Header />
       {children}

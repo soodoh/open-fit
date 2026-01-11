@@ -91,7 +91,11 @@ export const LoginForm = ({ register }: { register?: boolean }) => {
           {loading ? "Loading..." : register ? "Register" : "Login"}
         </Button>
 
-        {!register && (
+        {register ? (
+          <Button variant="outline" className="w-full" asChild>
+            <Link href="/signin">Back to sign in</Link>
+          </Button>
+        ) : (
           <Button variant="outline" className="w-full" asChild>
             <Link href="/register">Create an account</Link>
           </Button>
