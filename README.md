@@ -55,12 +55,12 @@ Paste the output in your `.env.local` as the value for `CONVEX_SELF_HOSTED_ADMIN
 Note:
 Running `./generate_admin_key.sh` will return a new key every time. But as long as the `INSTANCE_SECRET` env variable is consistent, any admin keys generated in the future will still work.
 
-### 5. Run convex dev
+### 5. Deploy schema & functions to Convex container
 
 Now that the containers are running & .env.local is updated accordingly, run the following.
 
 ```bash
-npx convex dev
+npx convex deploy
 ```
 
 ### 6. Generate JWT keys for auth & apply to Convex function environment variables
