@@ -128,7 +128,7 @@ Replace `your@email.com` with the email you registered with.
 
 ## Tech Stack
 
-- **Frontend**: Next.js 15, React 19, TypeScript
+- **Frontend**: Next.js 16, React 19, TypeScript
 - **Backend**: Convex (real-time database and serverless functions)
 - **Authentication**: Convex Auth with email/password
 - **Styling**: Tailwind CSS, shadcn/ui components
@@ -226,8 +226,6 @@ Replace `your@email.com` with the email you registered with.
     - [ ] Suggest alternate exercises based on muscle group
     - [ ] Filter exercises based on available equipment
 - [ ] User Profile page
-    - [ ] Dark mode / other themes
-    - [ ] Choose default units (metric, imperial)
     - [ ] Create gyms, assign available equipment
 - [ ] Exercises page
     - [ ] Users can add custom exercises
