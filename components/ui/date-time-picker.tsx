@@ -65,6 +65,7 @@ export function DateTimePicker({
       <Popover>
         <PopoverTrigger asChild>
           <Button
+            type="button"
             variant="outline"
             disabled={disabled}
             className={cn(

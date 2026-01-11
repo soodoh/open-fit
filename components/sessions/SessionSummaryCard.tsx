@@ -43,7 +43,8 @@ export const SessionSummaryCard = ({
               </span>
             </div>
           </div>
-          <div onClick={(e) => e.preventDefault()}>
+          {/* stopPropagation to prevent card link click */}
+          <div onClick={(e) => e.stopPropagation()}>
             <EditSessionMenu session={session} />
           </div>
         </div>

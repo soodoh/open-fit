@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { api } from "@/convex/_generated/api";
 import { useMutation } from "convex/react";
-import { CalendarPlus, Loader2, Star, X } from "lucide-react";
+import { AlertCircle, CalendarPlus, Loader2, Star, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { SelectTemplate } from "./SelectTemplate";
 import type {
@@ -46,6 +46,7 @@ export const EditSessionModal = ({
     useState<RoutineDayWithRoutine | null>(null);
   const [hoveredStar, setHoveredStar] = useState<number | null>(null);
   const [isPending, setIsPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const createSession = useMutation(api.mutations.sessions.create);
   const updateSession = useMutation(api.mutations.sessions.update);
@@ -62,18 +63,27 @@ export const EditSessionModal = ({
       setEndTime(session?.endTime ? new Date(session.endTime) : null);
       setWorkoutTemplate(null);
       setHoveredStar(null);
+      setError(null);
     }
   }, [open, session]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+
     // Must be null or valid date
     const isStartValid = startTime === null || !isNaN(startTime.getTime());
     const isEndValid = endTime === null || !isNaN(endTime.getTime());
     // Prevent negative durations (if both are valid dates)
     const isDurationValid =
       !startTime || !endTime || startTime.getTime() < endTime.getTime();
-    if (!isStartValid || !isEndValid || !isDurationValid) {
+
+    if (!isStartValid || !isEndValid) {
+      setError("Please enter valid dates");
+      return;
+    }
+    if (!isDurationValid) {
+      setError("End time must be after start time");
       return;
     }
 
@@ -99,6 +109,8 @@ export const EditSessionModal = ({
         });
       }
       onClose();
+    } catch {
+      setError("Failed to save session. Please try again.");
     } finally {
       setIsPending(false);
     }
@@ -243,6 +255,14 @@ export const EditSessionModal = ({
                 className="flex min-h-[80px] w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
               />
             </div>
+
+            {/* Error Message */}
+            {error && (
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
+                <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                <span>{error}</span>
+              </div>
+            )}
           </div>
 
           {/* Footer */}
