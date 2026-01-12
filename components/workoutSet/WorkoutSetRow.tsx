@@ -22,14 +22,12 @@ export const WorkoutSetRow = ({
   view,
   set,
   setNum,
-  reorder,
   units,
   startRestTimer,
 }: {
   view: ListView;
   set: SetWithRelations;
   setNum: number;
-  reorder: boolean;
   units: Units;
   startRestTimer: (seconds: number) => void;
 }) => {
@@ -48,17 +46,15 @@ export const WorkoutSetRow = ({
         isRowDisabled ? "bg-muted/40" : "hover:bg-muted/20"
       }`}
     >
-      {(reorder || view !== ListView.CurrentSession) && (
-        <Button
-          variant="ghost"
-          size="icon"
-          className="touch-manipulation h-8 w-8 text-muted-foreground hover:text-foreground flex-shrink-0"
-          {...attributes}
-          {...listeners}
-        >
-          <GripVertical className="h-4 w-4" />
-        </Button>
-      )}
+      <Button
+        variant="ghost"
+        size="icon"
+        className="touch-manipulation h-8 w-8 text-muted-foreground hover:text-foreground flex-shrink-0"
+        {...attributes}
+        {...listeners}
+      >
+        <GripVertical className="h-4 w-4" />
+      </Button>
 
       <SetTypeMenu set={set} setNum={setNum} />
 

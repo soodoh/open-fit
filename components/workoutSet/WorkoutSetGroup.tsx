@@ -72,7 +72,6 @@ export const WorkoutSetGroup = ({
   const [expanded, setExpanded] = useState(
     view === ListView.CurrentSession && sets.some((set) => !set.completed),
   );
-  const [canReorderSets, setReorderSets] = useState(false);
 
   const createSet = useMutation(api.mutations.sets.create);
   const reorderSets = useMutation(api.mutations.sets.reorder);
@@ -195,13 +194,7 @@ export const WorkoutSetGroup = ({
         </CollapsibleTrigger>
 
         {!isReorderActive && (
-          <EditSetGroupMenu
-            view={view}
-            setGroup={setGroup}
-            reorder={canReorderSets}
-            onReorder={() => setReorderSets(!canReorderSets)}
-            units={units}
-          />
+          <EditSetGroupMenu setGroup={setGroup} units={units} />
         )}
       </div>
 
@@ -228,7 +221,6 @@ export const WorkoutSetGroup = ({
                       set={set}
                       setNum={setNum}
                       units={units}
-                      reorder={canReorderSets}
                       startRestTimer={startRestTimer}
                     />
                   );

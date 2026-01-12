@@ -8,18 +8,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  ListView,
-  type SetGroupWithRelations,
-  type Units,
-} from "@/lib/convex-types";
-import {
-  ArrowUpDown,
-  Edit,
-  MessageSquare,
-  MoreHorizontal,
-  Trash2,
-} from "lucide-react";
+import { type SetGroupWithRelations, type Units } from "@/lib/convex-types";
+import { Edit, MessageSquare, MoreHorizontal, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { BulkEditSetModal } from "./BulkEditSetModal";
 import { EditSetCommentModal } from "./EditSetCommentModal";
@@ -31,16 +21,10 @@ enum Modal {
 }
 
 export const EditSetGroupMenu = ({
-  view,
   setGroup,
-  reorder,
-  onReorder,
   units,
 }: {
-  view: ListView;
   setGroup: SetGroupWithRelations;
-  reorder: boolean;
-  onReorder: () => void;
   units: Units;
 }) => {
   const [modal, setModal] = useState<Modal | null>(null);
@@ -83,18 +67,6 @@ export const EditSetGroupMenu = ({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          {view === ListView.CurrentSession && (
-            <DropdownMenuItem
-              onClick={() => {
-                onReorder();
-                setOpen(false);
-              }}
-            >
-              <ArrowUpDown className="mr-2 h-4 w-4" />
-              {reorder ? "Hide Reorder" : "Show Reorder"}
-            </DropdownMenuItem>
-          )}
-
           <DropdownMenuItem onClick={() => setModal(Modal.BULK_EDIT)}>
             <Edit className="mr-2 h-4 w-4" />
             Bulk edit

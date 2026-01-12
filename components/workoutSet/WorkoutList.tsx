@@ -128,7 +128,7 @@ export const WorkoutList = ({
                 className="text-sm text-muted-foreground flex items-center gap-1.5 cursor-pointer"
               >
                 <ArrowUpDown className="h-3.5 w-3.5" />
-                Reorder
+                Reorder exercises
               </Label>
             </div>
           </div>
