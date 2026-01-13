@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { api } from "@/convex/_generated/api";
 import { useMutation } from "convex/react";
-import { Edit, MoreVertical, Play, Trash2 } from "lucide-react";
+import { Edit, Play, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { type ReactNode, useState } from "react";
 import { DeleteDayModal } from "./DeleteDayModal";

@@ -1,5 +1,3 @@
-"use client";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,7 +10,6 @@ import {
   ListView,
   type SetGroupWithRelations,
   SetType,
-  type SetWithNumber,
   type SetWithRelations,
   type Units,
 } from "@/lib/convex-types";
@@ -78,21 +75,25 @@ export const WorkoutSetGroup = ({
 
   useEffect(() => {
     if (sets.every((set) => set.completed)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setExpanded(false);
     }
   }, [sets]);
 
   const exercise = sets[0]?.exercise;
-  const setsWithNumber = useMemo(() => {
-    let setNum = 1;
-    return sets.reduce((acc, set) => {
-      acc.push({ set, setNum });
-      if (set.type === SetType.NORMAL) {
-        setNum += 1;
-      }
-      return acc;
-    }, [] as SetWithNumber[]);
-  }, [sets]);
+  const setsWithNumber = useMemo(
+    () =>
+      sets.map((set, index) => {
+        const setNum = sets.slice(0, index + 1).reduce((total, set) => {
+          if (set.type === SetType.NORMAL) {
+            return total + 1;
+          }
+          return total;
+        }, 0);
+        return { set, setNum };
+      }),
+    [sets],
+  );
 
   const mouseSensor = useSensor(MouseSensor);
   const touchSensor = useSensor(TouchSensor);

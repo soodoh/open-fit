@@ -29,6 +29,7 @@ export const EditSessionMenu = ({
 
   useEffect(() => {
     if (modal) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setMenuOpen(false);
     }
   }, [modal]);

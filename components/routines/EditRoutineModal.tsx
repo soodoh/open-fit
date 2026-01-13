@@ -1,5 +1,3 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -64,7 +62,7 @@ export const EditRoutineModal = ({
         });
       }
       onClose();
-    } catch (error) {
+    } catch {
       setErrors({ name: "Failed to save routine" });
     } finally {
       setIsPending(false);

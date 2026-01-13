@@ -1,5 +1,3 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -40,6 +38,7 @@ export const WorkoutTimer = ({
     : (remainingSeconds / totalSeconds) * 100;
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTotalSeconds(set.reps);
   }, [set.reps]);
 

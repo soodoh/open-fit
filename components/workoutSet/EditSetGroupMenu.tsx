@@ -33,6 +33,7 @@ export const EditSetGroupMenu = ({
 
   useEffect(() => {
     if (modal) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setOpen(false);
     }
   }, [modal]);
