@@ -18,6 +18,7 @@ import type * as mutations_setGroups from "../mutations/setGroups.js";
 import type * as mutations_sets from "../mutations/sets.js";
 import type * as mutations_userProfiles from "../mutations/userProfiles.js";
 import type * as queries_exercises from "../queries/exercises.js";
+import type * as queries_lookups from "../queries/lookups.js";
 import type * as queries_routineDays from "../queries/routineDays.js";
 import type * as queries_routines from "../queries/routines.js";
 import type * as queries_sessions from "../queries/sessions.js";
@@ -43,6 +44,7 @@ declare const fullApi: ApiFromModules<{
   "mutations/sets": typeof mutations_sets;
   "mutations/userProfiles": typeof mutations_userProfiles;
   "queries/exercises": typeof queries_exercises;
+  "queries/lookups": typeof queries_lookups;
   "queries/routineDays": typeof queries_routineDays;
   "queries/routines": typeof queries_routines;
   "queries/sessions": typeof queries_sessions;

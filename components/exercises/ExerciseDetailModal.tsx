@@ -20,13 +20,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Exercise } from "@/lib/convex-types";
+import { useExerciseLookups } from "@/lib/use-exercise-lookups";
 import { Dumbbell, Flame, Gauge, Settings2, Target } from "lucide-react";
 import Image from "next/image";
 
-// Helper to format enum values for display
-function formatEnumValue(value: string): string {
+// Helper to format display names (capitalize words)
+function formatDisplayName(value: string): string {
   return value
-    .split("_")
+    .split(" ")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 }
@@ -40,6 +41,14 @@ export const ExerciseDetailModal = ({
   open: boolean;
   onClose: () => void;
 }) => {
+  const { getEquipmentName, getMuscleGroupNames, getCategoryName } =
+    useExerciseLookups();
+
+  const categoryName = getCategoryName(exercise.categoryId);
+  const equipmentName = getEquipmentName(exercise.equipmentId);
+  const primaryMuscleNames = getMuscleGroupNames(exercise.primaryMuscleIds);
+  const secondaryMuscleNames = getMuscleGroupNames(exercise.secondaryMuscleIds);
+
   return (
     <Dialog open={open} onOpenChange={() => onClose()}>
       <DialogContent className="sm:max-w-[560px] p-0 overflow-hidden max-h-[90vh] flex flex-col">
@@ -63,7 +72,7 @@ export const ExerciseDetailModal = ({
                 {exercise.name}
               </DialogTitle>
               <DialogDescription className="text-sm">
-                {formatEnumValue(exercise.category)}
+                {formatDisplayName(categoryName)}
               </DialogDescription>
             </div>
           </div>
@@ -108,18 +117,18 @@ export const ExerciseDetailModal = ({
                 <div>
                   <p className="text-xs text-muted-foreground">Level</p>
                   <p className="text-sm font-medium">
-                    {formatEnumValue(exercise.level)}
+                    {formatDisplayName(exercise.level)}
                   </p>
                 </div>
               </div>
             )}
-            {exercise.equipment && (
+            {equipmentName && (
               <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/50">
                 <Settings2 className="h-4 w-4 text-muted-foreground" />
                 <div>
                   <p className="text-xs text-muted-foreground">Equipment</p>
                   <p className="text-sm font-medium">
-                    {formatEnumValue(exercise.equipment)}
+                    {formatDisplayName(equipmentName)}
                   </p>
                 </div>
               </div>
@@ -130,7 +139,7 @@ export const ExerciseDetailModal = ({
                 <div>
                   <p className="text-xs text-muted-foreground">Force</p>
                   <p className="text-sm font-medium">
-                    {formatEnumValue(exercise.force)}
+                    {formatDisplayName(exercise.force)}
                   </p>
                 </div>
               </div>
@@ -141,7 +150,7 @@ export const ExerciseDetailModal = ({
                 <div>
                   <p className="text-xs text-muted-foreground">Mechanic</p>
                   <p className="text-sm font-medium">
-                    {formatEnumValue(exercise.mechanic)}
+                    {formatDisplayName(exercise.mechanic)}
                   </p>
                 </div>
               </div>
@@ -150,25 +159,25 @@ export const ExerciseDetailModal = ({
 
           {/* Muscles */}
           <div className="space-y-4">
-            {exercise.primaryMuscles.length > 0 && (
+            {primaryMuscleNames.length > 0 && (
               <div>
                 <h4 className="text-sm font-medium mb-2">Primary Muscles</h4>
                 <div className="flex flex-wrap gap-2">
-                  {exercise.primaryMuscles.map((muscle) => (
+                  {primaryMuscleNames.map((muscle) => (
                     <Badge key={muscle} variant="default" className="text-xs">
-                      {formatEnumValue(muscle)}
+                      {formatDisplayName(muscle)}
                     </Badge>
                   ))}
                 </div>
               </div>
             )}
-            {exercise.secondaryMuscles.length > 0 && (
+            {secondaryMuscleNames.length > 0 && (
               <div>
                 <h4 className="text-sm font-medium mb-2">Secondary Muscles</h4>
                 <div className="flex flex-wrap gap-2">
-                  {exercise.secondaryMuscles.map((muscle) => (
+                  {secondaryMuscleNames.map((muscle) => (
                     <Badge key={muscle} variant="secondary" className="text-xs">
-                      {formatEnumValue(muscle)}
+                      {formatDisplayName(muscle)}
                     </Badge>
                   ))}
                 </div>

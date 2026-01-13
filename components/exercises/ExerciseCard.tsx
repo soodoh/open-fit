@@ -3,20 +3,27 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Exercise } from "@/lib/convex-types";
+import { useExerciseLookups } from "@/lib/use-exercise-lookups";
 import { Dumbbell } from "lucide-react";
 import { useState } from "react";
 import { ExerciseDetailModal } from "./ExerciseDetailModal";
 
-// Helper to format enum values for display
-function formatEnumValue(value: string): string {
+// Helper to format display names (capitalize words)
+function formatDisplayName(value: string): string {
   return value
-    .split("_")
+    .split(" ")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 }
 
 export const ExerciseCard = ({ exercise }: { exercise: Exercise }) => {
   const [showDetail, setShowDetail] = useState(false);
+  const { getEquipmentName, getMuscleGroupNames, getCategoryName } =
+    useExerciseLookups();
+
+  const categoryName = getCategoryName(exercise.categoryId);
+  const equipmentName = getEquipmentName(exercise.equipmentId);
+  const primaryMuscleNames = getMuscleGroupNames(exercise.primaryMuscleIds);
 
   return (
     <>
@@ -50,26 +57,26 @@ export const ExerciseCard = ({ exercise }: { exercise: Exercise }) => {
                 {exercise.name}
               </h3>
               <p className="text-xs text-muted-foreground mt-1">
-                {formatEnumValue(exercise.category)}
+                {formatDisplayName(categoryName)}
               </p>
             </div>
           </div>
 
           {/* Primary muscles */}
-          {exercise.primaryMuscles.length > 0 && (
+          {primaryMuscleNames.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mb-3">
-              {exercise.primaryMuscles.slice(0, 3).map((muscle) => (
+              {primaryMuscleNames.slice(0, 3).map((muscle) => (
                 <Badge
                   key={muscle}
                   variant="secondary"
                   className="text-xs px-2 py-0.5"
                 >
-                  {formatEnumValue(muscle)}
+                  {formatDisplayName(muscle)}
                 </Badge>
               ))}
-              {exercise.primaryMuscles.length > 3 && (
+              {primaryMuscleNames.length > 3 && (
                 <Badge variant="outline" className="text-xs px-2 py-0.5">
-                  +{exercise.primaryMuscles.length - 3}
+                  +{primaryMuscleNames.length - 3}
                 </Badge>
               )}
             </div>
@@ -77,13 +84,11 @@ export const ExerciseCard = ({ exercise }: { exercise: Exercise }) => {
 
           {/* Footer info */}
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
-            {exercise.equipment && (
-              <span>{formatEnumValue(exercise.equipment)}</span>
-            )}
+            {equipmentName && <span>{formatDisplayName(equipmentName)}</span>}
             {exercise.level && (
               <>
-                {exercise.equipment && <span>•</span>}
-                <span>{formatEnumValue(exercise.level)}</span>
+                {equipmentName && <span>•</span>}
+                <span>{formatDisplayName(exercise.level)}</span>
               </>
             )}
           </div>

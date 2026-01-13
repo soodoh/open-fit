@@ -92,9 +92,15 @@ function ExercisesContent() {
   const [equipment, setEquipment] = useState<Equipment | undefined>(undefined);
   const [level, setLevel] = useState<Level | undefined>(undefined);
   const [category, setCategory] = useState<Category | undefined>(undefined);
-  const [primaryMuscle, setPrimaryMuscle] = useState<Muscle | undefined>(undefined);
+  const [primaryMuscle, setPrimaryMuscle] = useState<Muscle | undefined>(
+    undefined,
+  );
 
-  const hasFilters = equipment !== undefined || level !== undefined || category !== undefined || primaryMuscle !== undefined;
+  const hasFilters =
+    equipment !== undefined ||
+    level !== undefined ||
+    category !== undefined ||
+    primaryMuscle !== undefined;
 
   const clearFilters = () => {
     setEquipment(undefined);
@@ -135,11 +141,9 @@ function ExercisesContent() {
     results: exercises,
     status: browseStatus,
     loadMore: loadMoreBrowse,
-  } = usePaginatedQuery(
-    api.queries.exercises.list,
-    filterArgs,
-    { initialNumItems: EXERCISES_PAGE_SIZE },
-  );
+  } = usePaginatedQuery(api.queries.exercises.list, filterArgs, {
+    initialNumItems: EXERCISES_PAGE_SIZE,
+  });
 
   // Paginated search results
   const {
@@ -216,7 +220,9 @@ function ExercisesContent() {
           <div className="mt-4 flex flex-wrap items-center gap-3">
             <Select
               value={equipment ?? ""}
-              onValueChange={(value) => setEquipment(value === "" ? undefined : (value as Equipment))}
+              onValueChange={(value) =>
+                setEquipment(value === "" ? undefined : (value as Equipment))
+              }
             >
               <SelectTrigger className="w-[150px]">
                 <SelectValue placeholder="Equipment" />
@@ -232,7 +238,9 @@ function ExercisesContent() {
 
             <Select
               value={level ?? ""}
-              onValueChange={(value) => setLevel(value === "" ? undefined : (value as Level))}
+              onValueChange={(value) =>
+                setLevel(value === "" ? undefined : (value as Level))
+              }
             >
               <SelectTrigger className="w-[140px]">
                 <SelectValue placeholder="Level" />
@@ -248,7 +256,9 @@ function ExercisesContent() {
 
             <Select
               value={category ?? ""}
-              onValueChange={(value) => setCategory(value === "" ? undefined : (value as Category))}
+              onValueChange={(value) =>
+                setCategory(value === "" ? undefined : (value as Category))
+              }
             >
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Category" />
@@ -264,7 +274,9 @@ function ExercisesContent() {
 
             <Select
               value={primaryMuscle ?? ""}
-              onValueChange={(value) => setPrimaryMuscle(value === "" ? undefined : (value as Muscle))}
+              onValueChange={(value) =>
+                setPrimaryMuscle(value === "" ? undefined : (value as Muscle))
+              }
             >
               <SelectTrigger className="w-[150px]">
                 <SelectValue placeholder="Muscle" />
@@ -299,27 +311,33 @@ function ExercisesContent() {
         {isLoading && <LoadingSkeleton />}
 
         {/* Empty State */}
-        {!isLoading && exercises && exercises.length === 0 && !isSearching && !hasFilters && (
-          <EmptyState />
-        )}
+        {!isLoading &&
+          exercises &&
+          exercises.length === 0 &&
+          !isSearching &&
+          !hasFilters && <EmptyState />}
 
         {/* No Results with Filters */}
-        {!isLoading && displayExercises && displayExercises.length === 0 && hasFilters && !isSearching && (
-          <div className="flex flex-col items-center justify-center py-16 px-4">
-            <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mb-4">
-              <Search className="w-8 h-8 text-muted-foreground/60" />
+        {!isLoading &&
+          displayExercises &&
+          displayExercises.length === 0 &&
+          hasFilters &&
+          !isSearching && (
+            <div className="flex flex-col items-center justify-center py-16 px-4">
+              <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mb-4">
+                <Search className="w-8 h-8 text-muted-foreground/60" />
+              </div>
+              <h3 className="text-lg font-medium text-foreground mb-1">
+                No exercises found
+              </h3>
+              <p className="text-muted-foreground text-center text-sm mb-4">
+                No exercises match your selected filters
+              </p>
+              <Button variant="outline" size="sm" onClick={clearFilters}>
+                Clear filters
+              </Button>
             </div>
-            <h3 className="text-lg font-medium text-foreground mb-1">
-              No exercises found
-            </h3>
-            <p className="text-muted-foreground text-center text-sm mb-4">
-              No exercises match your selected filters
-            </p>
-            <Button variant="outline" size="sm" onClick={clearFilters}>
-              Clear filters
-            </Button>
-          </div>
-        )}
+          )}
 
         {/* No Search Results */}
         {!isLoading &&
@@ -338,7 +356,12 @@ function ExercisesContent() {
                 {hasFilters && " with the selected filters"}
               </p>
               {hasFilters && (
-                <Button variant="outline" size="sm" onClick={clearFilters} className="mt-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={clearFilters}
+                  className="mt-4"
+                >
                   Clear filters
                 </Button>
               )}

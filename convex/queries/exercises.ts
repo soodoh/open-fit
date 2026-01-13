@@ -2,56 +2,11 @@ import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
 import { query } from "../_generated/server";
 
-// Enum validators for filter arguments
-const EquipmentEnum = v.union(
-  v.literal("body_only"),
-  v.literal("machine"),
-  v.literal("cable"),
-  v.literal("foam_roll"),
-  v.literal("dumbbell"),
-  v.literal("barbell"),
-  v.literal("ez_curl_bar"),
-  v.literal("kettlebells"),
-  v.literal("medicine_ball"),
-  v.literal("exercise_ball"),
-  v.literal("bands"),
-  v.literal("other"),
-);
-
+// Level enum (still used as a direct field)
 const ExerciseLevelEnum = v.union(
   v.literal("beginner"),
   v.literal("intermediate"),
   v.literal("expert"),
-);
-
-const ExerciseCategoryEnum = v.union(
-  v.literal("strength"),
-  v.literal("cardio"),
-  v.literal("stretching"),
-  v.literal("plyometrics"),
-  v.literal("powerlifting"),
-  v.literal("strongman"),
-  v.literal("olympic_weightlifting"),
-);
-
-const MuscleGroupEnum = v.union(
-  v.literal("abdominals"),
-  v.literal("chest"),
-  v.literal("quadriceps"),
-  v.literal("hamstrings"),
-  v.literal("glutes"),
-  v.literal("adductors"),
-  v.literal("abductors"),
-  v.literal("calves"),
-  v.literal("forearms"),
-  v.literal("shoulders"),
-  v.literal("biceps"),
-  v.literal("triceps"),
-  v.literal("traps"),
-  v.literal("lats"),
-  v.literal("middle_back"),
-  v.literal("lower_back"),
-  v.literal("neck"),
 );
 
 // Search exercises by name with pagination and optional filters
@@ -59,10 +14,10 @@ export const search = query({
   args: {
     searchTerm: v.string(),
     paginationOpts: paginationOptsValidator,
-    equipment: v.optional(EquipmentEnum),
+    equipmentId: v.optional(v.id("equipment")),
     level: v.optional(ExerciseLevelEnum),
-    category: v.optional(ExerciseCategoryEnum),
-    primaryMuscle: v.optional(MuscleGroupEnum),
+    categoryId: v.optional(v.id("categories")),
+    primaryMuscleId: v.optional(v.id("muscleGroups")),
   },
   handler: async (ctx, args) => {
     if (!args.searchTerm.trim()) {
@@ -78,24 +33,24 @@ export const search = query({
       .withSearchIndex("search_exercise", (q) => {
         let searchQuery = q.search("name", args.searchTerm);
 
-        if (args.equipment !== undefined) {
-          searchQuery = searchQuery.eq("equipment", args.equipment);
+        if (args.equipmentId !== undefined) {
+          searchQuery = searchQuery.eq("equipmentId", args.equipmentId);
         }
         if (args.level !== undefined) {
           searchQuery = searchQuery.eq("level", args.level);
         }
-        if (args.category !== undefined) {
-          searchQuery = searchQuery.eq("category", args.category);
+        if (args.categoryId !== undefined) {
+          searchQuery = searchQuery.eq("categoryId", args.categoryId);
         }
 
         return searchQuery;
       })
       .paginate(args.paginationOpts);
 
-    // Apply client-side filtering for primaryMuscle (array field)
-    if (args.primaryMuscle !== undefined) {
+    // Apply client-side filtering for primaryMuscleId (array field)
+    if (args.primaryMuscleId !== undefined) {
       const filteredPage = paginatedExercises.page.filter((exercise) =>
-        exercise.primaryMuscles.includes(args.primaryMuscle!),
+        exercise.primaryMuscleIds.includes(args.primaryMuscleId!),
       );
       return {
         ...paginatedExercises,
@@ -111,10 +66,10 @@ export const search = query({
 export const searchCount = query({
   args: {
     searchTerm: v.string(),
-    equipment: v.optional(EquipmentEnum),
+    equipmentId: v.optional(v.id("equipment")),
     level: v.optional(ExerciseLevelEnum),
-    category: v.optional(ExerciseCategoryEnum),
-    primaryMuscle: v.optional(MuscleGroupEnum),
+    categoryId: v.optional(v.id("categories")),
+    primaryMuscleId: v.optional(v.id("muscleGroups")),
   },
   handler: async (ctx, args) => {
     if (!args.searchTerm.trim()) {
@@ -126,24 +81,24 @@ export const searchCount = query({
       .withSearchIndex("search_exercise", (q) => {
         let searchQuery = q.search("name", args.searchTerm);
 
-        if (args.equipment !== undefined) {
-          searchQuery = searchQuery.eq("equipment", args.equipment);
+        if (args.equipmentId !== undefined) {
+          searchQuery = searchQuery.eq("equipmentId", args.equipmentId);
         }
         if (args.level !== undefined) {
           searchQuery = searchQuery.eq("level", args.level);
         }
-        if (args.category !== undefined) {
-          searchQuery = searchQuery.eq("category", args.category);
+        if (args.categoryId !== undefined) {
+          searchQuery = searchQuery.eq("categoryId", args.categoryId);
         }
 
         return searchQuery;
       })
       .collect();
 
-    // Apply client-side filtering for primaryMuscle (array field)
-    if (args.primaryMuscle !== undefined) {
+    // Apply client-side filtering for primaryMuscleId (array field)
+    if (args.primaryMuscleId !== undefined) {
       return results.filter((exercise) =>
-        exercise.primaryMuscles.includes(args.primaryMuscle!),
+        exercise.primaryMuscleIds.includes(args.primaryMuscleId!),
       ).length;
     }
 
@@ -155,10 +110,10 @@ export const searchCount = query({
 export const list = query({
   args: {
     paginationOpts: paginationOptsValidator,
-    equipment: v.optional(EquipmentEnum),
+    equipmentId: v.optional(v.id("equipment")),
     level: v.optional(ExerciseLevelEnum),
-    category: v.optional(ExerciseCategoryEnum),
-    primaryMuscle: v.optional(MuscleGroupEnum),
+    categoryId: v.optional(v.id("categories")),
+    primaryMuscleId: v.optional(v.id("muscleGroups")),
   },
   handler: async (ctx, args) => {
     const paginatedExercises = await ctx.db
@@ -169,23 +124,32 @@ export const list = query({
 
     // Apply client-side filtering (since regular indexes don't support multiple filter fields)
     const hasFilters =
-      args.equipment !== undefined ||
+      args.equipmentId !== undefined ||
       args.level !== undefined ||
-      args.category !== undefined ||
-      args.primaryMuscle !== undefined;
+      args.categoryId !== undefined ||
+      args.primaryMuscleId !== undefined;
 
     if (hasFilters) {
       const filteredPage = paginatedExercises.page.filter((exercise) => {
-        if (args.equipment !== undefined && exercise.equipment !== args.equipment) {
+        if (
+          args.equipmentId !== undefined &&
+          exercise.equipmentId !== args.equipmentId
+        ) {
           return false;
         }
         if (args.level !== undefined && exercise.level !== args.level) {
           return false;
         }
-        if (args.category !== undefined && exercise.category !== args.category) {
+        if (
+          args.categoryId !== undefined &&
+          exercise.categoryId !== args.categoryId
+        ) {
           return false;
         }
-        if (args.primaryMuscle !== undefined && !exercise.primaryMuscles.includes(args.primaryMuscle)) {
+        if (
+          args.primaryMuscleId !== undefined &&
+          !exercise.primaryMuscleIds.includes(args.primaryMuscleId)
+        ) {
           return false;
         }
         return true;
@@ -231,35 +195,44 @@ export const count = query({
 // Get count of exercises with filters applied (for browse mode)
 export const listCount = query({
   args: {
-    equipment: v.optional(EquipmentEnum),
+    equipmentId: v.optional(v.id("equipment")),
     level: v.optional(ExerciseLevelEnum),
-    category: v.optional(ExerciseCategoryEnum),
-    primaryMuscle: v.optional(MuscleGroupEnum),
+    categoryId: v.optional(v.id("categories")),
+    primaryMuscleId: v.optional(v.id("muscleGroups")),
   },
   handler: async (ctx, args) => {
     const exercises = await ctx.db.query("exercises").collect();
 
     const hasFilters =
-      args.equipment !== undefined ||
+      args.equipmentId !== undefined ||
       args.level !== undefined ||
-      args.category !== undefined ||
-      args.primaryMuscle !== undefined;
+      args.categoryId !== undefined ||
+      args.primaryMuscleId !== undefined;
 
     if (!hasFilters) {
       return exercises.length;
     }
 
     const filtered = exercises.filter((exercise) => {
-      if (args.equipment !== undefined && exercise.equipment !== args.equipment) {
+      if (
+        args.equipmentId !== undefined &&
+        exercise.equipmentId !== args.equipmentId
+      ) {
         return false;
       }
       if (args.level !== undefined && exercise.level !== args.level) {
         return false;
       }
-      if (args.category !== undefined && exercise.category !== args.category) {
+      if (
+        args.categoryId !== undefined &&
+        exercise.categoryId !== args.categoryId
+      ) {
         return false;
       }
-      if (args.primaryMuscle !== undefined && !exercise.primaryMuscles.includes(args.primaryMuscle)) {
+      if (
+        args.primaryMuscleId !== undefined &&
+        !exercise.primaryMuscleIds.includes(args.primaryMuscleId)
+      ) {
         return false;
       }
       return true;

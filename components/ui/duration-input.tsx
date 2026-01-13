@@ -1,8 +1,10 @@
 import { cn } from "@/lib/utils";
 import * as React from "react";
 
-interface DurationInputProps
-  extends Omit<React.ComponentProps<"input">, "value" | "onChange"> {
+interface DurationInputProps extends Omit<
+  React.ComponentProps<"input">,
+  "value" | "onChange"
+> {
   value: string;
   onChange: (value: string) => void;
 }

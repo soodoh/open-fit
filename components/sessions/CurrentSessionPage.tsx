@@ -46,7 +46,10 @@ export const CurrentSessionPage = ({
 
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 rounded-xl bg-primary/10 dark:bg-foreground/10 flex items-center justify-center flex-shrink-0">
-              <Play className="h-6 w-6 text-primary dark:text-foreground" fill="currentColor" />
+              <Play
+                className="h-6 w-6 text-primary dark:text-foreground"
+                fill="currentColor"
+              />
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">

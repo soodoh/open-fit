@@ -33,6 +33,9 @@ export type WorkoutSetGroup = Doc<"workoutSetGroups">;
 export type WorkoutSet = Doc<"workoutSets">;
 export type RepetitionUnit = Doc<"repetitionUnits">;
 export type WeightUnit = Doc<"weightUnits">;
+export type Equipment = Doc<"equipment">;
+export type MuscleGroup = Doc<"muscleGroups">;
+export type Category = Doc<"categories">;
 
 // ID types
 export type ExerciseId = Id<"exercises">;
@@ -43,6 +46,9 @@ export type WorkoutSetGroupId = Id<"workoutSetGroups">;
 export type WorkoutSetId = Id<"workoutSets">;
 export type RepetitionUnitId = Id<"repetitionUnits">;
 export type WeightUnitId = Id<"weightUnits">;
+export type EquipmentId = Id<"equipment">;
+export type MuscleGroupId = Id<"muscleGroups">;
+export type CategoryId = Id<"categories">;
 
 // Complex types with relations
 export type RoutineWithDays = Routine & {

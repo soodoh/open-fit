@@ -2,7 +2,7 @@ import { authTables } from "@convex-dev/auth/server";
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
-// Enum type definitions matching Prisma
+// Enum type definitions
 const RoleEnum = v.union(v.literal("USER"), v.literal("ADMIN"));
 
 const SetGroupTypeEnum = v.union(v.literal("NORMAL"), v.literal("SUPERSET"));
@@ -26,54 +26,9 @@ const ExerciseLevelEnum = v.union(
   v.literal("expert"),
 );
 
-const MuscleGroupEnum = v.union(
-  v.literal("abdominals"),
-  v.literal("chest"),
-  v.literal("quadriceps"),
-  v.literal("hamstrings"),
-  v.literal("glutes"),
-  v.literal("adductors"),
-  v.literal("abductors"),
-  v.literal("calves"),
-  v.literal("forearms"),
-  v.literal("shoulders"),
-  v.literal("biceps"),
-  v.literal("triceps"),
-  v.literal("traps"),
-  v.literal("lats"),
-  v.literal("middle_back"),
-  v.literal("lower_back"),
-  v.literal("neck"),
-);
-
-const ExerciseCategoryEnum = v.union(
-  v.literal("strength"),
-  v.literal("cardio"),
-  v.literal("stretching"),
-  v.literal("plyometrics"),
-  v.literal("powerlifting"),
-  v.literal("strongman"),
-  v.literal("olympic_weightlifting"),
-);
-
 const ExerciseMechanicEnum = v.union(
   v.literal("compound"),
   v.literal("isolation"),
-);
-
-const EquipmentEnum = v.union(
-  v.literal("body_only"),
-  v.literal("machine"),
-  v.literal("cable"),
-  v.literal("foam_roll"),
-  v.literal("dumbbell"),
-  v.literal("barbell"),
-  v.literal("ez_curl_bar"),
-  v.literal("kettlebells"),
-  v.literal("medicine_ball"),
-  v.literal("exercise_ball"),
-  v.literal("bands"),
-  v.literal("other"),
 );
 
 const ThemeEnum = v.union(
@@ -100,6 +55,18 @@ export default defineSchema({
   }).index("by_name", ["name"]),
 
   weightUnits: defineTable({
+    name: v.string(),
+  }).index("by_name", ["name"]),
+
+  equipment: defineTable({
+    name: v.string(),
+  }).index("by_name", ["name"]),
+
+  muscleGroups: defineTable({
+    name: v.string(),
+  }).index("by_name", ["name"]),
+
+  categories: defineTable({
     name: v.string(),
   }).index("by_name", ["name"]),
 
@@ -180,19 +147,21 @@ export default defineSchema({
 
   exercises: defineTable({
     name: v.string(),
-    equipment: v.optional(EquipmentEnum),
+    equipmentId: v.optional(v.id("equipment")),
     force: v.optional(ExerciseForceEnum),
     level: ExerciseLevelEnum,
     mechanic: v.optional(ExerciseMechanicEnum),
-    primaryMuscles: v.array(MuscleGroupEnum),
-    secondaryMuscles: v.array(MuscleGroupEnum),
+    primaryMuscleIds: v.array(v.id("muscleGroups")),
+    secondaryMuscleIds: v.array(v.id("muscleGroups")),
     instructions: v.array(v.string()),
-    category: ExerciseCategoryEnum,
+    categoryId: v.id("categories"),
     images: v.array(v.string()),
   })
     .index("by_name", ["name"])
+    .index("by_category", ["categoryId"])
+    .index("by_equipment", ["equipmentId"])
     .searchIndex("search_exercise", {
       searchField: "name",
-      filterFields: ["equipment", "level", "category"],
+      filterFields: ["equipmentId", "level", "categoryId"],
     }),
 });

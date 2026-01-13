@@ -63,74 +63,92 @@ export const mockUserData = action({
 // Internal Actions
 // ============================================================================
 
-// MuscleGroup type for transformed muscles (matching schema)
-type MuscleGroup =
-  | "abdominals"
-  | "chest"
-  | "quadriceps"
-  | "hamstrings"
-  | "glutes"
-  | "adductors"
-  | "abductors"
-  | "calves"
-  | "forearms"
-  | "shoulders"
-  | "biceps"
-  | "triceps"
-  | "traps"
-  | "lats"
-  | "middle_back"
-  | "lower_back"
-  | "neck";
+// Lookup maps for IDs (populated during seeding)
+type LookupMaps = {
+  equipment: Map<string, Id<"equipment">>;
+  muscleGroups: Map<string, Id<"muscleGroups">>;
+  categories: Map<string, Id<"categories">>;
+};
 
-// Equipment type matching schema
-type Equipment =
-  | "body_only"
-  | "machine"
-  | "cable"
-  | "foam_roll"
-  | "dumbbell"
-  | "barbell"
-  | "ez_curl_bar"
-  | "kettlebells"
-  | "medicine_ball"
-  | "exercise_ball"
-  | "bands"
-  | "other";
+// Equipment names for seeding
+const EQUIPMENT_NAMES = [
+  "body only",
+  "machine",
+  "cable",
+  "foam roll",
+  "dumbbell",
+  "barbell",
+  "e-z curl bar",
+  "kettlebells",
+  "medicine ball",
+  "exercise ball",
+  "bands",
+  "other",
+];
 
-// Helper function to transform exercise data to match schema
-function transformExercise(exercise: RawExercise) {
-  const equipmentMap: Record<string, Equipment> = {
-    "body only": "body_only",
-    "e-z curl bar": "ez_curl_bar",
-    "medicine ball": "medicine_ball",
-    "exercise ball": "exercise_ball",
-    "foam roll": "foam_roll",
-  };
+// Muscle group names for seeding
+const MUSCLE_GROUP_NAMES = [
+  "abdominals",
+  "chest",
+  "quadriceps",
+  "hamstrings",
+  "glutes",
+  "adductors",
+  "abductors",
+  "calves",
+  "forearms",
+  "shoulders",
+  "biceps",
+  "triceps",
+  "traps",
+  "lats",
+  "middle back",
+  "lower back",
+  "neck",
+];
 
-  const transformMuscle = (muscle: string): MuscleGroup =>
-    muscle.replace(" ", "_") as MuscleGroup;
+// Category names for seeding
+const CATEGORY_NAMES = [
+  "strength",
+  "cardio",
+  "stretching",
+  "plyometrics",
+  "powerlifting",
+  "strongman",
+  "olympic weightlifting",
+];
 
-  const transformEquipment = (
-    equipment: RawExercise["equipment"],
-  ): Equipment | undefined => {
-    if (!equipment) return undefined;
-    return equipmentMap[equipment] ?? (equipment as Equipment);
-  };
+// Helper function to transform exercise data to match schema using ID lookups
+function transformExercise(exercise: RawExercise, lookups: LookupMaps) {
+  const equipmentId = exercise.equipment
+    ? lookups.equipment.get(exercise.equipment)
+    : undefined;
+
+  const primaryMuscleIds = exercise.primaryMuscles.map((muscle) => {
+    const id = lookups.muscleGroups.get(muscle);
+    if (!id) throw new Error(`Muscle group not found: ${muscle}`);
+    return id;
+  });
+
+  const secondaryMuscleIds = exercise.secondaryMuscles.map((muscle) => {
+    const id = lookups.muscleGroups.get(muscle);
+    if (!id) throw new Error(`Muscle group not found: ${muscle}`);
+    return id;
+  });
+
+  const categoryId = lookups.categories.get(exercise.category);
+  if (!categoryId) throw new Error(`Category not found: ${exercise.category}`);
 
   return {
     name: exercise.name,
-    equipment: transformEquipment(exercise.equipment),
+    equipmentId,
     force: exercise.force || undefined,
     level: exercise.level,
     mechanic: exercise.mechanic || undefined,
-    primaryMuscles: exercise.primaryMuscles.map(transformMuscle),
-    secondaryMuscles: exercise.secondaryMuscles.map(transformMuscle),
+    primaryMuscleIds,
+    secondaryMuscleIds,
     instructions: exercise.instructions,
-    category:
-      exercise.category === "olympic weightlifting"
-        ? ("olympic_weightlifting" as const)
-        : exercise.category,
+    categoryId,
     images: exercise.images,
   };
 }
@@ -164,13 +182,49 @@ export const seedDatabase = internalAction({
       console.log(`Created weight unit: ${name}`);
     }
 
-    // 3. Seed exercises
+    // 3. Seed equipment
+    console.log("Seeding equipment...");
+    const equipmentMap = new Map<string, Id<"equipment">>();
+    for (const name of EQUIPMENT_NAMES) {
+      const id = await ctx.runMutation(internal.seed.createEquipment, { name });
+      equipmentMap.set(name, id);
+      console.log(`Created equipment: ${name}`);
+    }
+
+    // 4. Seed muscle groups
+    console.log("Seeding muscle groups...");
+    const muscleGroupMap = new Map<string, Id<"muscleGroups">>();
+    for (const name of MUSCLE_GROUP_NAMES) {
+      const id = await ctx.runMutation(internal.seed.createMuscleGroup, {
+        name,
+      });
+      muscleGroupMap.set(name, id);
+      console.log(`Created muscle group: ${name}`);
+    }
+
+    // 5. Seed categories
+    console.log("Seeding categories...");
+    const categoryMap = new Map<string, Id<"categories">>();
+    for (const name of CATEGORY_NAMES) {
+      const id = await ctx.runMutation(internal.seed.createCategory, { name });
+      categoryMap.set(name, id);
+      console.log(`Created category: ${name}`);
+    }
+
+    // Build lookup maps for exercise transformation
+    const lookups: LookupMaps = {
+      equipment: equipmentMap,
+      muscleGroups: muscleGroupMap,
+      categories: categoryMap,
+    };
+
+    // 6. Seed exercises
     console.log(`Seeding ${rawExercises.length} exercises...`);
     let count = 0;
 
     for (const exercise of rawExercises) {
       try {
-        const transformed = transformExercise(exercise);
+        const transformed = transformExercise(exercise, lookups);
         await ctx.runMutation(internal.seed.createExercise, transformed);
         count++;
 
@@ -183,7 +237,7 @@ export const seedDatabase = internalAction({
     }
 
     console.log(
-      `Database seeding complete! Seeded ${count} exercises, ${repUnits.length} repetition units, ${weightUnits.length} weight units.`,
+      `Database seeding complete! Seeded ${count} exercises, ${repUnits.length} repetition units, ${weightUnits.length} weight units, ${EQUIPMENT_NAMES.length} equipment, ${MUSCLE_GROUP_NAMES.length} muscle groups, ${CATEGORY_NAMES.length} categories.`,
     );
 
     return {
@@ -456,25 +510,58 @@ export const createWeightUnit = internalMutation({
   },
 });
 
+export const createEquipment = internalMutation({
+  args: { name: v.string() },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query("equipment")
+      .withIndex("by_name", (q) => q.eq("name", args.name))
+      .first();
+
+    if (existing) {
+      return existing._id;
+    }
+
+    return await ctx.db.insert("equipment", args);
+  },
+});
+
+export const createMuscleGroup = internalMutation({
+  args: { name: v.string() },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query("muscleGroups")
+      .withIndex("by_name", (q) => q.eq("name", args.name))
+      .first();
+
+    if (existing) {
+      return existing._id;
+    }
+
+    return await ctx.db.insert("muscleGroups", args);
+  },
+});
+
+export const createCategory = internalMutation({
+  args: { name: v.string() },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query("categories")
+      .withIndex("by_name", (q) => q.eq("name", args.name))
+      .first();
+
+    if (existing) {
+      return existing._id;
+    }
+
+    return await ctx.db.insert("categories", args);
+  },
+});
+
 export const createExercise = internalMutation({
   args: {
     name: v.string(),
-    equipment: v.optional(
-      v.union(
-        v.literal("body_only"),
-        v.literal("machine"),
-        v.literal("cable"),
-        v.literal("foam_roll"),
-        v.literal("dumbbell"),
-        v.literal("barbell"),
-        v.literal("ez_curl_bar"),
-        v.literal("kettlebells"),
-        v.literal("medicine_ball"),
-        v.literal("exercise_ball"),
-        v.literal("bands"),
-        v.literal("other"),
-      ),
-    ),
+    equipmentId: v.optional(v.id("equipment")),
     force: v.optional(
       v.union(v.literal("push"), v.literal("pull"), v.literal("static")),
     ),
@@ -486,58 +573,10 @@ export const createExercise = internalMutation({
     mechanic: v.optional(
       v.union(v.literal("compound"), v.literal("isolation")),
     ),
-    primaryMuscles: v.array(
-      v.union(
-        v.literal("abdominals"),
-        v.literal("chest"),
-        v.literal("quadriceps"),
-        v.literal("hamstrings"),
-        v.literal("glutes"),
-        v.literal("adductors"),
-        v.literal("abductors"),
-        v.literal("calves"),
-        v.literal("forearms"),
-        v.literal("shoulders"),
-        v.literal("biceps"),
-        v.literal("triceps"),
-        v.literal("traps"),
-        v.literal("lats"),
-        v.literal("middle_back"),
-        v.literal("lower_back"),
-        v.literal("neck"),
-      ),
-    ),
-    secondaryMuscles: v.array(
-      v.union(
-        v.literal("abdominals"),
-        v.literal("chest"),
-        v.literal("quadriceps"),
-        v.literal("hamstrings"),
-        v.literal("glutes"),
-        v.literal("adductors"),
-        v.literal("abductors"),
-        v.literal("calves"),
-        v.literal("forearms"),
-        v.literal("shoulders"),
-        v.literal("biceps"),
-        v.literal("triceps"),
-        v.literal("traps"),
-        v.literal("lats"),
-        v.literal("middle_back"),
-        v.literal("lower_back"),
-        v.literal("neck"),
-      ),
-    ),
+    primaryMuscleIds: v.array(v.id("muscleGroups")),
+    secondaryMuscleIds: v.array(v.id("muscleGroups")),
     instructions: v.array(v.string()),
-    category: v.union(
-      v.literal("strength"),
-      v.literal("cardio"),
-      v.literal("stretching"),
-      v.literal("plyometrics"),
-      v.literal("powerlifting"),
-      v.literal("strongman"),
-      v.literal("olympic_weightlifting"),
-    ),
+    categoryId: v.id("categories"),
     images: v.array(v.string()),
   },
   handler: async (ctx, args) => {

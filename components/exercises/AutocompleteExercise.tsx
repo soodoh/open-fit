@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/popover";
 import { api } from "@/convex/_generated/api";
 import { Doc } from "@/convex/_generated/dataModel";
+import { useExerciseLookups } from "@/lib/use-exercise-lookups";
 import { useQuery } from "convex/react";
 import { Image as FallbackImage } from "lucide-react";
 import { useState } from "react";
@@ -32,6 +33,7 @@ export const AutocompleteExercise = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [open, setOpen] = useState(false);
+  const { getMuscleGroupNames } = useExerciseLookups();
 
   const options = useQuery(
     api.queries.exercises.searchSimple,
@@ -91,10 +93,12 @@ export const AutocompleteExercise = ({
                   </Avatar>
                   <div className="flex flex-col">
                     <span className="font-medium">{option.name}</span>
-                    {option.primaryMuscles &&
-                      option.primaryMuscles.length > 0 && (
+                    {option.primaryMuscleIds &&
+                      option.primaryMuscleIds.length > 0 && (
                         <span className="text-sm text-muted-foreground">
-                          {option.primaryMuscles.join(", ")}
+                          {getMuscleGroupNames(option.primaryMuscleIds).join(
+                            ", ",
+                          )}
                         </span>
                       )}
                   </div>
