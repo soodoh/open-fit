@@ -8,11 +8,15 @@ services:
     image: openfit
     container_name: openfit
     restart: always
-    env_file: .env.local
+    # env_file: ./.env.local
     environment:
       - CONVEX_SITE_URL=http://convex-backend:3210
       - CONVEX_SELF_HOSTED_URL=http://convex-backend:3210
       - NEXT_PUBLIC_CONVEX_URL=http://convex-backend:3210
+      # Ensure these are set in your .env.local or paste here if preferred
+      - CONVEX_SELF_HOSTED_ADMIN_KEY=${CONVEX_SELF_HOSTED_URL}
+      - JWT_PRIVATE_KEY=${JWT_PRIVATE_KEY}
+      - JWKS=${JWKS}
 
     ports:
       - "3000:3000"
@@ -31,7 +35,7 @@ services:
     #   - 3211:3211
     volumes:
       - data:/convex/data
-    env_file: ".env.local"
+    # env_file: ./.env.local
     environment:
       - CONVEX_CLOUD_ORIGIN=${CONVEX_CLOUD_ORIGIN:-http://127.0.0.1:3210}
       - CONVEX_SITE_ORIGIN=${CONVEX_SITE_ORIGIN:-http://127.0.0.1:3211}
@@ -42,13 +46,13 @@ services:
       - INSTANCE_NAME=convex-self-hosted
       # Ensure these are set in your .env.local or paste here if preferred
       - INSTANCE_SECRET=${INSTANCE_SECRET}
-      - CONVEX_SELF_HOSTED_ADMIN_KEY=${CONVEX_SELF_HOSTED_URL}
-      - JWT_PRIVATE_KEY=${JWT_PRIVATE_KEY}
-      - JWKS=${JWKS}
     healthcheck:
       test: curl -f http://localhost:3210/version
       interval: 5s
       start_period: 10s
+
+volumes:
+  data:
 
 networks:
   openfit-net:

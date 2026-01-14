@@ -18,7 +18,8 @@
     "start": "next start",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
-    "generate:keys": "node ./scripts/generateKeys.mjs"
+    "generate:keys": "node ./scripts/generateKeys.mjs",
+    "initdb": "node ./scripts/init.mjs"
   },
   "dependencies": {
     "@auth/core": "^0.37.4",
