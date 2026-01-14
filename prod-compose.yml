@@ -1,24 +1,54 @@
 services:
   openfit:
+    # TODO replace build this once it's released:
+    # image: ghcr.io/soodoh/open-fit:latest
     build:
       context: ./
       dockerfile: Dockerfile
     image: openfit
     container_name: openfit
     restart: always
-    env_file: .env
+    env_file: .env.local
     environment:
-      TZ: $TZ
-      AUTH_TRUST_HOST: true
-      DATABASE_URL: postgres://postgres:postgres@postgres:5432/postgres
-      ADMIN_EMAIL: $ADMIN_EMAIL
-      ADMIN_PASSWORD: $ADMIN_PASSWORD
+      - CONVEX_SITE_URL=http://convex-backend:3210
+      - CONVEX_SELF_HOSTED_URL=http://convex-backend:3210
+      - NEXT_PUBLIC_CONVEX_URL=http://convex-backend:3210
+
     ports:
       - "3000:3000"
-    # depends_on:
-    #   - postgres
+    depends_on:
+      - convex-backend
     networks:
       - openfit-net
+
+  convex-backend:
+    image: ghcr.io/get-convex/convex-backend:latest
+    stop_grace_period: 10s
+    stop_signal: SIGINT
+    # Optional: openfit image can access this their shared network, so exposing ports is not needed
+    # ports:
+    #   - 3210:3210
+    #   - 3211:3211
+    volumes:
+      - data:/convex/data
+    env_file: ".env.local"
+    environment:
+      - CONVEX_CLOUD_ORIGIN=${CONVEX_CLOUD_ORIGIN:-http://127.0.0.1:3210}
+      - CONVEX_SITE_ORIGIN=${CONVEX_SITE_ORIGIN:-http://127.0.0.1:3211}
+      - DOCUMENT_RETENTION_DELAY=${DOCUMENT_RETENTION_DELAY:-172800} # Lower default document retention to 2 days
+      - CONVEX_SITE_URL=${CONVEX_SITE_URL:-http://127.0.0.1:3210}
+      - CONVEX_SELF_HOSTED_URL=${CONVEX_SELF_HOSTED_URL:-http://127.0.0.1:3210}
+      - NEXT_PUBLIC_CONVEX_URL=${NEXT_PUBLIC_CONVEX_URL:-http://127.0.0.1:3210}
+      - INSTANCE_NAME=convex-self-hosted
+      # Ensure these are set in your .env.local or paste here if preferred
+      - INSTANCE_SECRET=${INSTANCE_SECRET}
+      - CONVEX_SELF_HOSTED_ADMIN_KEY=${CONVEX_SELF_HOSTED_URL}
+      - JWT_PRIVATE_KEY=${JWT_PRIVATE_KEY}
+      - JWKS=${JWKS}
+    healthcheck:
+      test: curl -f http://localhost:3210/version
+      interval: 5s
+      start_period: 10s
 
 networks:
   openfit-net:
