@@ -16,7 +16,7 @@
 
 | | |
 |--|--|
-| **Tech Stack** | Next.js 16, React 19, Convex, Tailwind CSS, shadcn/ui |
+| **Tech Stack** | Next.js 16, React 19, Convex, Tailwind CSS 3.4.19, shadcn/ui |
 | **Entry Point** | `app/layout.tsx` |
 | **Backend Entry** | `convex/schema.ts` |
 | **Architecture Pattern** | Component-based UI + Convex reactive queries |
@@ -37,14 +37,14 @@
 | Document | Description |
 |----------|-------------|
 | [Development Guide](./development-guide.md) | Setup instructions and dev workflow |
-| [Component Inventory](./component-inventory.md) | UI component catalog (~65 components) |
+| [Component Inventory](./component-inventory.md) | UI component catalog (67 components) |
 
-### API & Data _(To be generated)_
+### API & Data
 
 | Document | Description |
 |----------|-------------|
-| [API Contracts](./api-contracts.md) | Convex queries and mutations _(To be generated)_ |
-| [Data Models](./data-models.md) | Database schema details _(To be generated)_ |
+| [API Contracts](./api-contracts.md) | Convex queries (7) and mutations (6) |
+| [Data Models](./data-models.md) | Database schema (14 tables) |
 
 ## Existing Documentation
 
@@ -57,8 +57,8 @@
 
 ```
 open-fit/
-├── app/          # Next.js pages (9 routes)
-├── components/   # React components (~65 files)
+├── app/          # Next.js pages (8 routes)
+├── components/   # React components (67 files)
 ├── convex/       # Convex backend (schema, queries, mutations)
 ├── lib/          # Shared utilities
 ├── public/       # Static assets (800+ exercise images)
@@ -96,6 +96,8 @@ When working with AI assistants on this codebase:
 2. **Finding components:** Check [Component Inventory](./component-inventory.md)
 3. **File locations:** Reference [Source Tree Analysis](./source-tree-analysis.md)
 4. **Setup issues:** Consult [Development Guide](./development-guide.md)
+5. **API details:** Check [API Contracts](./api-contracts.md)
+6. **Database schema:** Review [Data Models](./data-models.md)
 
 ### For Feature Planning (PRD)
 
@@ -104,6 +106,7 @@ When creating a PRD for new features:
 1. Review [Architecture](./architecture.md) for existing patterns
 2. Check [Component Inventory](./component-inventory.md) for reusable components
 3. Reference [Source Tree Analysis](./source-tree-analysis.md) for file placement
+4. Check [Data Models](./data-models.md) for existing tables
 
 ## Domain Concepts
 
@@ -120,9 +123,9 @@ When creating a PRD for new features:
 
 | | |
 |--|--|
-| **Generated** | 2026-01-11 |
-| **Scan Level** | Quick (pattern-based) |
-| **Workflow** | document-project |
+| **Generated** | 2026-01-16 |
+| **Scan Level** | Deep (file-level analysis) |
+| **Workflow** | document-project v1.2.0 |
 
 ---
 

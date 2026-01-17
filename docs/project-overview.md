@@ -63,7 +63,7 @@ The application solves the common problem of tracking workouts by providing:
 ```
 open-fit/
 ├── app/          # Next.js pages (9 routes)
-├── components/   # React components (~65 files)
+├── components/   # React components (67 files)
 ├── convex/       # Backend (schema, queries, mutations)
 ├── lib/          # Shared utilities
 ├── public/       # Static assets (exercise images)

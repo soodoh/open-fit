@@ -2,7 +2,7 @@
 
 ## Overview
 
-Total components: ~65 files across 9 categories
+Total components: 67 files across 9 categories
 
 ## UI Primitives (shadcn/ui)
 
