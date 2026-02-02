@@ -9,7 +9,7 @@
 # =============================================================================
 # Stage 1: Build Next.js
 # =============================================================================
-FROM node:22-bookworm-slim AS builder
+FROM node:24-bookworm-slim AS builder
 
 # Install build dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
